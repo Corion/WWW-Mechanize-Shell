@@ -4,6 +4,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - Fixed the dependency on Win32::OLE - the module now handles other
     environments gracefully
   - Added some tests for the module fallbacks (these tests need Test::Without::Module)
+  - moved handling over to cvs
 
 0.04 20030301
   - reupload as the 0.02 and 0.03 upload was broken
