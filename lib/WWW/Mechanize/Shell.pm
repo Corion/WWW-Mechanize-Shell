@@ -108,7 +108,6 @@ sub init {
   $self->{agent} = WWW::Mechanize->new();
   $self->agent->{__www_mechanize_shell} = $self;
 
-  $self->{browser} = HTML::Display->new(); # undef;
   $self->{formfiller} = WWW::Mechanize::FormFiller->new(default => [ Ask => $self ]);
 
   $self->{history} = [];
@@ -143,6 +142,7 @@ sub init {
   };
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
   $self->source_file($sourcefile) if defined $sourcefile;
+  $self->{browser} = HTML::Display->new(); # undef;
 
   # Keep track of the files we consist of, to enable automatic reloading
   $self->{files} = undef;
@@ -1374,7 +1374,8 @@ __END__
   get http://www.corion.net/perl-dev
   save /.tar.gz$/
 
-=head1 DISPLAYING HTML
+=begin oldversion
+#=head1 DISPLAYING HTML
 
 WWW::Mechanize::Shell can display the HTML of the current page
 in your browser. Under Windows, this is done via an OLE call
@@ -1404,6 +1405,7 @@ of the following lines in your .mechanizerc :
 
 The communication is done either via OLE or through tempfiles, so
 the URL in the browser will look weird.
+=end oldversion
 
 =head1 FILLING FORMS VIA CUSTOM CODE
 
