@@ -272,7 +272,7 @@ sub request_dumper { print $_[1]->as_string if $_[0]->option("dumprequests"); };
 
 sub re_or_string {
   my ($self,$arg) = @_;
-  if ($arg =~ m!^/(.*)/([imsx]?)$!) {
+  if ($arg =~ m!^/(.*)/([imsx]*)$!) {
     my ($re,$mode) = ($1,$2);
     $re =~ s!([^\\])/!$1\\/!g;
     $arg = eval "qr/$re/$mode";
@@ -506,7 +506,7 @@ sub run_save {
   my @all_links = $self->agent->links;
   push @history, q{my @links;} . "\n";
   push @history, q{my @all_links = $agent->links();} . "\n";
-  
+
   $user_link = $self->re_or_string($user_link);
 
   if (ref $user_link) {
@@ -1371,6 +1371,25 @@ __END__
   # download prerelease versions of my modules
   get http://www.corion.net/perl-dev
   save /.tar.gz$/
+
+=head1 REGULAR EXPRESSION SYNTAX
+
+Some commands take regular expressions as parameters. A regular
+expression B<must> be a single parameter matching C<^/.*/([isxm]+)?$>, so
+you have to use quotes around it if the expression contains spaces :
+
+  /link_foo/       # will match as (?-xims:link_foo)
+  "/link foo/"     # will match as (?-xims:link foo)
+  
+Slashes do not need to be escaped, as the shell knows that a RE starts and
+ends with a slash :
+  
+  /link/foo/       # will match as (?-xims:link/foo)
+  "/link/ /foo/"   # will match as (?-xims:link/\s/foo)
+
+The C</i> modifier works as expected.
+If you desire more power over the regular expressions, consider dropping
+to Perl or recommend me a good parser module for regular expressions.
 
 =head1 DISPLAYING HTML
 

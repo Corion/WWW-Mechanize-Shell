@@ -6,6 +6,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - POD fixes
   - HTML::Display now checks for @ISA before loading a file
   - Displaying shared files is now tested against
+  - Updated POD to reflect the new RE parsing
 
 0.25
   - The "versions" command also lists HTML::Display now

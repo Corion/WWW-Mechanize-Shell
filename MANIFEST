@@ -46,6 +46,8 @@ t/16-form-fillout.t
 t/17-eval-multiline.t
 t/18-browser-autosync.t
 t/19-value-multi.t
+t/20-restart-without-script.t
+t/21-autofill-re.t
 t/401-server
 t/98-bin.t
 t/99-pod.t
