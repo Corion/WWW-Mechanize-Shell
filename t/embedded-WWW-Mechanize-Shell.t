@@ -1,4 +1,4 @@
-#!D:\Programme\indigoperl-5.6\bin\perl.exe -w
+#!/usr/bin/perl -w
 
 use Test::More 'no_plan';
 
@@ -20,9 +20,8 @@ sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
 sub READ {}
 sub READLINE {}
 sub GETC {}
-sub BINMODE {}
 
-my $Original_File = 'D:lib\WWW\Mechanize\Shell.pm';
+my $Original_File = 'lib/WWW/Mechanize/Shell.pm';
 
 package main;
 
@@ -31,21 +30,7 @@ $SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
 tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
 tie *STDERR, 'Catch', '_STDERR_' or die $!;
 
-SKIP: {
-    # A header testing whether we find all prerequisites :
-      # Check for module WWW::Mechanize::Shell
-  eval { require WWW::Mechanize::Shell };
-  skip "Need module WWW::Mechanize::Shell to run this test", 1
-    if $@;
-
-  # Check for module strict
-  eval { require strict };
-  skip "Need module strict to run this test", 1
-    if $@;
-
-
-    # The original POD test
-        undef $main::_STDOUT_;
+    undef $main::_STDOUT_;
     undef $main::_STDERR_;
 eval q{
   my $example = sub {
@@ -74,27 +59,7 @@ eval q{
 };
 is($@, '', "example from line 18");
 
-};
-SKIP: {
-    # A header testing whether we find all prerequisites :
-      # Check for module Term::ReadKey
-  eval { require Term::ReadKey };
-  skip "Need module Term::ReadKey to run this test", 1
-    if $@;
-
-  # Check for module WWW::Mechanize::Shell
-  eval { require WWW::Mechanize::Shell };
-  skip "Need module WWW::Mechanize::Shell to run this test", 1
-    if $@;
-
-  # Check for module strict
-  eval { require strict };
-  skip "Need module strict to run this test", 1
-    if $@;
-
-
-    # The original POD test
-    {
+{
     undef $main::_STDOUT_;
     undef $main::_STDERR_;
 #line 18 lib/WWW/Mechanize/Shell.pm
@@ -130,12 +95,6 @@ SKIP: {
     undef $main::_STDERR_;
 }
 
-};
-SKIP: {
-    # A header testing whether we find all prerequisites :
-    
-    # The original POD test
-        undef $main::_STDOUT_;
+    undef $main::_STDOUT_;
     undef $main::_STDERR_;
 
-};
