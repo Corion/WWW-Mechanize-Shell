@@ -7,7 +7,7 @@ WriteMakefile(
     'PREREQ_PM'    => {'Term::Shell' => 0.01,
 		       'URI::URL' => 0.00,
 		       'Test::Harness' => 2.30,
-                       'WWW::Mechanize' => 0.64,
+                       'WWW::Mechanize' => 0.63,
                        'WWW::Mechanize::FormFiller' => 0.05,
                        'Hook::LexWrap' => 0.20,
                        'HTML::TokeParser::Simple' => 2.0,

@@ -6,6 +6,8 @@ Todo:
     shells own JS blocking (badly, I guess)
 
 0.30
+  - Now needs the latest? Test::Harness because otherwise some tests failed
+    from time to time for no apparent reason.
   - using Devel::Cover. Code coverage of WWW/Mechanize/Shell.pm is now at 75.00%
     through the test suite
   - Provide better text for all links (for example when the content is an image)
