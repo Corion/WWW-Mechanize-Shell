@@ -48,6 +48,7 @@ BEGIN {
       'table' => 'table',
       'table params' => 'table foo bar',
       'value' => 'value key value',
+      'ua' => 'ua foo/1.1',
   );
 };
 
