@@ -21,7 +21,6 @@ SKIP: {
 
   use_ok("WWW::Mechanize::Shell");
   my $shell = do {
-    local $SIG{__WARN__} = sub { };
     WWW::Mechanize::Shell->new("shell", rcfile => undef );
   };
 

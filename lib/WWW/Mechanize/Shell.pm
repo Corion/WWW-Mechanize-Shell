@@ -149,6 +149,7 @@ sub init {
 
   $self->{options} = {
     autosync => 0,
+    warnings => 1,
     autorestart => 0,
     watchfiles => defined $args{watchfiles} ? $args{watchfiles} : 1,
     cookiefile => 'cookies.txt',
@@ -164,9 +165,10 @@ sub init {
       require File::Modified;
       $self->{files} = File::Modified->new(files=>[values %INC, $0]);
     };
-    if ($@) {
-      warn "Module File::Modified not found. Automatic reloading disabled.\n";
-    };
+    #if ($@) {
+    #  warn "Module File::Modified not found. Automatic reloading disabled.\n"
+    #    if $self->option('warnings');
+    #};
   };
 
   # Read our .rc file :
@@ -447,7 +449,8 @@ sub run_dump {
   if ($form) {
     $form->dump
   } else {
-    warn "There is no form on the current page\n";
+    warn "There is no form on the current page\n"
+      if $self->option('warnings');
   };
 };
 

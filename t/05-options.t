@@ -15,6 +15,7 @@ BEGIN {
     dumprequests 
     useole       
     browsercmd   
+    warnings
   );
 };
 
