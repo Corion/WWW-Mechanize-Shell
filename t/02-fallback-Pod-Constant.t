@@ -20,7 +20,10 @@ SKIP: {
   };
 
   use_ok("WWW::Mechanize::Shell");
-  my $shell = WWW::Mechanize::Shell->new("shell", rcfile => undef );
+  my $shell = do {
+    local $SIG{__WARN__} = sub {};
+    WWW::Mechanize::Shell->new("shell", rcfile => undef );
+  };
 
   isa_ok($shell,"WWW::Mechanize::Shell");
   my $text;

@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.12 20030320
+  - Added a test to check for the behaviour if HTML::TableExtract is not present
+  - silenced warnings in the tests
+  - No changes to the main module except for the version number
+
 0.11 20030318
   - Updated the tests so they skip when there is no terminal available
     (as is the case when the tests are run from cron)
