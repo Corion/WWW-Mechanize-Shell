@@ -11,9 +11,10 @@ use File::Temp qw(tempfile);
 use URI::URL;
 use Hook::LexWrap;
 use HTML::Display qw();
+use HTML::TokeParser::Simple;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.31';
+$VERSION = '0.32';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -283,7 +284,18 @@ sub sync_browser {
   return unless $self->agent->res;
 
   # Prepare the HTML for local display :
-  my $html = $self->agent->res->content;
+  my $unclean = $self->agent->res->content;
+  my $html = '';
+
+  # ugly fix:
+  # strip all target='_blank' attributes from the HTML:  
+  my $p = HTML::TokeParser::Simple->new(\$unclean);
+  while (my $token = $p->get_token) {
+    $token->delete_attr('target')
+      if $token->is_start_tag;
+    $html .= $token->as_is;
+  };
+  
   my $location = $self->agent->{uri};
   my $browser = $self->browser;
   $browser->display( html => $html, location => $location );
@@ -574,7 +586,7 @@ sub run_save {
     $target = $url->path;
     $target =~ s!^(.*/)?([^/]+)$!$2!;
     $url = $url->abs;
-    
+
     # use this line instead of the next in case you want to use smart mirroring
     #$agent->mirror($url,$target);
     $agent->get( $url, ':content_file' => $target );
@@ -591,7 +603,7 @@ CODE
         $self->status( "$url => $target" );
         $self->agent->get( $url, ':content_file' => $target );
       };
-      
+
       warn $@ if $@;
     };
   }

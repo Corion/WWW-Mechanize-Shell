@@ -4,7 +4,12 @@ Todo:
   + Think about HTML::FillInForm for displaying changed form values interactively
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
-    
+
+0.32
+  - now WWW::Mechanize::Shell directly uses HTML::TokeParser::Simple. Previously,
+    it was only needed for special cases of HTML::Display.
+  - WWW::Mechanize::Shell now strips all "target" attributes from your HTML.
+
 0.31
   - test t/13* didn't work when the CPAN build directory contains a space
   - Added patch by Philippe "BooK" Bruhat to allow downloading big files
