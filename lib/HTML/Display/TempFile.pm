@@ -5,6 +5,20 @@ use base 'HTML::Display::Common';
 
 HTML::Display::TempFile - base class to display HTML via a temporary file
 
+=head1 SYNOPSIS
+
+=for example begin
+
+  package HTML::Display::External;
+  use base 'HTML::Display::TempFile';
+  
+  sub browsercmd { 
+    # Return the string to pass to system()
+    # %s will be replaced by the temp file name
+  };
+  
+=for example end
+
 =cut
 
 sub display_html {
