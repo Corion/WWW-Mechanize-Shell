@@ -1,4 +1,5 @@
 package HTML::Display::Common;
+use base 'HTML::Display::TempFile';
 
 =head1 NAME
 

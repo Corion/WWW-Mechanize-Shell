@@ -1,5 +1,7 @@
 package HTML::Display::TempFile;
 use base 'HTML::Display::Common';
+use vars qw($VERSION);
+$VERSION='0.02';
 
 =head1 NAME
 
@@ -11,12 +13,12 @@ HTML::Display::TempFile - base class to display HTML via a temporary file
 
   package HTML::Display::External;
   use base 'HTML::Display::TempFile';
-  
-  sub browsercmd { 
+
+  sub browsercmd {
     # Return the string to pass to system()
     # %s will be replaced by the temp file name
   };
-  
+
 =for example end
 
 =cut

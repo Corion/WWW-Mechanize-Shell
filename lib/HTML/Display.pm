@@ -2,6 +2,8 @@ package HTML::Display;
 use strict;
 use HTML::TokeParser;
 use Carp qw( croak );
+use vars qw( $VERSION );
+$VERSION = '0.02';
 
 =head1 NAME
 

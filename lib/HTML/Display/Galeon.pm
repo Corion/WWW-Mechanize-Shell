@@ -1,5 +1,7 @@
 package HTML::Display::Galeon;
 use base 'HTML::Display::TempFile';
+use vars qw($VERSION);
+$VERSION='0.02';
 
 =head1 NAME
 

@@ -1,5 +1,7 @@
 package HTML::Display::Win32::IE;
 use base 'HTML::Display::Win32::OLE';
+use vars qw($VERSION);
+$VERSION='0.02';
 
 =head1 NAME
 

@@ -1,4 +1,7 @@
 package HTML::Display::Debian;
+use base 'HTML::Display::TempFile';
+use vars qw($VERSION);
+$VERSION='0.02';
 
 =head1 NAME
 
@@ -18,7 +21,6 @@ referenced as the program C</bin/x-www-browser>.
 
 =cut
 
-use base 'HTML::Display::TempFile';
 sub browsercmd { "x-www-browser %s" };
 
 1;

@@ -1,5 +1,7 @@
 package HTML::Display::Dump;
 use base 'HTML::Display::Common';
+use vars qw($VERSION);
+$VERSION='0.02';
 
 =head1 NAME
 
