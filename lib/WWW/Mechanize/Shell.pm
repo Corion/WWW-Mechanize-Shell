@@ -1,16 +1,17 @@
 package WWW::Mechanize::Shell;
-# $revision$
 
 use strict;
 use Carp;
 use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
 use HTTP::Cookies;
-use base 'Term::Shell';
+use base qw( Term::Shell Exporter );
 use FindBin;
+use URI::URL;
 
-use vars qw( $VERSION );
+use vars qw( $VERSION @EXPORT );
 $VERSION = '0.19';
+@EXPORT = qw( &shell );
 
 =head1 NAME
 
@@ -75,13 +76,13 @@ your current browsers cookies.
 # TODO:
 # * Log facility, log all stuff to a file
 # * History persistence (see log facility)
-# * Add comment facility to Term::Shell
 # DONE:
 # * Add auto form fill out stuff
 # * Add "open()" and "click()" RE functionality
 # * Modify WWW::Mechanize to accept REs as well as the other stuff
 # * Add simple script generation
 # * Fix Term::Shell command repetition on empty lines
+# * Add comment facility to Term::Shell
 
 eval { require Win32::OLE; Win32::OLE->import() };
 my $have_ole = $@ eq '';
@@ -120,17 +121,8 @@ sub init {
     useole => ($^O =~ /mswin/i) ? 1:0,
     browsercmd => 'galeon -n %s',
   };
-
-  # Keep track of the files we consist of, to enable automatic reloading
-  $self->{files} = undef;
-  if ($self->option('watchfiles')) {
-    eval {
-      require File::Modified;
-      $self->{files} = File::Modified->new(files=>[values %INC, $0]);
-    };
-    $self->display_user_warning( "Module File::Modified not found. Automatic reloading disabled.\n" )
-      if ($@);
-  };
+  # Load the proxy settings from the environment
+  $self->agent->env_proxy();
 
   # Read our .rc file :
   # I could use File::Homedir, but the docs claim it dosen't work on Win32. Maybe
@@ -142,12 +134,21 @@ sub init {
     my $userhome = $^O =~ /win32/i ? $ENV{'USERPROFILE'} || $ENV{'HOME'} : ((getpwuid($<))[7]);
     $sourcefile = "$userhome/.mechanizerc";
   };
+  $self->source_file($sourcefile) if $sourcefile; # and -f $sourcefile and -r $sourcefile;
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
 
-  # Load the proxy settings from the environment
-  $self->agent->env_proxy();
-
-  $self->source_file($sourcefile) if $sourcefile; # and -f $sourcefile and -r $sourcefile;
+  # Keep track of the files we consist of, to enable automatic reloading
+  $self->{files} = undef;
+  if ($self->option('watchfiles')) {
+    eval {
+      my @files = values %INC;
+      push @files, $0 unless $0 eq '-e';
+      require File::Modified;
+      $self->{files} = File::Modified->new(files=>\@files);
+    };
+    $self->display_user_warning( "Module File::Modified not found. Automatic reloading disabled.\n" )
+      if ($@);
+  };
 };
 
 =head2 C<$shell-E<gt>source_file FILENAME>
@@ -422,19 +423,41 @@ sub run_save {
   if (@links) {
     $self->add_history( @history,<<'CODE' );
   my @all_links = $agent->links();
+  my $base = $self->agent->uri;
   for my $link (@links) {
     my $target = $all_links[$link]->[0];
+    my $url = URI::URL->new($target,$base)->abs;
     $target =~ s!^(.*/)([^/]+)$!$1!;
-    $agent->mirror($link,$target);
-  }
+    $agent->get($url);
+    local *FILE;
+    if (open FILE, "> $target") {
+      binmode FILE;
+      print FILE $self->agent->content;
+      close FILE;
+    } else {
+      warn "Couldn't create $target : $!\n";
+    };
+    $agent->back;
+  };
 CODE
+    my $base = $self->agent->uri;
     for my $link (@links) {
       my $target = $all_links[$link]->[0];
+      my $url = URI::URL->new($target,$base)->abs;
       $target =~ s!^(.*/)([^/]+)$!$1!;
       eval {
-        print "$all_links[$link] => $target";
-        $self->agent->mirror($all_links[$link]->[0],$target);
-        print "\n";
+        print "$url => $target";
+        $self->agent->get($url);
+        local *FILE;
+        if (open FILE, "> $target") {
+          binmode FILE;
+          print FILE $self->agent->content;
+          close FILE;
+          print "\n";
+        } else {
+          print ": $!\n";
+        };
+        $self->agent->back;
       };
       warn $@ if $@;
     };
@@ -785,6 +808,7 @@ sub run_script {
 use strict;
 use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
+use URI::URL;
 
 my $agent = WWW::Mechanize->new();
 my $formfiller = WWW::Mechanize::FormFiller->new();
@@ -1090,6 +1114,16 @@ sub run_versions {
   $self->print_pairs( [@modules], [map { defined ${"${_}::VERSION"} ? ${"${_}::VERSION"} : "<undef>" } @modules]);
 };
 
+sub shell {
+  my $shell = WWW::Mechanize::Shell->new("shell");
+
+  if (@ARGV) {
+    $shell->source_file( @ARGV );
+  } else {
+    $shell->cmdloop;
+  };
+};
+
 {
   package WWW::Mechanize::FormFiller::Value::Ask;
   use WWW::Mechanize::FormFiller;
@@ -1270,38 +1304,20 @@ or maybe easier, by tacking Class::XPath onto an HTML tree)
 
 =item *
 
-Add C<mirror> as a command as well as C<getstore>, turning the shell into poor
-mans C<wget>. While I'm at it, also add C<head> as a command.
+Add C<head> as a command ?
 
 =item *
 
 Optionally silence the HTML::Parser / HTML::Forms warnings about invalid HTML.
-
-=item *
-
-Add a convenience C<shell> method to allow for command line invocation :
-
-  perl -MWWW::Mechanize::Shell -e "shell"
-
-=item *
-
-Add C<auth> command to add basic authentification to the current page.
-
-  auth user password
-
-  ==> $a->credentials("$host:$port", $realm, $user, $password);
-  (where $host,$port and $realm come from the current page)
-
-=item *
-
-Write tests using HTTP::Daemon that check the interaction of
-WWW::Mechanize(::Shell) against static content.
-
 =back
 
 =head1 EXPORT
 
-None by default.
+The routine C<shell> is exported into the importing namespace. This
+is mainly for convenience so you can use the following commandline
+invocation of the shell like with CPAN :
+
+  perl -MWWW::Mechanize::Shell -e"shell"
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -48,7 +48,7 @@ BEGIN {
       'value' => 'value key value',
       'ua' => 'ua foo/1.0',
   );
-  
+
   eval {
     require HTML::TableExtract;
     $tests{table} = 'table';
@@ -69,13 +69,11 @@ if ($@) {
   diag "Term::ReadKey seems to want a terminal";
 };
 
-use_ok('WWW::Mechanize::Shell');
-
 eval {
   require Test::MockObject;
   Test::MockObject->import();
 };
-skip "Test::MockObject not installed", scalar keys %tests
+skip "Test::MockObject not installed", scalar keys(%tests) +1
   if $@;
 
 my $mock_result = Test::MockObject->new;
@@ -84,6 +82,10 @@ $mock_result->set_always( code => 200 );
 my $mock_form = Test::MockObject->new;
 $mock_form->mock( value => sub {} )
           ->set_list( inputs => ());
+
+my $mock_uri = Test::MockObject->new;
+$mock_uri->set_always( abs => 'http://example.com/' );
+$mock_uri->fake_module( 'URI::URL', new => sub {$mock_uri} );
 
 my $mock_agent = Test::MockObject->new;
 $mock_agent->set_true($_)
@@ -95,13 +97,11 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( click => $mock_result )
            ->set_always( current_form => $mock_form )
            ->set_always( links => ([1,'foo']))
-           ->set_always( agent => 'mocked/1.0');
+           ->set_always( agent => 'mocked/1.0')
+           ->set_always( uri => $mock_uri );
 
-# Silence all warnings
-my $s = do {
-  local $SIG{__WARN__} = sub {};
-  WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
-};
+use_ok('WWW::Mechanize::Shell');
+my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 $s->{agent} = $mock_agent;
 
 my @history;
