@@ -50,16 +50,17 @@ BEGIN {
   					'fillout',
   					'submit',
     ], location => '%sformsubmit' },
+    form => { requests => 2, lines => [ 'get %s','form 1','submit' ], location => '%sformsubmit' },
     get => { requests => 1, lines => [ 'get %s' ], location => '%s' },
     get_content => { requests => 1, lines => [ 'get %s', 'content' ], location => '%s' },
     get_save => { requests => 4, lines => [ 'get %s','save "/\.save_log_server_test\.tmp$/"' ], location => '%s' },
     get_value_click => { requests => 2, lines => [ 'get %s','value query foo', 'click submit' ], location => '%sformsubmit' },
     get_value_submit => { requests => 2, lines => [ 'get %s','value query foo', 'submit' ], location => '%sformsubmit' },
-    get_value2_submit => { requests => 2, lines => [ 
+    get_value2_submit => { requests => 2, lines => [
     				'get %s',
-    				'value query foo', 
-    				'value session 2', 
-    				'submit' 
+    				'value query foo',
+    				'value session 2',
+    				'submit'
     ], location => '%sformsubmit' },
     open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ], location => '%stest' },
     open_re => { requests => 2, lines => [ 'get %s','open "foo1"','content' ], location => '%sfoo1.save_log_server_test.tmp' },

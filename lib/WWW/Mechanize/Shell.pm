@@ -10,7 +10,7 @@ use FindBin;
 use URI::URL;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.20';
+$VERSION = '0.21';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -21,7 +21,7 @@ WWW::Mechanize::Shell - An interactive shell for WWW::Mechanize
 
 From the command line as
 
-  perl WWW::Mechanize::Shell -eshell
+  perl -MWWW::Mechanize::Shell -eshell
 
 or alternatively as a custom shell program via :
 
@@ -475,7 +475,8 @@ sub run_save {
 
   my @links = ();
   my @all_links = $self->agent->links;
-  push @history, q{my @links;};
+  push @history, q{my @links;} . "\n";
+  push @history, q{my @all_links = $agent->links();} . "\n";
 
   if ($user_link =~ m!^/(.*)/$!) {
     my $re = qr($1);
@@ -484,15 +485,15 @@ sub run_save {
     if (@links == 0) {
       print "No match for /$re/.\n";
     };
-    push @history, sprintf q{@links = map { /%s/ } $agent->links();}, $re;
+    push @history, q{my $count = -1;} . "\n";
+    push @history, sprintf q{@links = map { $count++; (($_->[0] =~ /%s/)||($_->[1] =~ /%s/)) ? $count : () } @all_links;} . "\n", $re, $re;
   } else {
     @links = $user_link;
-    push @history, sprintf q{@links = '%s';}, $user_link;
+    push @history, sprintf q{@links = '%s';} . "\n", $user_link;
   };
 
   if (@links) {
     $self->add_history( @history,<<'CODE' );
-  my @all_links = $agent->links();
   my $base = $agent->uri;
   for my $link (@links) {
     my $target = $all_links[$link]->[0];
@@ -627,8 +628,8 @@ sub run_forms {
   my ($self,$number) = @_;
   if ($number) {
     $self->agent->form($number);
-    $self->agent->current_form->dump;
-    $self->add_history(sprintf q{$agent->form(%s));}, $number);
+    $self->status($self->agent->current_form->dump);
+    $self->add_history(sprintf q{$agent->form(%s);}, $number);
   } else {
     my $count = 1;
     my $formref = $self->agent->forms;
@@ -1307,9 +1308,7 @@ of the following lines in your .mechanizerc :
   # More lines for other browsers are welcome
 
 The communication is done either via OLE or through tempfiles, so
-the URL in the browser will look weird. There is currently no
-support for Mac specific display of HTML, and I don't know enough
-about AppleScript events to remotely control a browser there.
+the URL in the browser will look weird. 
 
 =head1 FILLING FORMS VIA CUSTOM CODE
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.21
+  - Fixed error in one-liner usage
+  - Fixed embarassing errors in 'forms' and 'save' commands
+  - other documentation fixes
+
 0.20
   - made t/00a*.t a TODO test so that CPAN install (silently) works
   - updated documentation on how to specify custom callbacks from
