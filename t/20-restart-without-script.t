@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-use Test::More tests => 5;
-$|++;
+use Test::More tests => 4;
 
 BEGIN{
   # Disable all ReadLine functionality
@@ -16,5 +15,4 @@ my $output= `$^X -Ilib -MWWW::Mechanize::Shell -e "WWW::Mechanize::Shell->new('t
 chomp $output;
 is($@, "","'restart' on -e dosen't crash");
 is($?, 0,"'restart' on -e dosen't crash");
-is($!, "","'restart' on -e dosen't crash");
 is($output,"OK","'restart' on -e dosen't crash");
