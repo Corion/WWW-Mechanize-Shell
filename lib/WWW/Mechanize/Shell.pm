@@ -132,9 +132,10 @@ sub init {
     $sourcefile = delete $args{rcfile};
   } else {
     my $userhome = $^O =~ /win32/i ? $ENV{'USERPROFILE'} || $ENV{'HOME'} : ((getpwuid($<))[7]);
-    $sourcefile = "$userhome/.mechanizerc";
+    $sourcefile = "$userhome/.mechanizerc"
+      if -f "$userhome/.mechanizerc";
   };
-  $self->source_file($sourcefile) if $sourcefile and -f $sourcefile;
+  $self->source_file($sourcefile) if $sourcefile;
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
 
   # Keep track of the files we consist of, to enable automatic reloading
