@@ -112,9 +112,9 @@ sub init {
 
   $self->{options} = {
     autosync => 0,
-    warnings => exists $args{warnings} ? $args{warnings} : 1,
+    warnings => (exists $args{warnings} ? $args{warnings} : 1),
     autorestart => 0,
-    watchfiles => defined $args{watchfiles} ? $args{watchfiles} : 1,
+    watchfiles => (exists $args{watchfiles} ? $args{watchfiles} : 1),
     cookiefile => 'cookies.txt',
     dumprequests => 0,
     useole => ($^O =~ /mswin/i) ? 1:0,
@@ -195,7 +195,7 @@ sub option {
   my ($self,$option,$value) = @_;
   if (exists $self->{options}->{$option}) {
     my $result = $self->{options}->{$option};
-    if (defined $value) {
+    if (scalar @_ == 3) {
       $self->{options}->{$option} = $value;
     };
     $result;
