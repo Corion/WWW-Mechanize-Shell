@@ -998,7 +998,6 @@ sub run_open {
 # Complete partially typed links :
 sub comp_open {
   my ($self,$word,$line,$start) = @_;
-  # return grep {/^$word/} map {$_->[1]} (@{$self->agent->extract_links()});
   my @completions = eval { grep {/^$word/} map { $self->link_text( $_ )} ($self->agent->find_all_links()) };
   $self->display_user_warning($@) if $@;
   return @completions;
