@@ -13,7 +13,7 @@ use Hook::LexWrap;
 use HTML::Display qw();
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.28';
+$VERSION = '0.29';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -106,9 +106,13 @@ sub init {
 		verbose => 0,
   };
   # Install the request dumper :
-  $self->{request_wrapper} = wrap 'WWW::Mechanize::request',
+  $self->{request_wrapper} = wrap *LWP::UserAgent::request,
                                pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); },
-                               post => sub { $self->response_dumper($_[0]->res) if $self->option("dumpresponses"); };
+                               post => sub { 
+                                 #warn scalar @_, " arguments";
+                                 #warn $_ for @_; 
+                                 $self->response_dumper($_[-1]) if $self->option("dumpresponses");
+                               };
 
   $self->{redirect_ok_wrapper} = wrap 'WWW::Mechanize::redirect_ok',
   																post => sub { return unless $_[1]; $self->status( "\nRedirecting to ".$_[1]->uri."\n" ); $_[-1] };
@@ -172,7 +176,8 @@ sub source_file {
   my ($self,$filename) = @_;
   local $_; # just to be on the safe side that we don't clobber outside users of $_
   local *F;
-  open F, "< $filename" or die "Couldn't open '$filename' : $!\n";
+  open F, "< $filename"
+    or die "Couldn't open '$filename' : $!\n";
   while (<F>) {
     $self->cmd($_);
     warn "cmd: $_"
@@ -200,7 +205,7 @@ sub display_user_warning {
     if $self->option('warnings');
 };
 
-=head2 C<$shell-E<gt>print_paged LIST> 
+=head2 C<$shell-E<gt>print_paged LIST>
 
 Prints the text in LIST using C<$ENV{PAGER}>. If C<$ENV{PAGER}>
 is empty, prints directly to C<STDOUT>. Most of this routine
@@ -210,12 +215,12 @@ comes from the C<perldoc> utility.
 
 sub print_paged {
   my $self = shift;
-  
+
   if ($ENV{PAGER} and -t STDOUT) {
     my ($fh,$filename) = tempfile();
     print $fh $_ for @_;
     close $fh;
-    
+
     my @pagers = ($ENV{PAGER});
 		foreach my $pager (@pagers) {
 			if ($^O eq 'VMS') {
@@ -223,8 +228,8 @@ sub print_paged {
 			} else {
 				last if system(qq{$pager "$filename"}) == 0;
 			}
-		};    
-    unlink $filename 
+		};
+    unlink $filename
       or $self->display_user_warning("Couldn't unlink tempfile $filename : $!\n");
   } else {
     print $_ for @_;
@@ -972,7 +977,10 @@ sub run_open {
 # Complete partially typed links :
 sub comp_open {
   my ($self,$word,$line,$start) = @_;
-  return grep {/^$word/} map {$_->[1]} (@{$self->agent->extract_links()});
+  # return grep {/^$word/} map {$_->[1]} (@{$self->agent->extract_links()});
+  my @completions = eval { grep {/^$word/} map {$_->[1]} (@{$self->agent->find_all_links()}) };
+  $self->display_user_warning($@) if $@;
+  return @completions;
 };
 
 =head2 back
@@ -1408,7 +1416,7 @@ sub run_source {
   if ($file) {
     eval { $self->source_file($file); };
     if ($@) {
-      print "Could not source file '$file' : $@";
+      $self->display_user_warning( "Could not source file '$file' : $@" );
     };
   } else {
     print "Syntax: source FILENAME\n";
