@@ -36,6 +36,7 @@ SKIP: {
       $warned = $_[0];
     };
 
+    $shell->option('warnings',1);
     eval {
       $shell->cmd("tables");
     };
