@@ -142,7 +142,7 @@ sub init {
     $sourcefile = "$userhome/.mechanizerc";
   };
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
-  
+
   #$self->add_handlers( '#' );
 
   # Load the proxy settings from the environment
@@ -402,11 +402,11 @@ sub run_save {
     print "No link given to save\n";
     return
   };
-  
+
   my @links = ();
   my @all_links = $self->agent->links;
   $self->add_history( q{my @links;} );
-  
+
   if ($user_link =~ m!^/(.*)/$!) {
     my $re = $1;
     my $count = -1;
@@ -414,26 +414,26 @@ sub run_save {
     if (@links == 0) {
       print "No match.\n";
     };
-    $self->add_history( sprintf q{@links = map { /%s/ } $agent->links();}, $re);    
+    $self->add_history( sprintf q{@links = map { /%s/ } $agent->links();}, $re);
   } else {
-    $self->add_history( sprintf q{@links = '%s'}, $user_link);    
+    $self->add_history( sprintf q{@links = '%s'}, $user_link);
   };
 
   if (@links) {
     $self->add_history( <<'CODE' );
   my @all_links = $agent->links();
-  for my $link (@links) { 
+  for my $link (@links) {
     my $target = $all_links[$link]->[0];
     $target =~ s!^(.*/)([^/]+)$!$1!;
-    $agent->mirror($link,$target); 
+    $agent->mirror($link,$target);
   }
 CODE
-    for my $link (@links) { 
+    for my $link (@links) {
       my $target = $all_links[$link]->[0];
       $target =~ s!^(.*/)([^/]+)$!$1!;
       eval {
         print "$all_links[$link] => $target";
-        $self->agent->mirror($all_links[$link]->[0],$target); 
+        $self->agent->mirror($all_links[$link]->[0],$target);
         print "\n";
       };
       warn $@ if $@;
@@ -458,19 +458,19 @@ sub run_content {
 Get/set the current user agent
 
 Syntax:
-  
+
   # fake Internet Explorer
   ua "Mozilla/4.0 (compatible; MSIE 4.01; Windows 98)"
-  
+
   # fake QuickTime v5
   ua "QuickTime (qtver=5.0.2;os=Windows NT 5.0Service Pack 2)"
-  
+
   # fake Mozilla/Gecko based
   ua "Mozilla/5.001 (windows; U; NT4.0; en-us) Gecko/25250101"
 
   # set empty user agent :
   ua ""
-  
+
 =cut
 
 sub run_ua {
@@ -1018,9 +1018,9 @@ Syntax:
 sub run_versions {
   my ($self) = @_;
   no strict 'refs';
-  my @modules = qw( WWW::Mechanize::Shell WWW::Mechanize::FormFiller WWW::Mechanize 
+  my @modules = qw( WWW::Mechanize::Shell WWW::Mechanize::FormFiller WWW::Mechanize
   							    Term::Shell
-                    HTML::Parser HTML::TableExtract HTML::Parser 
+                    HTML::Parser HTML::TableExtract HTML::Parser
                     Pod::Constants
                     File::Modified );
   eval "use $_" foreach @modules;
@@ -1111,6 +1111,11 @@ of the following lines in your .mechanizerc :
   set useole 0
   set browsercmd "phoenix.exe %s"
 
+  # for the Mac (thanks to merlyn)
+  set browsercmd "open -a Camino.app %s"
+  # or
+  set browsercmd "open -a Safari.app %s"
+
   # More lines for other browsers are welcome
 
 The communication is done either via OLE or through tempfiles, so
@@ -1197,7 +1202,8 @@ know where the reason for that lies - any hints are welcome !
 
 =item *
 
-Add XPath expressions (by moving C<WWW::Mechanize> from HTML::Parser to XML::XMLlib)
+Add XPath expressions (by moving C<WWW::Mechanize> from HTML::Parser to XML::XMLlib
+or maybe easier, by tacking Class::XPath onto an HTML tree)
 
 =item *
 
@@ -1207,6 +1213,26 @@ mans C<wget>. While I'm at it, also add C<head> as a command.
 =item *
 
 Optionally silence the HTML::Parser / HTML::Forms warnings about invalid HTML.
+
+=item *
+
+Add a convenience C<shell> method to allow for command line invocation :
+
+  perl -MWWW::Mechanize::Shell -e "shell"
+
+=item *
+
+Add C<auth> command to add basic authentification to the current page.
+
+  auth user password
+  
+  ==> $a->credentials("$host:$port", $realm, $user, $password);
+  (where $host,$port and $realm come from the current page)
+
+=item *
+
+Write tests using HTTP::Daemon that check the interaction of
+WWW::Mechanize(::Shell) against static content.
 
 =back
 
