@@ -51,9 +51,7 @@ or alternatively as a custom shell program via :
   BEGIN {
     no warnings 'once';
     no warnings 'redefine';
-    eval { require Term::ReadKey; };
     *WWW::Mechanize::Shell::cmdloop = sub {};
-    *Term::ReadKey::GetTerminalSize = sub {80,24};
     *WWW::Mechanize::Shell::display_user_warning = sub {};
     *WWW::Mechanize::Shell::source_file = sub {};
   };
@@ -853,8 +851,10 @@ is mostly intended to be used when testing server side code.
 sub run_reload {
   my ($self) = @_;
   eval {
-    $self->agent->request($self->agent->{req});
-    $self->add_history('$agent->request($agent->{req});');
+    #$self->agent->request($self->agent->{req});
+    #$self->add_history('$agent->request($agent->{req});');
+    $self->agent->reload();
+    $self->add_history('$agent->reload;');
     $self->sync_browser
       if ($self->option('autosync'));
   };
@@ -886,8 +886,8 @@ The command lists all valid options. Here is a short overview over
 the different options available :
 
     autosync     - automatically synchronize the browser window
-    autorestart  - restart the shell when any base file changes
-    watchfiles   - watch all base files for changes
+    autorestart  - restart the shell when any required module changes
+    watchfiles   - watch all required modules for changes
     cookiefile   - the file where to store all cookies
     dumprequests - dump all requests to STDOUT
     useole       - use MS IE OLE to display HTML
@@ -1364,6 +1364,9 @@ of the following lines in your .mechanizerc :
 
   # for galeon
   set browsercmd "galeon -n %s"
+  
+  # for mozilla (needs mozilla already started)
+  set browsercmd 'mozilla -remote "openURL(%s)"'
 
   # for opera (thanks to Tina Mueller)
   set browsercmd "opera -newwindow %s"

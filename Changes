@@ -5,7 +5,12 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - t/14* now skips instead of fails tests that can't succeed.
   - fixed test failing if Term::ReadKey was not available
   - fixed synopsis not reading the .mechanizerc
-  - multivalues ...
+  - made WWW::Mechanize::Shell use the "reload" method of WWW::Mechanize
+    (after all, I asked for that method ...)
+  - Test for multivalues added, but it's not testing the right stuff yet
+    (see CPAN RT # at https://rt.cpan.org )
+  - clarified documentation about "watchfiles" and "autoreload" (thanks to
+    Mark Stosberg)
 
 0.22
   - The module now requires WWW::Mechanize v0.43, as the internal
