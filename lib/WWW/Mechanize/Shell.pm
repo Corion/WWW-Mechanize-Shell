@@ -221,7 +221,7 @@ sub print_paged {
     print $fh $_ for @_;
     close $fh;
 
-    my @pagers = ($ENV{PAGER});
+    my @pagers = ($ENV{PAGER},qq{"$^X" -p});
 		foreach my $pager (@pagers) {
 			if ($^O eq 'VMS') {
 				last if system("$pager $filename") == 0; # quoting prevents logical expansion
@@ -273,7 +273,6 @@ sub precmd {
 sub browser {
   my ($self) = @_;
   $self->{browser} ||= HTML::Display->new();
-  warn "Have browser: " . $self->{browser};
   $self->{browser};
 };
 
