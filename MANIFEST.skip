@@ -1,6 +1,6 @@
-.lwpcookies
-.cvsignore
-.releaserc
+\.lwpcookies$
+\.cvsignore$
+\.releaserc$
 blib
 WWW-Mechanize-Shell-*
 WWW-Mechanize-Shell-*/
