@@ -4,9 +4,15 @@ Todo:
   + Think about HTML::FillInForm for displaying changed form values interactively
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
-
+    
 0.31
   - test t/13* didn't work when the CPAN build directory contains a space
+  - Added patch by Philippe "BooK" Bruhat to allow downloading big files
+    directly to disk.
+
+  Changed behaviour:
+  - The referrer header now always points to the original page you save from
+    when using the C<save> command.
 
 0.30
   - Now needs the latest? Test::Harness because otherwise some tests failed

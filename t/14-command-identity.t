@@ -154,12 +154,12 @@ BEGIN {
 
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /eval_/;
+  #  delete $tests{$_} unless /save/;
   #};
 };
 
 use Test::More tests => 1 + (scalar keys %tests)*7;
-BEGIN { 
+BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
   use_ok('WWW::Mechanize::Shell');
