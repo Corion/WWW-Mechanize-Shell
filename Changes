@@ -2,7 +2,8 @@ Revision history for Perl extension WWW::Mechanize::Shell.
 
 0.17
   - Fixed a doc bug where "exit" referred to the (nonexistent) "quit" topic (thanks Mark)
-  * Make a test checking the version of Pod::Constants !!
+  - Made a test checking the version of Pod::Constants and the help summary bug
+  - Fixed t/06*.t - it crashed when Test::MockObject wasn't installed
 
 0.16 20030429
   - Changed double quotes around parameters to single quotes

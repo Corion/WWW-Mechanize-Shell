@@ -68,7 +68,7 @@ eval {
   require Test::MockObject;
   Test::MockObject->import();
 };
-skip scalar keys %tests, "Test::MockObject not installed"
+skip "Test::MockObject not installed", scalar keys %tests
   if $@;
 
 my $mock_result = Test::MockObject->new;
@@ -112,7 +112,7 @@ sub compiles_ok {
   my ($fh,$name) = tempfile();
   print $fh ( "@history" );
   close $fh;
-  
+
   my $output = `$^X -c $name 2>&1`;
   chomp $output;
   is( $output, "$name syntax OK", $testname )
