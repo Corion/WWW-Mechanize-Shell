@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 =head1 NAME
 
@@ -265,8 +265,9 @@ sub sync_browser {
   };
 };
 
-sub prompt_str { $_[0]->agent->uri . ">" };
+sub prompt_str { ($_[0]->agent->uri || "") . ">" };
 
+# sub-classed from Term::Shell to handle all smry requests
 sub catch_smry {
   my ($self,$command) = @_;
 
@@ -288,6 +289,7 @@ sub catch_smry {
   return $result;
 };
 
+# sub-classed from Term::Shell to handle all help requests
 sub catch_help {
   my ($self,$command) = @_;
 
@@ -317,7 +319,7 @@ The shell implements various commands :
 
 =head2 exit
 
-See "quit"
+Leaves the shell.
 
 =cut
 
@@ -466,7 +468,7 @@ Syntax:
 
 sub run_value {
   my ($self,$key,$value) = @_;
-  
+
   eval {
     $self->agent->current_form->value($key,$value);
     # Hmm - neither $key nor $value may contain backslashes nor single quotes ...

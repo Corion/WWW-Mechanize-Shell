@@ -1,5 +1,9 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.17
+  - Fixed a doc bug where "exit" referred to the (nonexistent) "quit" topic (thanks Mark)
+  * Make a test checking the version of Pod::Constants !!
+
 0.16 20030429
   - Changed double quotes around parameters to single quotes
     to allow for urls like http://mark@foo.com (thanks Mark)
