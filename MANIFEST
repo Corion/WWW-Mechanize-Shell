@@ -1,5 +1,6 @@
 Changes
 MANIFEST			This list of files
+MANIFEST.skip
 Makefile.PL
 README
 examples/banking.postbank.de.mech
