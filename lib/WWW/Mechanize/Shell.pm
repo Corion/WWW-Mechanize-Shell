@@ -14,7 +14,7 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.36';
+$VERSION = '0.37';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1271,7 +1271,7 @@ sub run_auth {
                           sprintf( q{$agent->credentials($authority,$realm,'%s' => '%s');}, $user,$password ));
     } else {
       ($authority, $realm, $user, $password) = @_;
-      $self->add_history( sprintf q{$self->agent->credentials('%s','%s','%s','%s')}, $authority,$realm,$user,$password);
+      $self->add_history( sprintf q{$agent->credentials('%s','%s','%s','%s');}, $authority,$realm,$user,$password);
     };
     $self->agent->credentials($authority,$realm,$user => $password);
 };

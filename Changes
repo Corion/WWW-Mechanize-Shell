@@ -5,6 +5,9 @@ Todo:
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
 
+0.37
+  - Fixed bug that created invalid code for the C<auth> command
+
 0.36
   - Fixed the actual bug too.
 
