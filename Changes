@@ -1,5 +1,12 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.23
+  - "submit" didn't reload the browser HTML. Thanks to Slaven Rezic.
+  - t/14* now skips instead of fails tests that can't succeed.
+  - fixed test failing if Term::ReadKey was not available
+  - fixed synopsis not reading the .mechanizerc
+  - multivalues ...
+
 0.22
   - The module now requires WWW::Mechanize v0.43, as the internal
     API of WWW::Mechanize changed. Mixing W::M::S 0.21 or below with W::M v0.43+

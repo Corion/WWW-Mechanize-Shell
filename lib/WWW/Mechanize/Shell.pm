@@ -10,7 +10,7 @@ use FindBin;
 use URI::URL;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.22';
+$VERSION = '0.23';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -31,7 +31,7 @@ or alternatively as a custom shell program via :
   use strict;
   use WWW::Mechanize::Shell;
 
-  my $shell = WWW::Mechanize::Shell->new("shell", rcfile => undef );
+  my $shell = WWW::Mechanize::Shell->new("shell");
 
   if (@ARGV) {
     $shell->source_file( @ARGV );
@@ -45,17 +45,17 @@ or alternatively as a custom shell program via :
   BEGIN {
     require WWW::Mechanize::Shell;
     $ENV{PERL_RL} = 0;
-    #$ENV{PERL_RL_USE_TRK} = 0;
     $ENV{COLUMNS} = '80';
     $ENV{LINES} = '24';
   };
   BEGIN {
     no warnings 'once';
     no warnings 'redefine';
-    require Term::ReadKey;
+    eval { require Term::ReadKey; };
     *WWW::Mechanize::Shell::cmdloop = sub {};
     *Term::ReadKey::GetTerminalSize = sub {80,24};
     *WWW::Mechanize::Shell::display_user_warning = sub {};
+    *WWW::Mechanize::Shell::source_file = sub {};
   };
   isa_ok( $shell, "WWW::Mechanize::Shell" );
 
@@ -724,6 +724,7 @@ sub run_submit {
   eval {
     $self->status( $self->agent->submit->code."\n" );
     $self->add_history('$agent->submit();');
+    $self->sync_browser if $self->option('autosync');
   };
   warn $@ if $@;
 };
@@ -1467,6 +1468,11 @@ The shell works without this patch and the online help is still
 available through C<perldoc WWW::Mechanize::Shell>
 
 =head1 BUGS
+
+Bug reports are very welcome - please use the RT interface at
+https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Shell . Please
+try to include as much (relevant) information as possible - a test script
+that replicates the undesired behaviour is welcome every time!
 
 =over 4
 

@@ -39,10 +39,10 @@ tie *STDERR, 'Catch', '_STDERR_' or die $!;
 
 BEGIN {
   %tests = (
-    autofill => { requests => 2, lines => [ 'get %s', 
-                                            'autofill query Fixed foo', 
+    autofill => { requests => 2, lines => [ 'get %s',
+                                            'autofill query Fixed foo',
                                             'autofill cat Keep',
-                                            'fillout', 
+                                            'fillout',
                                             'submit' ], location => '%sformsubmit'},
     back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => '%s' },
     comment => { requests => 1, lines => [ '# a comment','get %s','# another comment' ], location => '%s' },
@@ -82,27 +82,27 @@ BEGIN {
     														 'autofill query Random::Date string %%Y%%m%%d', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_default => { requests => 2,
-    									lines => [ 'autofill query Default foo', 
+    									lines => [ 'autofill query Default foo',
 											           'autofill cat Keep',
 					    									 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_fixed => { requests => 2,
-    									lines => [ 'autofill query Fixed foo', 
+    									lines => [ 'autofill query Fixed foo',
 											           'autofill cat Keep',
     														 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_keep => { requests => 2,
-    									lines => [ 'autofill query Keep foo', 
+    									lines => [ 'autofill query Keep foo',
 											           'autofill cat Keep',
     														 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_random => { requests => 2,
-    									lines => [ 'autofill query Random foo', 
+    									lines => [ 'autofill query Random foo',
 											           'autofill cat Keep',
     														 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_word => { requests => 2,
-    									lines => [ 'eval srand 0', 
+    									lines => [ 'eval srand 0',
 											           'autofill cat Keep',
     														 'autofill query Random::Word size 1', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
@@ -149,7 +149,7 @@ BEGIN {
 
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /^get_red/;
+  #  delete $tests{$_} unless /^fillout_mul/;
   #};
 };
 

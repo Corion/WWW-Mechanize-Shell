@@ -37,12 +37,15 @@ SERVERLOOP: {
         $res = HTTP::Response->new(302);
 				$res->header('location', $d->url . $1);
       } else {
-        my ($session,$query);
         my $q = CGI->new($r->uri->query);
+        
+        # Make sticky form fields
+        my ($query,$session,%cat);
+        $query = defined $q->param('query') ? $q->param('query') : "(empty)";
         $session = defined $q->param('session') ? $q->param('session') : 1;
-        $query = defined $q->param('query') ? $q->param('query') : "empty";
-
-        $res = HTTP::Response->new(200, "OK", undef, sprintf($body,$location,$session,$query));
+        %cat = map { $_ => 1 } (defined $q->param('cat') ? $q->param('cat') : qw( cat_foo cat_bar ));
+        my @categories = map { $cat{$_} ? "checked" : "" } qw( cat_foo cat_bar cat_baz );
+        $res = HTTP::Response->new(200, "OK", undef, sprintf($body,$location,$session,$query,@categories));
         $res->content_type('text/html');
         debug "Request " . ($r->uri->path || "/");
         if ( $location eq '/quit_server') {
@@ -87,6 +90,9 @@ __DATA__
     <input type="hidden" name="session" value="%s"/>
     <input type="text" name="query" value="%s"/>
     <input type="submit" name="submit" value="Go"/>
+    <input type="checkbox" name="cat" value="cat_foo" %s />
+    <input type="checkbox" name="cat" value="cat_bar" %s />
+    <input type="checkbox" name="cat" value="cat_baz" %s />
   </form>
 </p>
 </body>

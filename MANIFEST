@@ -27,6 +27,7 @@ t/14-command-identity.t
 t/15-history-save.t
 t/16-form-fillout.t
 t/17-eval-multiline.t
+t/18-browser-autosync.t
 t/98-bin.t
 t/99-pod.t
 t/401-server
