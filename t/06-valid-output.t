@@ -50,11 +50,15 @@ BEGIN {
       'save' => 'save 0',
       'save re' => 'save /.../',
       'submit' => 'submit',
-      'table' => 'table',
-      'table params' => 'table foo bar',
       'value' => 'value key value',
       'ua' => 'ua foo/1.1',
   );
+  
+  eval {
+    require HTML::TableExtract;
+    $tests{table} = 'table';
+    $tests{'table params'} = 'table foo bar';
+  };
 };
 
 use Test::More tests => scalar (keys %tests)*2 +1;
