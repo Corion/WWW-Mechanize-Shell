@@ -142,9 +142,10 @@ sub init {
   if ($self->option('watchfiles')) {
     eval {
       my @files = values %INC;
-      push @files, $0 unless $0 eq '-e';
+      push @files, $0
+        unless $0 eq '-e';
       require File::Modified;
-      $self->{files} = File::Modified->new(files=>\@files);
+      $self->{files} = File::Modified->new(files=>[@files]);
     };
     $self->display_user_warning( "Module File::Modified not found. Automatic reloading disabled.\n" )
       if ($@);
