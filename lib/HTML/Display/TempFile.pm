@@ -27,12 +27,27 @@ sub display_html {
   # We need to use a temp file for communication
   my ($self,$html) = @_;
 
+  $self->cleanup_tempfiles;  
+
   require File::Temp;
-  my($tempfh, $tempfile) = File::Temp::tempfile(undef, UNLINK => 1, SUFFIX => '.html');
+  my($tempfh, $tempfile) = File::Temp::tempfile(undef, SUFFIX => '.html');
   print $tempfh $html;
+  close $tempfh;
+
+  push @{$self->{delete}}, $tempfile;  
+  
   my $cmdline = sprintf($self->browsercmd, $tempfile);
   system( $cmdline ) == 0
     or warn "Couldn't launch '$cmdline' : $?";
+};
+
+sub cleanup_tempfiles {
+  my ($self) = @_;
+  for my $file (@{$self->{delete}}) {
+    unlink $file
+      or warn "Couldn't remove tempfile $file : $!\n";
+  };
+  $self->{delete} = [];
 };
 
 sub browsercmd { $_[0]->{browsercmd} };

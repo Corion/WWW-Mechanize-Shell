@@ -142,7 +142,7 @@ sub init {
   };
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
   $self->source_file($sourcefile) if defined $sourcefile;
-  $self->{browser} = HTML::Display->new(); # undef;
+  $self->{browser} = undef;
 
   # Keep track of the files we consist of, to enable automatic reloading
   $self->{files} = undef;
@@ -247,15 +247,8 @@ sub precmd {
 
 sub browser {
   my ($self) = @_;
-  #return unless $have_ole and $self->option('useole');
-  my $browser = $self->{browser};
-  #unless ($browser) {
-  #  $browser = Win32::OLE->CreateObject("InternetExplorer.Application");
-  #  $browser->{'Visible'} = 1;
-  #  $self->{browser} = $browser;
-  #  $browser->Navigate('about:blank');
-  #};
-  $browser;
+  $self->{browser} ||= HTML::Display->new();
+  $self->{browser};
 };
 
 sub sync_browser {
@@ -1388,39 +1381,13 @@ __END__
   get http://www.corion.net/perl-dev
   save /.tar.gz$/
 
-=begin oldversion
+=head1 DISPLAYING HTML
 
-#=head1 DISPLAYING HTML
-
-WWW::Mechanize::Shell can display the HTML of the current page
-in your browser. Under Windows, this is done via an OLE call
-to Microsoft Internet Explorer. If you don't like MSIE or are
-working under Unix where IE is not an option, you can try one
-of the following lines in your .mechanizerc :
-
-  # for galeon
-  set browsercmd "galeon -n %s"
-
-  # for mozilla (needs mozilla already started)
-  set browsercmd 'mozilla -remote "openURL(%s)"'
-
-  # for opera (thanks to Tina Mueller)
-  set browsercmd "opera -newwindow %s"
-
-  # for Win32, using Phoenix instead of IE
-  set useole 0
-  set browsercmd "phoenix.exe %s"
-
-  # for the Mac (thanks to merlyn)
-  set browsercmd "open -a Camino.app %s"
-  # or
-  set browsercmd "open -a Safari.app %s"
-
-  # More lines for other browsers are welcome
-
-The communication is done either via OLE or through tempfiles, so
-the URL in the browser will look weird.
-=end oldversion
+WWW::Mechanize::Shell now uses the module HTML::Display
+to display the HTML of the current page in your browser.
+Have a look at the documentation of HTML::Display how to
+make it use your browser of choice in the case it does not
+already guess it correctly.
 
 =head1 FILLING FORMS VIA CUSTOM CODE
 

@@ -3,6 +3,9 @@ Revision history for Perl extension WWW::Mechanize::Shell.
 0.26
   - added RE support to autofill
   - fixed broken HTML display as the filename was passed doubled
+  - POD fixes
+  - HTML::Display now checks for @ISA before loading a file
+  - Displaying shared files is now tested against
 
 0.25
   - The "versions" command also lists HTML::Display now
@@ -18,12 +21,14 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - fixed loading of classes in HTML::Display. Classes are only required
     if there is no method "display_html" in that namespace already.
   - fixed embarassing Linux compatibility bugs
+  - HTML::Display::TempFile now also works under Windows where sharing did not
+    allow another process to read the file while it was being written
 
 0.23
   - "submit" didn't reload the browser HTML. Thanks to Slaven Rezic.
   - t/14* now skips instead of fails tests that can't succeed.
   - fixed test failing if Term::ReadKey was not available
-  - fixed synopsis not reading the .mechanizerc
+  - fixed synopsis code not reading the .mechanizerc
   - made WWW::Mechanize::Shell use the "reload" method of WWW::Mechanize
     (after all, I asked for that method ...)
   - Test for multivalues added, but it's not testing the right stuff yet

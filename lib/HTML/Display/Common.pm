@@ -60,9 +60,11 @@ sub new {
 This is the routine used to display the HTML to the user. It takes the
 following parameters :
 
-  html => SCALAR containing the HTML
-  file => SCALAR containing the filename of the file to be displayed
-  location => optional base url for the HTML, so that relative links still work
+  html     => SCALAR containing the HTML
+  file     => SCALAR containing the filename of the file to be displayed
+  base     => optional base url for the HTML, so that relative links still work
+
+  location    (synonymous to base)
 
 =head3 Basic usage :
 
@@ -105,12 +107,17 @@ it to the user, the C<location> parameter comes in very handy :
   my $browser = HTML::Display->new();
 
   # This will display part of the Google logo
-  $browser->display( html => $html, location => 'http://www.google.com' );
+  $browser->display( html => $html, base => 'http://www.google.com' );
 
 =for example end
 
 =for example_testing
   isa_ok($browser, "HTML::Display::Dump","The browser");
+  is( $main::_STDOUT_,
+  	'<html><head><base href="http://www.google.com/" /></head><body><img src="/images/hp0.gif"></body></html>',
+  	"HTML gets output");
+  $main::_STDOUT_ = "";
+  $browser->display( html => $html, location => 'http://www.google.com' );
   is( $main::_STDOUT_,
   	'<html><head><base href="http://www.google.com/" /></head><body><img src="/images/hp0.gif"></body></html>',
   	"HTML gets output");
@@ -126,7 +133,6 @@ sub display {
     %args = @_;
   };
 
-  #$args{location} ||= "";
   if ($args{file}) {
     my $filename = delete $args{file};
     local $/;
@@ -136,11 +142,14 @@ sub display {
     $args{html} = <FILE>;
   };
 
+  $args{base} = delete $args{location}
+    if (! exists $args{base} and exists $args{location});
+
   my $new_html;
-  if (exists $args{location}) {
+  if (exists $args{base}) {
     # trim to directory create BASE HREF
     # We are carefull to not trim if we just have http://domain.com
-    my $location = URI::URL->new( $args{location} );
+    my $location = URI::URL->new( $args{base} );
     my $path = $location->path;
     $path =~ s%(?<!/)/[^/]*$%/%;
     $location = sprintf "%s://%s%s", $location->scheme, $location->authority , $path;

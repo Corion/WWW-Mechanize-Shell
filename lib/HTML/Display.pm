@@ -86,14 +86,14 @@ add a new class or replace a class (or the rule), modify C<%os_default> :
 =cut
 
 %os_default = (
-  "HTML::Display::Win32::IE"    => sub { 
-  																	 my $have_ole; 
+  "HTML::Display::Win32::IE"    => sub {
+  																	 my $have_ole;
   																	 eval {
-  																		 require Win32::OLE; 
-  																		 Win32::OLE->import(); 
+  																		 require Win32::OLE;
+  																		 Win32::OLE->import();
   																		 $have_ole = 1;
-  																	 }; 
-  																	 $have_ole and $^O =~ qr/mswin32/i 
+  																	 };
+  																	 $have_ole and $^O =~ qr/mswin32/i
   																 },
   "HTML::Display::Debian" 		=> sub { -x "/bin/x-www-browser" },
   "HTML::Display::OSX"				=> sub { $^O =~ qr/darwin/i },
@@ -129,9 +129,11 @@ sub new {
   $best_class ||= "HTML::Display::Dump";
 
   { no strict 'refs';
-    undef $@;
+    undef $@;    
     eval "use $best_class;"
-      unless defined *{"${best_class}::display_html"}{CODE};
+      unless ( @{"${best_class}::ISA"}
+              or defined *{"${best_class}::new"}{CODE} 
+              or defined *{"${best_class}::AUTOLOAD"}{CODE});
     croak "While trying to load $best_class: $@" if $@;
   };
   return $best_class->new(@_);
@@ -141,10 +143,12 @@ sub new {
 
 Will display the HTML. The following arguments are valid :
 
-  location => Base to which all relative links will be resolved
+  base     => Base to which all relative links will be resolved
   html     => Scalar containing the HTML to be displayed
   file     => Scalar containing the name of the file to be displayed
   						This file will possibly be copied into a temporary file!
+
+  location    (synonymous to base)
 
 If only one argument is passed, then it is taken as if
 

@@ -1,9 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
 
-package main;
-use strict;
-
 use vars qw( @options );
 
 BEGIN {
