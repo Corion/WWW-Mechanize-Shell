@@ -9,7 +9,7 @@ use File::Temp;
 use URI::URL qw();
 use Carp qw(carp croak);
 
-=head 2 C<Test::HTTP::LocalServer-E<gt>spawn %ARGS>
+=head2 C<Test::HTTP::LocalServer-E<gt>spawn %ARGS>
 
 This spawns a new HTTP server. The server will stay running until
   $server->stop
