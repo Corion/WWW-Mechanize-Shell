@@ -8,6 +8,7 @@ bin/hotmail.signup.mech
 bin/wwwshell.pl
 lib/WWW/Mechanize/Shell.pm
 t/00-use.t
+t/00a-Term-Shell-catch-smry.t
 t/01-fallback-Win32-OLE.t
 t/02-fallback-Pod-Constant.t
 t/02-fallback-HTML-TableExtract.t
