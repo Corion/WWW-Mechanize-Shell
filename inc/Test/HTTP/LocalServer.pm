@@ -62,7 +62,7 @@ sub spawn {
   my $url = <$server>;
   chomp $url;
   die "Couldn't find fake server url" unless $url;
-  
+
   $self->{_fh} = $server;
   $self->{_server_url} = URI::URL->new($url);
 
@@ -77,7 +77,7 @@ if you need to compare results from two runs.
 
 =cut
 
-sub port { 
+sub port {
   carp __PACKAGE__ . "::port called without a server" unless $_[0]->{_server_url};
   $_[0]->{_server_url}->port
 };
@@ -85,14 +85,12 @@ sub port {
 =head2 C<$server-E<gt>url>
 
 This returns the url where you can contact the server. This url
-is valid until you call
+is valid until the C<$server> goes out of scope or you call
   $server->stop;
-or
-  $server->get_output;
 
 =cut
 
-sub url { 
+sub url {
   $_[0]->{_server_url}->abs
 };
 
@@ -103,8 +101,8 @@ url.
 
 =cut
 
-sub stop { 
-  get( $_[0]->{_server_url} . "quit_server" ); 
+sub stop {
+  get( $_[0]->{_server_url} . "quit_server" );
   undef $_[0]->{_server_url}
 };
 
@@ -119,15 +117,10 @@ as a string.
 
 sub get_output {
   my ($self) = @_;
-  $self->stop;
-  local $/;
-  local *LOG;
-  open LOG, "<", $self->{logfile}
-    or die "Couldn't retrieve logfile";
-  join "", <LOG>;
+  return get( $self->{_server_url} . "get_server_log" );
 };
 
-sub DESTROY { 
+sub DESTROY {
   $_[0]->stop if $_[0]->{_server_url};
   for my $file (@{$_[0]->{delete}}) {
     unlink $file or warn "Couldn't remove tempfile $file : $!\n";

@@ -70,6 +70,8 @@ BEGIN {
       table
       ua
       value
+      tick
+      untick
   );
 };
 

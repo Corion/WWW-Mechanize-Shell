@@ -43,11 +43,11 @@ BEGIN {
                                             'autofill query Fixed foo',
                                             'autofill cat Keep',
                                             'fillout',
-                                            'submit' ], location => '%sformsubmit'},
-    back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => '%s' },
-    comment => { requests => 1, lines => [ '# a comment','get %s','# another comment' ], location => '%s' },
-    eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ], location => '%s' },
-    eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ], location => '%s' },
+                                            'submit' ], location => qr'^%s/formsubmit\?session=1&query=foo&cat=cat_foo&cat=cat_bar$'},
+    back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => qr'^%s/$' },
+    comment => { requests => 1, lines => [ '# a comment','get %s','# another comment' ], location => qr'^%s/$' },
+    eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ], location => qr'^%s/$' },
+    eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ], location => qr'^%s/$' },
     eval_sub => { requests => 2, lines => [
 						'# Fill in the "date" field with the current date/time as string',
   					'eval sub ::custom_today { "20030511" };',
@@ -59,7 +59,7 @@ BEGIN {
   					'eval $self->agent->current_form->value("session")',
   					'submit',
   					'content',
-    ], location => '%sformsubmit' },
+    ], location => qr'^%s/formsubmit\?session=20030511&query=\(empty\)&cat=cat_foo&cat=cat_bar$' },
     eval_multiline => { requests => 2,
     									lines => [ 'get %s',
     							 							 'autofill query Keep',
@@ -69,60 +69,62 @@ BEGIN {
     														 'eval "Hello World ",
     														        "from ",$self->agent->uri',
     														 'content' ],
-    									location => '%sformsubmit' },
-    form => { requests => 2, lines => [ 'get %s','form 1','submit' ], location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$' },
+    form => { requests => 2, lines => [ 'get %s','form 1','submit' ], 
+              location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$' 
+            },
     formfiller_chars => { requests => 2,
     									lines => [ 'eval srand 0',
 											           'autofill cat Keep',
     														 'autofill query Random::Chars size 5 set alpha', 'get %s', 'fillout','submit','content' ],
-    									location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=[a-zA-Z]{5}&cat=cat_foo&cat=cat_bar$' },
     formfiller_date => { requests => 2,
     									lines => [ 'eval srand 0',
 											           'autofill cat Keep',
     														 'autofill query Random::Date string %%Y%%m%%d', 'get %s', 'fillout','submit','content' ],
-    									location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=\d{8}&cat=cat_foo&cat=cat_bar$' },
     formfiller_default => { requests => 2,
     									lines => [ 'autofill query Default foo',
 											           'autofill cat Keep',
 					    									 'get %s', 'fillout','submit','content' ],
-    									location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$' },
     formfiller_fixed => { requests => 2,
     									lines => [ 'autofill query Fixed foo',
 											           'autofill cat Keep',
     														 'get %s', 'fillout','submit','content' ],
-    									location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=foo&cat=cat_foo&cat=cat_bar$' },
     formfiller_keep => { requests => 2,
-    									lines => [ 'autofill query Keep foo',
+    									lines => [ 'autofill query Keep',
 											           'autofill cat Keep',
     														 'get %s', 'fillout','submit','content' ],
-    									location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar' },
     formfiller_random => { requests => 2,
     									lines => [ 'autofill query Random foo',
 											           'autofill cat Keep',
     														 'get %s', 'fillout','submit','content' ],
-    									location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=foo&cat=cat_foo&cat=cat_bar' },
     formfiller_re => { requests => 2,
     									lines => [ 'eval srand 0',
 											           'autofill cat Keep',
     														 'autofill /qu/ Random::Date string %%Y%%m%%d', 'get %s', 'fillout','submit','content' ],
-    									location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=\d{8}&cat=cat_foo&cat=cat_bar' },
     formfiller_word => { requests => 2,
     									lines => [ 'eval srand 0',
 											           'autofill cat Keep',
     														 'autofill query Random::Word size 1', 'get %s', 'fillout','submit','content' ],
-    									location => '%sformsubmit' },
-    get => { requests => 1, lines => [ 'get %s' ], location => '%s' },
-    get_content => { requests => 1, lines => [ 'get %s', 'content' ], location => '%s' },
-    get_redirect => { requests => 2, lines => [ 'get %sredirect/startpage' ], location => '%sstartpage' },
-    get_save => { requests => 4, lines => [ 'get %s','save "/\.save_log_server_test\.tmp$/"' ], location => '%s' },
-    get_value_click => { requests => 2, lines => [ 'get %s','value query foo', 'click submit' ], location => '%sformsubmit' },
-    get_value_submit => { requests => 2, lines => [ 'get %s','value query foo', 'submit' ], location => '%sformsubmit' },
+    									location => qr'^%s/formsubmit\?session=1&query=\w+&cat=cat_foo&cat=cat_bar' },
+    get => { requests => 1, lines => [ 'get %s' ], location => qr'^%s/' },
+    get_content => { requests => 1, lines => [ 'get %s', 'content' ], location => qr'^%s/' },
+    get_redirect => { requests => 2, lines => [ 'get %sredirect/startpage' ], location => qr'^%s/startpage' },
+    get_save => { requests => 4, lines => [ 'get %s','save "/\.save_log_server_test\.tmp$/"' ], location => qr'^%s/' },
+    get_value_click => { requests => 2, lines => [ 'get %s','value query foo', 'click submit' ], location => qr'^%s/formsubmit\?session=1&query=foo&submit=Go&cat=cat_foo&cat=cat_bar' },
+    get_value_submit => { requests => 2, lines => [ 'get %s','value query foo', 'submit' ], location => qr'^%s/formsubmit\?session=1&query=foo&cat=cat_foo&cat=cat_bar' },
     get_value2_submit => { requests => 2, lines => [
     				'get %s',
     				'value query foo',
     				'value session 2',
     				'submit'
-    ], location => '%sformsubmit' },
+    ], location => qr'^%s/formsubmit\?session=2&query=foo&cat=cat_foo&cat=cat_bar' },
     interactive_script_creation => { requests => 2,
     									lines => [ 'eval @::list=qw(foo bar xxx)',
     														 'eval no warnings "once"; *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub { my $value=shift @::list; push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ]; $value }',
@@ -131,30 +133,42 @@ BEGIN {
     														 'fillout',
     														 'submit',
     														 'content' ],
-    									location => '%sformsubmit' },
-    open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ], location => '%stest' },
-    open_re => { requests => 2, lines => [ 'get %s','open "foo1"','content' ], location => '%sfoo1.save_log_server_test.tmp' },
-    open_re2 => { requests => 2, lines => [ 'get %s','open "/foo1/"','content' ], location => '%sfoo1.save_log_server_test.tmp' },
-    open_re3 => { requests => 2, lines => [ 'get %s','open "/Link /foo/"','content' ], location => '%sfoo' },
-    open_re4 => { requests => 2, lines => [ 'get %s','open "/Link \/foo/"','content' ], location => '%sfoo' },
-    open_re5 => { requests => 2, lines => [ 'get %s','open "/Link /$/"','content' ], location => '%sslash_end' },
-    open_re6 => { requests => 2, lines => [ 'get %s','open "/^/Link$/"','content' ], location => '%sslash_front' },
-    open_re7 => { requests => 2, lines => [ 'get %s','open "/^/Link in slashes//"','content' ], location => '%sslash_both' },
-    reload => { requests => 2, lines => [ 'get %s','reload','content' ], location => '%s' },
-    reload_2 => { requests => 3, lines => [ 'get %s','open "/Link \/foo/"','reload','content' ], location => '%sfoo' },
-    ua_get => { requests => 1, lines => [ 'ua foo/1.1', 'get %s' ], location => '%s' },
-    ua_get_content => { requests => 1, lines => [ 'ua foo/1.1', 'get %s', 'content' ], location => '%s' },
+    									location => qr'^%s/formsubmit\?session=foo&query=bar&cat=cat_foo&cat=cat_bar$' },
+    open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ], location => qr'^%s/test$' },
+    open_re => { requests => 2, lines => [ 'get %s','open "foo1"','content' ], location => qr'^%s/foo1.save_log_server_test.tmp$' },
+    open_re2 => { requests => 2, lines => [ 'get %s','open "/foo1/"','content' ], location => qr'^%s/foo1.save_log_server_test.tmp$' },
+    open_re3 => { requests => 2, lines => [ 'get %s','open "/Link /foo/"','content' ], location => qr'^%s/foo$' },
+    open_re4 => { requests => 2, lines => [ 'get %s','open "/Link \/foo/"','content' ], location => qr'^%s/foo$' },
+    open_re5 => { requests => 2, lines => [ 'get %s','open "/Link /$/"','content' ], location => qr'^%s/slash_end$' },
+    open_re6 => { requests => 2, lines => [ 'get %s','open "/^/Link$/"','content' ], location => qr'^%s/slash_front$' },
+    open_re7 => { requests => 2, lines => [ 'get %s','open "/^/Link in slashes//"','content' ], location => qr'^%s/slash_both$' },
+    reload => { requests => 2, lines => [ 'get %s','reload','content' ], location => qr'^%s/$' },
+    reload_2 => { requests => 3, lines => [ 'get %s','open "/Link \/foo/"','reload','content' ], location => qr'^%s/foo$' },
+    tick => { requests => 2, 
+              lines => [ 'get %s','tick cat cat_foo','submit','content' ], 
+              location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$' },
+    tick_all => { requests => 2, 
+              lines => [ 'get %s','tick cat','submit','content' ], 
+              location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar&cat=cat_baz$' },
+    ua_get => { requests => 1, lines => [ 'ua foo/1.1', 'get %s' ], location => qr'^%s/$' },
+    ua_get_content => { requests => 1, lines => [ 'ua foo/1.1', 'get %s', 'content' ], location => qr'^%s/$' },
+    untick => { requests => 2, 
+              lines => [ 'get %s','untick cat cat_foo','submit','content' ], 
+              location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_bar$' },
+    untick_all => { requests => 2, 
+              lines => [ 'get %s','untick cat','submit','content' ], 
+              location => qr'^%s/formsubmit\?session=1&query=\(empty\)$' },
   );
 
   eval {
     require HTML::TableExtract;
-    $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ], location => '%s' };
-    $tests{get_table_params} = { requests => 1, lines => [ 'get %s','table Col2 Col1' ], location => '%s' };
+    $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ], location => qr'^%s/$' };
+    $tests{get_table_params} = { requests => 1, lines => [ 'get %s','table Col2 Col1' ], location => qr'^%s/$' };
   };
 
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /_re/;
+  #  delete $tests{$_} unless /tick/;
   #};
 };
 
@@ -187,6 +201,7 @@ use vars qw( $actual_requests $dumped_requests );
   *WWW::Mechanize::Shell::request_dumper = sub { $dumped_requests++ };
 };
 
+my $server = Test::HTTP::LocalServer->spawn();
 for my $name (sort keys %tests) {
   $_STDOUT_ = '';
   undef $_STDERR_;
@@ -195,10 +210,13 @@ for my $name (sort keys %tests) {
   my @lines = @{$tests{$name}->{lines}};
   my $requests = $tests{$name}->{requests};
 
-  my $server = Test::HTTP::LocalServer->spawn();
+  #my $server = Test::HTTP::LocalServer->spawn();
 	my $code_port = $server->port;
 
-  my $result_location = sprintf $tests{$name}->{location}, $server->url;
+  my $url = $server->url;
+  $url =~ s!/$!!;
+  my $result_location = sprintf $tests{$name}->{location}, $url;
+  $result_location = qr{$result_location};
 	my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 	$s->option("dumprequests",1);
 	for my $line (@lines) {
@@ -208,14 +226,14 @@ for my $name (sort keys %tests) {
 	$s->cmd('eval $self->agent->uri');
   my $code_output = $_STDOUT_;
   diag join( "\n", $s->history )
-    unless is($s->agent->uri,$result_location,"Shell moved to the specified url for $name");
+    unless like($s->agent->uri,$result_location,"Shell moved to the specified url for $name");
 	is($_STDERR_,undef,"Shell produced no error output for $name");
 	is($actual_requests,$requests,"$requests requests were made for $name");
 	is($dumped_requests,$requests,"$requests requests were dumped for $name");
 	my $code_requests = $server->get_output;
 
   # Get a clean start
-  $server = Test::HTTP::LocalServer->spawn();
+  #$server = Test::HTTP::LocalServer->spawn();
 	my $script_port = $server->port;
 
   # Modify the generated Perl script to match the new? port

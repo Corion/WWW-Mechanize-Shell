@@ -66,26 +66,9 @@ and also has the capability to output crude Perl code that recreates
 the recorded session. Its main use is as an interactive starting point
 for automating a session through WWW::Mechanize.
 
-=for old_version
-It has "live" display support for Microsoft Internet Explorer on Win32
-and thanks to Slaven Rezic for other systems as well. Non-IE browsers
-will use tempfiles while IE will be controled via OLE.
-
 The cookie support is there, but no cookies are read from your existing
 browser sessions. See L<HTTP::Cookies> on how to implement reading/writing
 your current browsers cookies.
-
-=cut
-
-# Blindly allow redirects
-{
-  no warnings 'redefine';
-  *WWW::Mechanize::redirect_ok = sub { $_[0]->{__www_mechanize_shell}->status( "\nRedirecting to ".$_[1]->uri ); $_[0]->{uri} = $_[1]->uri; 1 };
-}
-
-#=for old_version
-#eval { require Win32::OLE; Win32::OLE->import() };
-#my $have_ole = $@ eq '';
 
 =head2 C<WWW::Mechanize::Shell-E<gt>new %ARGS>
 
@@ -119,12 +102,13 @@ sub init {
     watchfiles => (exists $args{watchfiles} ? $args{watchfiles} : 1),
     cookiefile => 'cookies.txt',
     dumprequests => 0,
-    #useole => ($^O =~ /mswin/i) ? 1:0,
-    #browsercmd => 'galeon -n %s',
   };
   # Install the request dumper :
   $self->{request_wrapper} = wrap 'WWW::Mechanize::request',
                                pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); };
+
+  $self->{redirect_ok_wrapper} = wrap 'WWW::Mechanize::redirect_ok',
+  																post => sub { $self->status( "\nRedirecting to ".$_[1]->uri ); $_[-1] };
 
   # Load the proxy settings from the environment
   $self->agent->env_proxy();
@@ -262,8 +246,6 @@ sub sync_browser {
   my $location = $self->agent->{uri};
   my $browser = $self->browser;
   $browser->display( html => $html, location => $location );
-  #$html =~ s!(</head>)!<base href="$location" />$1!i
-  #  unless ($html =~ /<BASE/i);
 };
 
 sub prompt_str { ($_[0]->agent->uri || "") . ">" };
@@ -316,9 +298,9 @@ use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
 use URI::URL;
 
-{ no warnings 'redefine';
-  *WWW::Mechanize::redirect_ok = sub { $_[0]->{uri} = $_[1]->uri; 1 };
-};
+#{ no warnings 'redefine';
+#  *WWW::Mechanize::redirect_ok = sub { $_[0]->{uri} = $_[1]->uri; 1 };
+#};
 
 my $agent = WWW::Mechanize->new();
 my $formfiller = WWW::Mechanize::FormFiller->new();
@@ -706,7 +688,7 @@ Syntax:
 
 sub run_value {
   my ($self,$key,@values) = @_;
-  
+
   # dwim on @values
   my $value = join " ", @values;
 
@@ -715,7 +697,7 @@ sub run_value {
   #if ($field and ($field->type eq 'checkbox')) {
   #  # We want to explicitly multiple checkboxes. This means we
   #  # have to clear all checkboxes and then set them explicitly.
- # 
+ #
  #   for my $value (@values) {
   #    # Blatantly stolen from WWW::Mechanize::Ticky by
   #    # Mark Fowler E<lt>mark@twoshortplanks.comE<gt>
@@ -745,6 +727,84 @@ sub run_value {
     $self->add_history( sprintf q{{ local $^W; $agent->current_form->value('%s', '%s'); };}, $key, $value);
   };
   warn $@ if $@;
+};
+
+=head2 tick
+
+Set checkbox marks
+
+Syntax:
+
+  tick NAME VALUE(s)
+
+If no value is given, all boxes are checked.
+
+=cut
+
+sub tick {
+  my ($self,$tick,$key,@values) = @_;
+  eval {
+    local $^W;
+    for my $value (@values) {
+      $self->agent->$tick($key,$value);
+    };
+    # Hmm - neither $key nor $value may contain backslashes nor single quotes ...
+    my $value_str = join ", ", map {qq{'$_'}} @values;
+    $self->add_history( sprintf q{{ local $^W; for (%s) { $agent->%s('%s', $_); };}}, $value_str, $tick, $key);
+  };
+  warn $@ if $@;
+};
+
+sub tick_all {
+  my ($self,$tick,$name) = @_;
+  eval {
+    local $^W;
+    my $index = 0;
+    while(my $input = $self->agent->current_form->find_input($name,'checkbox',$index)) {
+      my $value = (grep { defined $_ } ($input->possible_values()))[0];
+      $self->agent->$tick($name,$value);
+      $index++;
+    };
+    $self->add_history( sprintf q{
+    { local $^W; my $index = 0;
+      while(my $input = $agent->current_form->find_input('%s','checkbox',$index)) {
+        my $value = (grep { defined $_ } ($input->possible_values()))[0];
+        $agent->%s('%s',$value);
+        $index++;
+      };
+    }}, $name, $tick, $name);
+  };
+  warn $@ if $@;
+};
+
+sub run_tick {
+  my ($self,$key,@values) = @_;
+  if (scalar @values) {
+    $self->tick( "tick", $key, @values )
+  } else {
+    $self->tick_all( "tick", $key )
+  };
+};
+
+=head2 untick
+
+Remove checkbox marks
+
+Syntax:
+
+  untick NAME VALUE(s)
+
+If no value is given, all marks are removed.
+
+=cut
+
+sub run_untick {
+  my ($self,$key,@values) = @_;
+  if (scalar @values) {
+    $self->tick( "untick", $key, @values )
+  } else {
+    $self->tick_all( "untick", $key )
+  };
 };
 
 =head2 submit

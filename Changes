@@ -1,6 +1,9 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
 0.27
+  - now needs WWW::Mechanize 0.47
+  - added "tick" and "untick" commands (plus tests)
+  - fixed t/14*.t so that now the correct locations are used
   - removed ::Unwrap class that was not used anywhere
   - If more than one value is passed to the "value" command, the parameters
     are concatenated with spaces
