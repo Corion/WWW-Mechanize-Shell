@@ -24,8 +24,9 @@ find(\&wanted, "bin");
 plan tests => scalar @files;
 
 foreach my $file (@files) {
-  my $result = system( $^X, "-I$blib", "-c", $file );
-  is( $?, 0, "Script '$file' compiles");
+  my $result = `$^X "-I$blib" -c "$file" 2>&1`;
+  chomp $result;
+  is( $result, "$file syntax OK", "Script '$file' compiles");
 }
 
 sub wanted {

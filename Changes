@@ -4,6 +4,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - Changed double quotes around parameters to single quotes
     to allow for urls like http://mark@foo.com (thanks Mark)
   - Added tests to check that created scripts at least compile
+  - Made the form fillout more robust by wrapping it in an eval block
 
 0.14 20030414
   - Fixed a bad list bug introduced with my unix-browser patch to the options system. Slaven Rezics

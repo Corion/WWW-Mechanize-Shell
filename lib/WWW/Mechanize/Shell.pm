@@ -688,7 +688,10 @@ value via the autofill command.
 
 sub run_fillout {
   my ($self) = @_;
-  $self->{formfiller}->fill_form($self->agent->current_form);
+  eval {
+    $self->{formfiller}->fill_form($self->agent->current_form);
+  };
+  warn $@ if $@;
   $self->add_history('$formfiller->fill_form($agent->current_form);');
 };
 
@@ -937,6 +940,24 @@ The C<history> command outputs a skeleton script that reproduces
 your actions as done in the current session. It pulls in
 C<WWW::Mechanize::FormFiller>, which is possibly not needed. You
 should add some error and connection checking afterwards.
+
+=head1 ADDING FIELDS TO HTML
+
+If you are automating a JavaScript dependent site, you will encounter
+JavaScript like this :
+
+    <script>
+      document.write( "<input type=submit name=submit>" );
+    </script>
+
+HTML::Form will not know about this and will not have provided a
+submit button for you (understandably). If you want to create such
+a submit button from within your automation script, use the following
+code :
+
+    $agent->current_form->push_input( submit => { name => "submit", value =>"submit" } );
+
+This also works for other dynamically generated input fields.
 
 =head1 PROXY SUPPORT
 
