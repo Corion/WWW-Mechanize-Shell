@@ -1,7 +1,11 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
-0.30
+Todo:
   + Think about HTML::FillInForm for displaying changed form values interactively
+  + Check how the new WWW::Mechanize JavaScript handling interacts with the
+    shells own JS blocking (badly, I guess)
+
+0.30
   - using Devel::Cover. Code coverage of WWW/Mechanize/Shell.pm is now at 75.00%
     through the test suite
   - Provide better text for all links (for example when the content is an image)
