@@ -41,6 +41,7 @@ BEGIN {
   %tests = (
     autofill => { requests => 2, lines => [ 'get %s', 'autofill query Fixed foo', 'fillout', 'submit' ], location => '%sformsubmit'},
     back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => '%s' },
+    comment => { requests => 1, lines => [ '# a comment','get %s','# another comment' ], location => '%s' },
     eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ], location => '%s' },
     eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ], location => '%s' },
     eval_sub => { requests => 2, lines => [
@@ -54,6 +55,15 @@ BEGIN {
   					'submit',
   					'content',
     ], location => '%sformsubmit' },
+    eval_multiline => { requests => 2,
+    									lines => [ 'get %s',
+    							 							 'autofill query Keep',
+    														 'fillout',
+    														 'submit',
+    														 'eval "Hello World ",
+    														        "from ",$self->agent->uri',
+    														 'content' ],
+    									location => '%sformsubmit' },
     form => { requests => 2, lines => [ 'get %s','form 1','submit' ], location => '%sformsubmit' },
     formfiller_chars => { requests => 2,
     									lines => [ 'eval srand 0',
@@ -119,7 +129,7 @@ BEGIN {
 
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /^r/;
+  #  delete $tests{$_} unless /^e/;
   #};
 };
 

@@ -1217,7 +1217,6 @@ sub run_eval {
     my $code = $1;
     my $script_code = $code;
     $script_code =~ s/\$self->agent\b/\$agent/g;
-    $script_code =~ s/\$shell->agent\b/\$agent/g;
     $self->add_history( sprintf q{ print( do { %s },"\n" );}, $script_code);
     print eval $code,"\n";
   };

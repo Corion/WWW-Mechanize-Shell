@@ -33,7 +33,7 @@ use vars qw($_STDOUT_ $_STDERR_);
 tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
 tie *STDERR, 'Catch', '_STDERR_' or die $!;
 
-use Test::More tests => 4;
+use Test::More tests => 7;
 
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
@@ -41,16 +41,20 @@ $ENV{PERL_RL} = 0;
 SKIP: {
 
 use_ok('WWW::Mechanize::Shell');
-my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 
-eval {
-  $s->cmd('eval "Hello",
-" World";
-');
+sub command_ok {
+  my ($command,$expected,$name) = @_;
+  my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
+  eval { $s->cmd($command) };
+  is($@,"","$name does not crash");
+  is($_STDERR_,undef,"$name produces no warnings");
+  is($_STDOUT_,$expected,"$name produces the desired output");
+  undef $_STDOUT_;
+  undef $_STDERR_;
 };
-is($@,"","Multiline eval does not crash");
-is($_STDERR_,undef,"Multiline eval produces no warnings");
-is($_STDOUT_,"Hello World\n","Multiline eval produces the desired output");
+
+command_ok('eval "Hello",
+ " World"', "Hello World\n","Multiline eval");
+command_ok('eval "Hello from ",
+ $self->agent->uri || ""', "Hello from \n","Multiline eval substitution");
 };
-
-
