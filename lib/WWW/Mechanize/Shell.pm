@@ -79,19 +79,8 @@ your current browsers cookies.
 # Blindly allow redirects
 {
   no warnings 'redefine';
-  *WWW::Mechanize::redirect_ok = sub { print "\nRedirecting to ",$_[1]->uri; $_[0]->{uri} = $_[1]->uri; 1 };
+  *WWW::Mechanize::redirect_ok = sub { $_[0]->{__www_mechanize_shell}->status( "\nRedirecting to ".$_[1]->uri ); $_[0]->{uri} = $_[1]->uri; 1 };
 }
-
-# TODO:
-# * Log facility, log all stuff to a file
-# * History persistence (see log facility)
-# DONE:
-# * Add auto form fill out stuff
-# * Add "open()" and "click()" RE functionality
-# * Modify WWW::Mechanize to accept REs as well as the other stuff
-# * Add simple script generation
-# * Fix Term::Shell command repetition on empty lines
-# * Add comment facility to Term::Shell
 
 eval { require Win32::OLE; Win32::OLE->import() };
 my $have_ole = $@ eq '';
@@ -102,7 +91,7 @@ This is the constructor for a new shell instance. Some of the options
 can be passed to the constructor as parameters.
 
 By default, a file C<.mechanizerc> (respectively C<mechanizerc> under Windows)
-is the users home directory is executed before the interactive shell loop is
+in the users home directory is executed before the interactive shell loop is
 entered. This can be used to set some defaults. If you want to supply a different
 filename for the rcfile, the C<rcfile> parameter can be passed to the constructor :
 
@@ -115,6 +104,8 @@ sub init {
   my ($name,%args) = @{$self->{API}{args}};
 
   $self->{agent} = WWW::Mechanize->new();
+  $self->agent->{__www_mechanize_shell} = $self;
+  
   $self->{browser} = undef;
   $self->{formfiller} = WWW::Mechanize::FormFiller->new(default => [ Ask => $self ]);
 
@@ -160,6 +151,19 @@ sub init {
     $self->display_user_warning( "Module File::Modified not found. Automatic reloading disabled.\n" )
       if ($@);
   };
+};
+
+=head2 C<$shell-E<gt>release_agent>
+
+Since the shell stores a reference back to itself within the
+WWW::Mechanize instance, it is necessary to break this
+circular reference. This method does this.
+
+=cut
+
+sub release_agent {
+  my ($self) = @_;
+  $self->{agent} = undef;
 };
 
 =head2 C<$shell-E<gt>source_file FILENAME>
@@ -315,6 +319,10 @@ use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
 use URI::URL;
 
+{ no warnings 'redefine';
+  *WWW::Mechanize::redirect_ok = sub { $_[0]->{uri} = $_[1]->uri; 1 };
+};
+
 my $agent = WWW::Mechanize->new();
 my $formfiller = WWW::Mechanize::FormFiller->new();
 $agent->env_proxy();
@@ -460,7 +468,7 @@ sub run_get {
   my ($self,$url) = @_;
   $self->status( "Retrieving $url" );
   my $code;
-  eval { $code = $self->agent->get($url)->code};
+  eval { $code = $self->agent->get($url)->code };
   if ($@) {
     print "\n$@\n" if $@;
     $self->agent->back;

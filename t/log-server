@@ -24,13 +24,19 @@ SERVERLOOP: {
       if ($location =~ m!^/link/([^/]+)/(.*)$!) {
         ($link1,$link2) = ($1,$2);
       };
-      my $res = HTTP::Response->new(200, "OK", undef, sprintf($body,$location));
-      $res->content_type('text/html');
-      debug "Request " . ($r->uri->path || "/");
-      if ( $location eq '/quit_server') {
-        debug "Quitting";
-        $c->force_last_request;
-        $quitserver = 1;
+      my $res;
+      if ($location =~ m!^/redirect/(.*)$!) {
+        $res = HTTP::Response->new(302);
+				$res->header('location', $d->url . $1);
+      } else {
+        $res = HTTP::Response->new(200, "OK", undef, sprintf($body,$location));
+        $res->content_type('text/html');
+        debug "Request " . ($r->uri->path || "/");
+        if ( $location eq '/quit_server') {
+          debug "Quitting";
+          $c->force_last_request;
+          $quitserver = 1;
+        };
       };
       $c->send_response($res);
       last if $quitserver;
