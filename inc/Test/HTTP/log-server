@@ -51,7 +51,7 @@ SERVERLOOP: {
         if ($location =~ m!^/redirect/(.*)$!) {
 	        $res = HTTP::Response->new(302);
                 $res->header('location', $d->url . $1);
-        elsif ($location =~ m!^/notfound/(.*)$!) {
+        } elsif ($location =~ m!^/notfound/(.*)$!) {
 	        $res = HTTP::Response->new(404);
                 #$res->header('location', $d->url . $1);
         } else {
