@@ -39,7 +39,7 @@ tie *STDERR, 'Catch', '_STDERR_' or die $!;
 
 BEGIN {
   %tests = (
-    autofill => { requests => 2, lines => [ 'get %s', 'autofill query Fixed foo', 'fillout', 'submit' ], location => '%sformsubmit'},
+    autofill => { requests => 2, lines => [ 'get %s', 'autofill session Keep', 'autofill query Fixed foo', 'fillout', 'submit' ], location => '%sformsubmit'},
     back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => '%s' },
     eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ], location => '%s' },
     eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ], location => '%s' },
@@ -47,6 +47,7 @@ BEGIN {
 						'# Fill in the "date" field with the current date/time as string',
   					'eval sub ::custom_today { "20030511" };',
   					'autofill session Callback ::custom_today',
+  					'autofill query Keep',
   					'get %s',
   					'fillout',
   					'eval $self->agent->current_form->value("session")',
@@ -55,25 +56,27 @@ BEGIN {
     ], location => '%sformsubmit' },
     form => { requests => 2, lines => [ 'get %s','form 1','submit' ], location => '%sformsubmit' },
     formfiller_chars => { requests => 2,
-    									lines => [ 'eval srand 0', 'autofill query Random::Chars size 5 set alpha', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'eval srand 0', 
+    									           'autofill session Keep',
+    														 'autofill query Random::Chars size 5 set alpha', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_date => { requests => 2,
-    									lines => [ 'eval srand 0', 'autofill query Random::Date string %%Y%%m%%d', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'eval srand 0', 'autofill session Keep', 'autofill query Random::Date string %%Y%%m%%d', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_default => { requests => 2,
-    									lines => [ 'autofill query Default foo', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'autofill session Keep', 'autofill query Default foo', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_fixed => { requests => 2,
-    									lines => [ 'autofill query Fixed foo', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'autofill session Keep', 'autofill query Fixed foo', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_keep => { requests => 2,
-    									lines => [ 'autofill query Keep foo', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'autofill session Keep', 'autofill query Keep foo', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_random => { requests => 2,
-    									lines => [ 'autofill query Random foo', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'autofill session Keep', 'autofill query Random foo', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_word => { requests => 2,
-    									lines => [ 'eval srand 0', 'autofill query Random::Word size 1', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'eval srand 0', 'autofill session Keep', 'autofill query Random::Word size 1', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     get => { requests => 1, lines => [ 'get %s' ], location => '%s' },
     get_content => { requests => 1, lines => [ 'get %s', 'content' ], location => '%s' },
@@ -130,7 +133,7 @@ $ENV{PERL_RL} = 0;
 use_ok('WWW::Mechanize::Shell');
 
 eval { require HTTP::Daemon; };
-skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*5
+skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*6
   if ($@);
 require Test::HTTP::LocalServer; # from inc
 

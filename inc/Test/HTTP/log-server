@@ -8,6 +8,11 @@ $|++;
 my $d = HTTP::Daemon->new or die;
 print $d->url, "\n";
 
+my $filename = $ARGV[0];
+if ($filename) {
+  open DATA, "< $filename"
+    or die "Couldn't read page '$filename' : $!\n";
+};
 my $body = join "", <DATA>;
 
 sub debug($) {
@@ -34,7 +39,7 @@ SERVERLOOP: {
         my $q = CGI->new($r->uri->query);
         $session = defined $q->param('session') ? $q->param('session') : 1;
         $query = defined $q->param('query') ? $q->param('query') : "empty";
-        
+
         $res = HTTP::Response->new(200, "OK", undef, sprintf($body,$location,$session,$query));
         $res->content_type('text/html');
         debug "Request " . ($r->uri->path || "/");

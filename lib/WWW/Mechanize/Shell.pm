@@ -1213,7 +1213,7 @@ Examples:
 sub run_eval {
   my ($self) = @_;
   my $code = $self->line;
-  $code =~ /^eval\s+(.*)$/ and do {
+  $code =~ /^eval\s+(.*)$/sm and do {
     my $code = $1;
     my $script_code = $code;
     $script_code =~ s/\$self->agent\b/\$agent/g;
@@ -1289,6 +1289,7 @@ sub shell {
     my ($class,$name,$shell) = @_;
     # Using the name here to allow for late binding and overriding via eval()
     # from the shell command line
+    #warn __PACKAGE__ . "::ask_value";
     my $self = $class->SUPER::new($name, __PACKAGE__ . '::ask_value');
     $self->{shell} = $shell;
     Carp::carp "WWW::Mechanize::FormFiller::Value::Ask->new called without a value for the shell" unless $self->{shell};
@@ -1305,12 +1306,13 @@ sub shell {
     };
     my $value;
     $value = $input->value;
-    if ($value eq "") {
+    #warn $value if $value;
+    if ($input->type ne "submit") {
       $value = $self->{shell}->prompt("(" . $input->type . ")" . $input->name . "> [" . ($input->value || "") . "] ",
-                            ($input->value||''), @values );
+                              ($input->value||''), @values );
+      undef $value if ($value eq "" and $input->type eq "checkbox");
+      push @{$self->{shell}->{answers}}, [ $input->name, $value ];
     };
-    undef $value if ($value eq "" and $input->type eq "checkbox");
-    push @{$self->{shell}->{answers}}, [ $input->name, $value ];
     $value;
   };
 };
