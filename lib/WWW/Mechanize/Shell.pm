@@ -108,9 +108,9 @@ sub init {
   # Install the request dumper :
   $self->{request_wrapper} = wrap *LWP::UserAgent::request,
                                pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); },
-                               post => sub { 
+                               post => sub {
                                  #warn scalar @_, " arguments";
-                                 #warn $_ for @_; 
+                                 #warn $_ for @_;
                                  $self->response_dumper($_[-1]) if $self->option("dumpresponses");
                                };
 
@@ -1752,12 +1752,6 @@ in Perl, either in the final script or through C<eval> commands.
 The shell currently detects when you want to follow a JavaScript link and tells you
 that this is not supported. It would be nicer if there was some callback mechanism
 to (automatically?) extract URLs from JavaScript-infected links.
-
-=item *
-
-The embedded test C<t/embedded-WWW-Mechanize-Shell.t> currently dies under Perl 5.8
-and Solaris after successfully running all tests. I can't test this myself so I don't
-know where the reason for that lies - any hints are welcome !
 
 =back
 

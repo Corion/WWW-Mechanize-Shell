@@ -8,6 +8,7 @@ bin/hotmail.signup.mech
 bin/wwwshell.pl
 inc/Test/HTTP/LocalServer.pm
 inc/Test/HTTP/log-server
+inc/IO/Catch.pm
 lib/HTML/Display.pm
 lib/HTML/Display/Common.pm
 lib/HTML/Display/Debian.pm
@@ -48,6 +49,10 @@ t/18-browser-autosync.t
 t/19-value-multi.t
 t/20-restart-without-script.t
 t/21-autofill-re.t
+t/22-complete-command.t
+t/23-check-dumpresponses.t
+t/24-source-file.t
+t/25-save-file-nolink.t
 t/401-server
 t/98-bin.t
 t/99-pod.t
