@@ -1,5 +1,14 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.13 20030404
+  - Slaven Rezic submitted a patch to enable synchronous HTML
+    display under Unix ! Thanks go to Slaven !! 
+    All bugs/errors are my fault !
+  - fixed a crash if the url to the get command was invalid
+  - fixed a crash if a browser was launched without a previous request
+  - added tests for those two crashes
+  - moved example shell from examples/shell.pl to bin/wwwshell.pl
+
 0.12 20030320
   - Added a test to check for the behaviour if HTML::TableExtract is not present
   - silenced warnings in the tests

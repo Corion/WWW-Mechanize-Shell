@@ -50,21 +50,20 @@ and also has the capability to output crude Perl code that recreates
 the recorded session. Its main use is as an interactive starting point
 for automating a session through WWW::Mechanize.
 
-It has "live" display support for Microsoft Internet Explorer on Win32,
-if anybody has an idea on how to implement this for other browsers, I'll be
-glad to build this in - from what I know, you cannot write raw HTML into
-any other browser window.
+It has "live" display support for Microsoft Internet Explorer on Win32
+and thanks to Slaven Rezic for other systems as well. Non-IE browsers
+will use tempfiles while IE will be controled via OLE.
 
 The cookie support is there, but no cookies are read from your existing
 sessions. See L<HTTP::Cookies> on how to implement reading/writing
-your current browser cookies.
+your current browsers cookies.
 
 =cut
 
 # Blindly allow redirects
 {
   no warnings;
-  *WWW::Mechanize::redirect_ok = sub { print "\nRedirecting to ",$_[1]->uri; $_[0]->{uri} = $_[1]; 1 };
+  *WWW::Mechanize::redirect_ok = sub { print "\nRedirecting to ",$_[1]->uri; $_[0]->{uri} = $_[1]->uri; 1 };
 }
 
 {
@@ -73,7 +72,7 @@ your current browser cookies.
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
   use vars qw( $VERSION );
-  $VERSION = '0.10';
+  $VERSION = '0.13';
 
   sub new {
     my ($class,$name,$shell) = @_;
@@ -154,6 +153,8 @@ sub init {
     watchfiles => defined $args{watchfiles} ? $args{watchfiles} : 1,
     cookiefile => 'cookies.txt',
     dumprequests => 0,
+    useole => $^O =~ /mswin/i,
+    browsercmd => 'galeon -n %s',
   };
 
   # Keep track of the files we consist of, to enable automatic reloading
@@ -218,20 +219,9 @@ sub precmd {
   $self->SUPER::precmd(@_);
 };
 
-sub postcmd {
-  my $self = shift @_;
-  # We want to restart when any module was changed
-  if ($self->{files} and $self->{files}->changed()) {
-    print "One or more of the base files were changed\n";
-    $self->restart_shell if ($self->option('autorestart'));
-  };
-
-  $self->SUPER::precmd(@_);
-};
-
 sub browser {
   my ($self) = @_;
-  return unless $have_ole;
+  return unless $have_ole and $self->option('useole');
   my $browser = $self->{browser};
   unless ($browser) {
     $browser = Win32::OLE->CreateObject("InternetExplorer.Application");
@@ -244,23 +234,35 @@ sub browser {
 
 sub sync_browser {
   my ($self) = @_;
-  my $browser = $self->browser;
+
+  # We only can display html if we have any :
+  return unless $self->agent->res;
+
+  # Prepare the HTML for local display :
+  my $html = $self->agent->res->content;
+  my $location = $self->agent->{uri};
+  $html =~ s!(</head>)!<base href="$location" />$1!i
+    unless ($html =~ /<BASE/i);
+
+  my $browser;
+  $browser = $self->browser;
   if ($browser) {
+    # We can push the HTML into a IE browser window
     my $document = $browser->{Document};
     $document->open("text/html","replace");
-    my $html = $self->agent->{res}->content;
-    my $location = $self->agent->{uri};
-
-    # If there is no <BASE> tag, set one
-
-    $html =~ s!(</head>)!<base href="$location" />$1!i
-      unless ($html =~ /<BASE/i);
-
     $document->write($html);
+  } else {
+    # We need to use a temp file for communication
+    require File::Temp;
+    my($tempfh, $tempfile) = File::Temp::tempfile(undef, UNLINK => 1);
+    print $tempfh $html;
+    my $cmdline = sprintf($self->option('browsercmd'), $tempfile);
+    system( $cmdline ) == 0
+      or warn "Couldn't launch '$cmdline' : $?";
   };
 };
 
-sub prompt_str { $_[0]->agent->{uri} . ">" };
+sub prompt_str { $_[0]->agent->uri . ">" };
 
 sub catch_smry {
   my ($self,$command) = @_;
@@ -338,6 +340,7 @@ Download a specific URL.
 This is used as the entry point in all sessions
 
 Syntax:
+
   get URL
 
 =cut
@@ -345,12 +348,19 @@ Syntax:
 sub run_get {
   my ($self,$url) = @_;
   print "Retrieving $url";
-  print "(",$self->agent->get($url)->code,")";
-  print "\n";
+  my $code;
+  eval { $code = $self->agent->get($url)->code};
+  if ($@) {
+    print "\n$@\n" if $@;
+    $self->agent->back;
+  } else {
+    print "($code)\n"
+  };
 
-  $self->agent->form(1);
+  $self->agent->form(1)
+    if $self->agent->forms and scalar @{$self->agent->forms};
   $self->sync_browser if $self->option('autosync');
-  $self->add_history('$agent->get("'.$url.'");'."\n",'  $agent->form(1);');
+  $self->add_history('$agent->get("'.$url.'");'."\n",'  $agent->form(1) if $agent->forms;');
 };
 
 =head2 content
@@ -445,6 +455,7 @@ sub run_dump {
 Set a form value
 
 Syntax:
+
   value NAME [VALUE]
 
 =cut
@@ -481,6 +492,7 @@ Clicks on the button named NAME.
 No regular expression expansion is done on NAME.
 
 Syntax:
+
   click NAME
 
 =cut
@@ -510,6 +522,7 @@ It opens the link whose text is matched by RE,
 and displays all links if more than one matches.
 
 Syntax:
+
   open RE
 
 =cut
@@ -596,7 +609,22 @@ sub run_browse {
 Sets a shell option
 
 Syntax:
+
    set OPTION [value]
+
+The command lists all valid options. Here is a short overview over
+the different options available :
+
+    autosync     - automatically synchronize the browser window
+    autorestart  - restart the shell when any base file changes
+    watchfiles   - watch all base files for changes
+    cookiefile   - the file where to store all cookies
+    dumprequests - dump all requests to STDOUT
+    useole       - use MS IE OLE to display HTML
+    browsercmd   - the shell command to display a HTML page. If you have
+                   MS Internet Explorer, you won't need this
+                   The first %s in this string will be replaced by
+                   the current url.
 
 =cut
 
@@ -660,16 +688,18 @@ sub run_fillout {
 Display a table described by the columns COLUMNS.
 
 Syntax:
+
   table COLUMNS
 
 Example:
+
   table Product Price Description
 
 If there is a table on the current page that has in its first row the three
 columns C<Product>, C<Price> and C<Description> (not necessarily in that order),
 the script will display these columns of the whole table.
 
-L<HTML::TableExtract> is needed for this feature.
+The C<HTML::TableExtract> module is needed for this feature.
 
 =cut
 
@@ -710,6 +740,7 @@ PRINTTABLE
 Display a list of tables.
 
 Syntax:
+
   tables
 
 This command will display the top row for every
@@ -748,6 +779,7 @@ sub run_tables {
 Set the cookie file name
 
 Syntax:
+
   cookies FILENAME
 
 =cut
@@ -775,6 +807,7 @@ session fields, C<Keep> is a good candidate, for interactive stuff,
 C<Ask> is a value implemented by the shell.
 
 Syntax:
+
   autofill NAME [PARAMETERS]
 
 Examples:
@@ -807,6 +840,7 @@ sub run_autofill {
 Evaluate Perl code and print the result
 
 Syntax:
+
   eval CODE
 
 =cut
@@ -824,6 +858,7 @@ sub run_eval {
 Execute a batch of commands from a file.
 
 Syntax:
+
   source FILENAME
 
 =cut
@@ -853,7 +888,6 @@ __END__
   # (yes, this is a bad example of automating, as Google
   #  already has a Perl API. But other sites don't)
 
-
 =head2 Retrieving a table
 
   get http://www.perlmonks.org
@@ -863,11 +897,33 @@ __END__
   # now you have a program that gives you a csv file of
   # that table.
 
+=head1 DISPLAYING HTML
+
+WWW::Mechanize::Shell can display the HTML of the current page
+in your browser. Under Windows, this is done via an OLE call
+to Microsoft Internet Explorer. If you don't like MSIE or are
+working under Unix where IE is not an option, you can try one
+of the following lines in your .mechanizerc :
+
+  # for galeon
+  set browsercmd "galeon -n %s"
+  
+  # for Win32, using Phoenix instead of IE
+  set useole 0
+  set browsercmd "phoenix.exe %s"
+  
+  # More lines for other browsers are welcome
+
+The communication is done either via OLE or through tempfiles, so 
+the URL in the browser will look weird. There is currently no
+support for Mac specific display of HTML, and I don't know enough
+about AppleScript events to remotely control a browser there.
+
 =head1 GENERATED SCRIPTS
 
 The C<history> command outputs a skeleton script that reproduces
 your actions as done in the current session. It pulls in
-L<WWW::Mechanize::FormFiller>, which is possibly not needed. You
+C<WWW::Mechanize::FormFiller>, which is possibly not needed. You
 should add some error and connection checking afterwards.
 
 =head1 PROXY SUPPORT
@@ -882,7 +938,7 @@ load their proxies from the environment.
 
 The online help feature is currently a bit broken in C<Term::Shell>,
 but a fix is in the works. Until then, you can reenable the
-dynamic online help by patching L<Term::Shell> :
+dynamic online help by patching C<Term::Shell> :
 
 Remove the three lines
 
@@ -900,7 +956,7 @@ in C<sub run_help> and replace them by
 
 =item *
 
-Add method (to L<WWW::Mechanize>) to specify binary (file) uploads
+Add method (to C<WWW::Mechanize> ?) to specify binary (file) uploads
 
 =item *
 
@@ -908,7 +964,7 @@ Add command to specify a file value to a form
 
 =item *
 
-Add xpath expressions (by moving L<WWW::Mechanize> from HTML::Parser to XML::XMLlib)
+Add XPath expressions (by moving C<WWW::Mechanize> from HTML::Parser to XML::XMLlib)
 
 =back
 

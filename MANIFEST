@@ -3,9 +3,9 @@ MANIFEST			This list of files
 MANIFEST.skip
 Makefile.PL
 README
-examples/banking.postbank.de.mech
-examples/hotmail.signup.mech
-examples/shell.pl
+bin/banking.postbank.de.mech
+bin/hotmail.signup.mech
+bin/wwwshell.pl
 lib/WWW/Mechanize/Shell.pm
 t/00-use.t
 t/01-fallback-Win32-OLE.t
@@ -13,4 +13,8 @@ t/02-fallback-Pod-Constant.t
 t/02-fallback-HTML-TableExtract.t
 t/03-documentation.t
 t/04-history-invariant.t
+t/10-nonexistent-host.t
+t/11-browse-without-request.t
+t/98-bin.t
 t/99-pod.t
+t/embedded-WWW-Mechanize-Shell.t
