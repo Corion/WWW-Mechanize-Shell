@@ -101,7 +101,7 @@ it to the user, the C<location> parameter comes in very handy :
 
 =for example begin
 
-  my $html = '<html><body><img src="/images/hp0.gif"></body>';
+  my $html = '<html><body><img src="/images/hp0.gif"></body></html>';
   my $browser = HTML::Display->new();
 
   # This will display part of the Google logo
@@ -111,7 +111,9 @@ it to the user, the C<location> parameter comes in very handy :
 
 =for example_testing
   isa_ok($browser, "HTML::Display::Dump","The browser");
-  is( $main::_STDOUT_,'<html><body><img src="/images/hp0.gif"></body>',"HTML gets output");
+  is( $main::_STDOUT_,
+  	'<html><head><base href="http://www.google.com/" /></head><body><img src="/images/hp0.gif"></body></html>',
+  	"HTML gets output");
 
 =cut
 
