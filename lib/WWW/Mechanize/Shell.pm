@@ -381,6 +381,64 @@ sub run_get {
   $self->add_history( sprintf qq{\$agent->get('%s');\n  \$agent->form(1) if \$agent->forms;}, $url);
 };
 
+=head2 save
+
+Download a link into a file.
+
+If more than one link matches the RE, all matching links are
+saved. The filename is taken from the last part of the
+URL. Alternatively, the number of a link may also be given.
+
+Syntax:
+
+  save RE
+
+=cut
+
+sub run_save {
+  my ($self,$user_link) = @_;
+
+  unless (defined $user_link) {
+    print "No link given to save\n";
+    return
+  };
+  
+  my @links = ();
+  $self->add_history( q{my @links;} );    
+  
+  if ($user_link =~ m!^/(.*)/$!) {
+    my $re = $1;
+    my $count = -1;
+    my @possible_links = @{$self->agent->links()};
+    @links = map { $count++; $_->[1] =~ /$re/ ? $count : () } @possible_links;
+    if (@links == 0) {
+      print "No match.\n";
+    };
+    $self->add_history( sprintf q{@links = map { /%s/ } } @{$agent->links()};}, $re);    
+  } else {
+    $self->add_history( sprintf q{@links = '%s'}, $user_link);    
+  };
+
+  if (@links) {
+    $self->add_history( q{for my $link (@links) { $agent->mirror($link); } });
+    for $link (@links) {
+      eval {
+        $self->agent->follow($link);
+        $self->add_history( sprintf qq{\$agent->follow('%s');}, $user_link);
+        $self->agent->form(1);
+        if ($self->option('autosync')) {
+          $self->sync_browser;
+        } else {
+          #print $self->agent->{res}->as_string;
+          print "(",$self->agent->{res}->code,")\n";
+        };
+      };
+      warn $@ if $@;
+    };
+  };
+};
+
+
 =head2 content
 
 Display the HTML for the current page
