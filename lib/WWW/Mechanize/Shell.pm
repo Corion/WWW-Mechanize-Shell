@@ -1188,7 +1188,7 @@ sub run_autofill {
     $name = $self->re_or_string($name);
     if (ref $name) {
       $name_vis = qq{qr($name)};
-      warn "autofill RE detected $name";
+      #warn "autofill RE detected $name";
     } else {
       $name_vis = qq{"$name"};
     };

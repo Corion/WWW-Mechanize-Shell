@@ -46,5 +46,6 @@ $s->agent->{forms} = [ HTML::Form->parse($s->agent->{content}, "http://www.examp
 $s->agent->{form}  = $s->agent->{forms}->[0];
 
 $s->cmd( 'autofill /qu/i Fixed "filled"' );
+$s->cmd( 'fillout' );
 
 is($s->agent->current_form->find_input("query")->value,"filled", "autofill via RE works");
