@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.06 20030308
+  - bumped version because I uploaded a partial file to CPAN ...
+
 0.05 20030307
   - Fixed the dependency on Win32::OLE - the module now handles other
     environments gracefully

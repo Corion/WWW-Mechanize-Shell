@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 =head1 NAME
 
@@ -107,13 +107,13 @@ package WWW::Mechanize::Shell;
 # TODO:
 # * Log facility, log all stuff to a file
 # * History persistence (see log facility)
-# * Fix Term::Shell command repetition on empty lines
 # * Add comment facility to Term::Shell
 # DONE:
 # * Add auto form fill out stuff
 # * Add "open()" and "click()" RE functionality
 # * Modify WWW::Mechanize to accept REs as well as the other stuff
 # * Add simple script generation
+# * Fix Term::Shell command repetition on empty lines
 
 use strict;
 use base 'Term::Shell';
