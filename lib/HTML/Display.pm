@@ -86,7 +86,7 @@ add a new class or replace a class (or the rule), modify C<%os_default> :
 =cut
 
 %os_default = (
-  "HTML::Display::Win32::IE" 	=> sub { eval "use Win32::OLE"; (! $@) and $^O =~ qr/mswin32/i },
+  "HTML::Display::Win32::IE" 	=> sub { my $have_ole; eval "use Win32::OLE; $have_ole = 1;"; $have_ole and $^O =~ qr/mswin32/i },
   "HTML::Display::Debian" 		=> sub { -x "/bin/x-www-browser" },
   "HTML::Display::OSX"				=> sub { $^O =~ qr/darwin/i },
 );
