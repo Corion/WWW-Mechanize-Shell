@@ -10,7 +10,7 @@ use FindBin;
 use URI::URL;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.19';
+$VERSION = '0.20';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1205,7 +1205,7 @@ sub shell {
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
   use vars qw( $VERSION );
-  $VERSION = '0.19';
+  $VERSION = '0.20';
 
   sub new {
     my ($class,$name,$shell) = @_;
@@ -1362,6 +1362,14 @@ available through C<perldoc WWW::Mechanize::Shell>
 =head1 BUGS
 
 =over 4
+
+=item *
+
+The two parameter version of the C<auth> command guesses the realm from
+the last received response. Currently a RE is used to extract the realm,
+but this fails with some servers resp. in some cases. Use the four
+parameter version of C<auth>, or if not possible, code the extraction
+in Perl, either in the final script or through C<eval> commands.
 
 =item *
 
