@@ -50,6 +50,9 @@ SKIP: {
 		diag '    #? $o->summary($h);';
 		diag '    #: "undocumented";';
     diag '      my $smry = $o->summary($h);';
+    diag 'Fixing this is not necessary - you will get no online help';
+    diag 'but the shell will otherwise work fine. Help is still';
+    diag 'available through ``perldoc WWW::Mechanize::Shell``';
   };
 };
 
