@@ -4,11 +4,16 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - Added new command "reload", which repeats the last request
     (intended for testing/modifying server side code)
   - Altered fillout command - now _all_ fields that aren't predefined
-    via an "autofill" command get asked interactively. Previously fields 
+    via an "autofill" command get asked interactively. Previously fields
     that already had a value weren't asked. This means that you maybe
     have to rewrite parts of your scripts if you are using the shell
     as a testing tool. See t/14* and t/16* for scripts that redefine
     the interactive asking method to something noninteractive.
+    Field types that do not get asked are : hidden,submit
+  - The "eval" command now takes multiline strings. This is not interesting
+    if you're using the plain shell, as the readline shell dosen't know about
+    about multiline strings, but if you're using the $shell->cmd() feature,
+    it's handy to split your evals over more than one line.
 
 0.21
   - Fixed error in one-liner usage

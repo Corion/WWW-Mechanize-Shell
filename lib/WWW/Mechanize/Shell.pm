@@ -1307,7 +1307,7 @@ sub shell {
     my $value;
     $value = $input->value;
     #warn $value if $value;
-    if ($input->type ne "submit") {
+    if ($input->type !~ /^(submit|hidden)$/) {
       $value = $self->{shell}->prompt("(" . $input->type . ")" . $input->name . "> [" . ($input->value || "") . "] ",
                               ($input->value||''), @values );
       undef $value if ($value eq "" and $input->type eq "checkbox");
