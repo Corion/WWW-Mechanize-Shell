@@ -1,5 +1,5 @@
 #!/bin/bash
-for $PERL in (perl perl5.6.1 perl5.8.0); do
+for PERL in perl perl5.6.1 perl5.8.0; do
   echo "--- $PERL"
   $PERL Makefile.PL 2>&1
   make 2>&1
