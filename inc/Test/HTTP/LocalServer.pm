@@ -51,7 +51,7 @@ sub spawn {
   close $fh;
   push @{$self->{delete}},$logfile;
   $self->{logfile} = $logfile;
-  my $web_page = delete $args{file};
+  my $web_page = delete $args{file} || "";
   #if (defined $web_page) {
   #  $web_page = qq{$web_page}
   #} else {
