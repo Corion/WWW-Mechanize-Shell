@@ -44,7 +44,7 @@ BEGIN {
     eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ] },
     get => { requests => 1, lines => [ 'get %s' ] },
     get_content => { requests => 1, lines => [ 'get %s', 'content' ] },
-    get_save => { requests => 4, lines => [ 'get %s','save /\.save_log_server_test\.tmp$/' ] },
+    get_save => { requests => 4, lines => [ 'get %s','save "/\.save_log_server_test\.tmp$/"' ] },
     get_value_click => { requests => 2, lines => [ 'get %s','value query foo', 'click submit' ] },
     get_value_submit => { requests => 2, lines => [ 'get %s','value query foo', 'submit' ] },
     get_value2_submit => { requests => 2, lines => [ 'get %s','value query foo', 'value session 2', 'submit' ] },

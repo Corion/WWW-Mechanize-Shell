@@ -134,7 +134,7 @@ sub init {
     my $userhome = $^O =~ /win32/i ? $ENV{'USERPROFILE'} || $ENV{'HOME'} : ((getpwuid($<))[7]);
     $sourcefile = "$userhome/.mechanizerc";
   };
-  $self->source_file($sourcefile) if $sourcefile; # and -f $sourcefile and -r $sourcefile;
+  $self->source_file($sourcefile) if $sourcefile and -f $sourcefile;
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
 
   # Keep track of the files we consist of, to enable automatic reloading
@@ -470,11 +470,11 @@ sub run_save {
   push @history, q{my @links;};
 
   if ($user_link =~ m!^/(.*)/$!) {
-    my $re = $1;
+    my $re = qr($1);
     my $count = -1;
     @links = map { $count++; (($_->[0] =~ /$re/)||($_->[1] =~ /$re/)) ? $count : () } @all_links;
     if (@links == 0) {
-      print "No match.\n";
+      print "No match for /$re/.\n";
     };
     push @history, sprintf q{@links = map { /%s/ } $agent->links();}, $re;
   } else {
