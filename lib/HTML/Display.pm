@@ -119,7 +119,10 @@ sub new {
   };
   $best_class ||= "HTML::Display::Dump";
 
-  eval "require $best_class";
+  { no strict 'refs';
+    eval "require $best_class"
+      unless defined *{"${best_class}::new"}{CODE};
+  };
   die $@ if $@;
   return $best_class->new(@_);
 };
