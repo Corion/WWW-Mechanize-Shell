@@ -1555,7 +1555,8 @@ sub run_referrer {
   }
 };
 
-sub alias_referrer { qw(referer) };
+sub run_referer { goto &{$_[0]->run_referrer} };
+# sub alias_referrer { qw(referer) };
 
 =head2 response
 

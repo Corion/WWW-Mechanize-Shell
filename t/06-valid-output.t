@@ -33,6 +33,7 @@ BEGIN {
       'open' => 'open foo',
       'reload' => 'reload',
       'referrer' => 'referrer ""',
+      'referrer val' => 'referrer "foo"',
       'referer' => 'referer ""',
       'save' => 'save 0',
       'save re' => 'save /.../',
@@ -104,6 +105,7 @@ my @history;
 { no warnings 'redefine';
   *WWW::Mechanize::Shell::add_history = sub {
     shift;
+    # warn $_ for @_;
     push @history, join "", @_;
   };
 };
@@ -112,7 +114,7 @@ sub compiles_ok {
   my ($command,$testname) = @_;
   $testname ||= $command;
   @history = ();
-  $s->cmd('links');
+  # $s->cmd('links');
   $s->cmd($command);
   local $, = "\n";
   my ($fh,$name) = tempfile();
