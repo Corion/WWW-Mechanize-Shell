@@ -2,6 +2,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
 
 0.26
   - added RE support to autofill
+  - fixed broken HTML display as the filename was passed doubled
 
 0.25
   - The "versions" command also lists HTML::Display now

@@ -28,9 +28,9 @@ sub display_html {
   my ($self,$html) = @_;
 
   require File::Temp;
-  my($tempfh, $tempfile) = File::Temp::tempfile(undef, UNLINK => 1);
+  my($tempfh, $tempfile) = File::Temp::tempfile(undef, UNLINK => 1, SUFFIX => '.html');
   print $tempfh $html;
-  my $cmdline = sprintf($self->browsercmd, $tempfile x 2);
+  my $cmdline = sprintf($self->browsercmd, $tempfile);
   system( $cmdline ) == 0
     or warn "Couldn't launch '$cmdline' : $?";
 };
