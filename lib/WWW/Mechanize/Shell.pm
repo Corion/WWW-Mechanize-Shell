@@ -124,9 +124,9 @@ sub init {
     #browsercmd => 'galeon -n %s',
   };
   # Install the request dumper :
-  $self->{request_wrapper} = wrap 'WWW::Mechanize::request', 
-                               pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); }; 
-  
+  $self->{request_wrapper} = wrap 'WWW::Mechanize::request',
+                               pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); };
+
   # Load the proxy settings from the environment
   $self->agent->env_proxy();
 
@@ -633,6 +633,9 @@ sub run_ua {
 
 Display all links on a page
 
+The links numbers displayed can used by C<open> to directly
+select a link to follow.
+
 =cut
 
 sub run_links {
@@ -771,14 +774,17 @@ sub run_click {
 
 =head2 open
 
-Open a link on the current page
+<open> accepts one argument, which can be a regular expression or the number
+of a link on the page, starting at zero. These numbers are displayed by the
+C<links> function. It goes directly to the page if a number is used
+or if the RE has one match. Otherwise, a list of links matching
+the regular expression is displayed.
 
-It opens the link whose text is matched by RE,
-and displays all links if more than one matches.
+The regular expression should start and end with "/".
 
 Syntax:
 
-  open RE
+  open  [ RE | # ]
 
 =cut
 
@@ -1381,7 +1387,7 @@ of the following lines in your .mechanizerc :
 
   # for galeon
   set browsercmd "galeon -n %s"
-  
+
   # for mozilla (needs mozilla already started)
   set browsercmd 'mozilla -remote "openURL(%s)"'
 

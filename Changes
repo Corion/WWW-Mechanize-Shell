@@ -12,6 +12,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
     and/or distribution, but the Changes file is also for me :-)
   - clarified documentation about "watchfiles" and "autoreload" (thanks to
     Mark Stosberg)
+  - Documentation fixes for "open" and "links" (also courtesy of Mark Stosberg)
   - The dumprequests feature needs Hook::LexWrap - it didn't work
     properly before. The feature is tested in t/14
   - factored out the HTML display into a module of its own
