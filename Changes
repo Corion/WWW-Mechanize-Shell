@@ -15,13 +15,17 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - Documentation fixes for "open" and "links" (also courtesy of Mark Stosberg)
   - The dumprequests feature needs Hook::LexWrap - it didn't work
     properly before. The feature is tested in t/14
+  - "restart" in a -e oneliner dosen't crash the shell (it also dosen't restart though)
   - factored out the HTML display into a module of its own (HTML::Display),
     distributed with this. This breaks existing setups, as the "browsercmd"
     and "useole" option disappeared. You can configure the used browser 
     class by setting the environment variable PERL_HTML_DISPLAY_CLASS
     or PERL_HTML_DISPLAY_COMMAND, either in your environment or in your mechanizerc.
-
-  - "restart" in a -e oneliner dosen't crash the shell (it also dosen't restart though)
+    
+    If this feature causes too much grief, I will reimplement the browsercmd
+    stuff again in a later release (but possibly different).
+    
+    Please also tell me whether HTML::Display would be worth a release on its own!
 
 0.22
   - The module now requires WWW::Mechanize v0.43, as the internal
