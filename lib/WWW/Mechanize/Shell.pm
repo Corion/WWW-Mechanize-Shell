@@ -12,7 +12,7 @@ use Hook::LexWrap;
 use HTML::Display qw();
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.25';
+$VERSION = '0.26';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1176,6 +1176,11 @@ the WWW::Mechanize::FormFiller::Value subclass you want to use. For
 session fields, C<Keep> is a good candidate, for interactive stuff,
 C<Ask> is a value implemented by the shell.
 
+A field name starting and ending with a slash (C</>) is taken to be
+a regular expression and will be applied to all fields with their
+name matching the expression. A field with a matching name still
+takes precedence over the regular expression.
+
 Syntax:
 
   autofill NAME [PARAMETERS]
@@ -1186,6 +1191,7 @@ Examples:
   autofill password Ask
   autofill selection Random red green orange
   autofill session Keep
+  autofill "/date$/" Random::Date string "%m/%d/%Y"
 
 =cut
 
@@ -1194,9 +1200,17 @@ sub run_autofill {
   @args = ($self)
     if ($class eq 'Ask');
   if ($class) {
+    my $name_vis;
+    if ($name =~ m!^/(.*)/$!) {
+      #warn "autofill RE detected";
+      $name_vis = qq{qr$name};
+      $name = qr{$1};
+    } else {
+      $name_vis = qq{"$name"};
+    };
     eval {
       $self->{formfiller}->add_filler($name,$class,@args);
-      $self->add_history( sprintf qq{\$formfiller->add_filler( "%s" => "%s" => %s ); }, $name, $class, join( ",", map {qq{'$_'}} @args));
+      $self->add_history( sprintf qq{\$formfiller->add_filler( %s => "%s" => %s ); }, $name_vis, $class, join( ",", map {qq{'$_'}} @args));
     };
     warn $@
       if $@;

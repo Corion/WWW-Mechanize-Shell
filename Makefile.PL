@@ -7,9 +7,9 @@ WriteMakefile(
     'PREREQ_PM'    => {'Term::Shell' => 0.01,
     									 'URI::URL' => 0.00,
                        'WWW::Mechanize' => 0.43,
-                       'WWW::Mechanize::FormFiller' => 0.04,
+                       'WWW::Mechanize::FormFiller' => 0.05,
                        'Hook::LexWrap' => 0.20,
-                       'HTML::TokeParser::Simple' => 2.0, 
+                       'HTML::TokeParser::Simple' => 2.0,
                       }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'lib/WWW/Mechanize/Shell.pm', # retrieve abstract from module

@@ -101,6 +101,11 @@ BEGIN {
 											           'autofill cat Keep',
     														 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
+    formfiller_re => { requests => 2,
+    									lines => [ 'eval srand 0',
+											           'autofill cat Keep',
+    														 'autofill /qu/ Random::Date string %%Y%%m%%d', 'get %s', 'fillout','submit','content' ],
+    									location => '%sformsubmit' },
     formfiller_word => { requests => 2,
     									lines => [ 'eval srand 0',
 											           'autofill cat Keep',
@@ -149,7 +154,7 @@ BEGIN {
 
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /^back/;
+  #  delete $tests{$_} unless /^formfiller_re/;
   #};
 };
 

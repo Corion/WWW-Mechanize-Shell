@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.26
+  - added RE support to autofill
+
 0.25
   - The "versions" command also lists HTML::Display now
   - hunted down and fixed error in skipping too many tests in t/01-Win32-OLE-fallback.t
