@@ -141,16 +141,15 @@ sub init {
     $sourcefile = "$userhome/.mechanizerc"
       if -f "$userhome/.mechanizerc";
   };
-  $self->source_file($sourcefile) if $sourcefile;
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
+  $self->source_file($sourcefile) if defined $sourcefile;
 
   # Keep track of the files we consist of, to enable automatic reloading
   $self->{files} = undef;
   if ($self->option('watchfiles')) {
     eval {
-      my @files = values %INC;
-      push @files, $0
-        unless $0 eq '-e';
+      my @files = grep { -f && -r && $_ ne '-e' } values %INC;
+      local $, = ",";
       require File::Modified;
       $self->{files} = File::Modified->new(files=>[@files]);
     };
@@ -229,9 +228,10 @@ sub option {
 };
 
 sub restart_shell {
-  print "Restarting $0\n";
-
-  exec $^X, $0, @ARGV;
+  if ($0 ne '-e') {
+    print "Restarting $0\n";
+    exec $^X, $0, @ARGV;
+  };
 };
 
 sub precmd {
@@ -454,7 +454,8 @@ sub alias_exit { qw(quit) };
 
 Restart the shell.
 
-This is mostly useful when you are modifying the shell itself.
+This is mostly useful when you are modifying the shell itself. It dosen't
+work if you use the shell in oneliner mode with C<-e>.
 
 =cut
 
@@ -906,14 +907,10 @@ the different options available :
 
     autosync     - automatically synchronize the browser window
     autorestart  - restart the shell when any required module changes
+                   This does not work with C<-e> oneliners.
     watchfiles   - watch all required modules for changes
     cookiefile   - the file where to store all cookies
     dumprequests - dump all requests to STDOUT
-    useole       - use MS IE OLE to display HTML
-    browsercmd   - the shell command to display a HTML page. If you have
-                   MS Internet Explorer, you won't need this
-                   The first %s in this string will be replaced by
-                   the current url.
 
 =cut
 

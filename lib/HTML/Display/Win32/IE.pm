@@ -28,14 +28,15 @@ sub new {
 };
 
 sub setup {
-  my ($self,$control) = shift;
+  my ($self,$control) = @_;
+  warn "Setting up browser";
   $control->{'Visible'} = 1;
   $control->Navigate('about:blank');
 };
 
 sub display_html {
   my ($self,$html) = @_;
-  my $browser = $self->{browser};
+  my $browser = $self->control;
   my $document = $browser->{Document};
   $document->open("text/html","replace");
   $document->write($html);

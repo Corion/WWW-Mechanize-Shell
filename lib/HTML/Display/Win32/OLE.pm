@@ -58,9 +58,9 @@ sub control {
   unless ($self->{control}) {
     eval "use Win32::OLE";
     die $@ if $@;
-    my $control = Win32::OLE->CreateObject($self->{app_string});    
-    $self->setup($control);
+    my $control = Win32::OLE->CreateObject($self->{app_string});
     $self->{control} = $control;
+    $self->setup($control);
   };
   $self->{control};
 };
