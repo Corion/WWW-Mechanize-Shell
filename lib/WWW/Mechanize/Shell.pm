@@ -309,7 +309,7 @@ sub script {
   $prefix ||= "";
 
   my @result = sprintf <<'HEADER', $^X;
-#%s -w
+#!%s -w
 use strict;
 use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
@@ -335,6 +335,29 @@ sub status {
   print join "", @_;
 };
 
+=head2 C<$shell-E<gt>display FILENAME LINES>
+
+C<display> is called to output listings, currently from the
+C<history> and C<script> commands. If the second parameter
+is defined, it is the name of the file to be written,
+otherwise the lines are displayed to the user.
+
+=cut
+
+sub display {
+  my ($self,$filename,@lines) = @_;
+  if (defined $filename) {
+    eval {
+      open my $f, ">", $filename
+        or die "Couldn't create $filename : $!";
+      print $f join( "", map { "$_\n" } (@lines) );
+      close $f;
+    };
+    warn $@ if $@;
+  } else {
+    print join( "", map { "$_\n" } (@lines) );
+  };
+};
 
 # sub-classed from Term::Shell to handle all run_ requests that have no corresponding sub
 # This is used for comments
@@ -866,27 +889,39 @@ sub run_set {
 
 Display your current session history as the relevant commands.
 
+Syntax: 
+
+  history [FILENAME]
+
 Commands that have no influence on the browser state are not added
-to the history.
+to the history. If a parameter is given to the C<history> command,
+the history is saved to that file instead of displayed onscreen.
 
 =cut
 
 sub run_history {
-  my ($self) = @_;
-  print join( "", map { "$_\n" } ($self->history) ), "\n";
+  my ($self,$filename) = @_;
+  $self->display($filename,$self->history);
 };
 
 =head2 script
 
 Display your current session history as a Perl script using WWW::Mechanize.
 
+Syntax: 
+
+  script [FILENAME]
+
+If a parameter is given to the C<script> command, the script is saved to
+that file instead of displayed on the console.
+
 This command was formerly known as C<history>.
 
 =cut
 
 sub run_script {
-  my ($self) = @_;
-  print join( "\n", $self->script("  ")), "\n";
+  my ($self,$filename) = @_;
+  $self->display($filename,$self->script("  "));
 };
 
 =head2 fillout
@@ -1112,7 +1147,7 @@ sub run_autofill {
   if ($class) {
     eval {
       $self->{formfiller}->add_filler($name,$class,@args);
-      $self->add_history( sprintf qq{\$formfiller->add_filler( %s => %s => '%s' ); }, $name, $class, join( ",", @args));
+      $self->add_history( sprintf qq{\$formfiller->add_filler( %s => %s => %s ); }, $name, $class, join( ",", map {qq{'$_'}} @args));
     };
     warn $@
       if $@;
@@ -1308,7 +1343,7 @@ of the following lines in your .mechanizerc :
   # More lines for other browsers are welcome
 
 The communication is done either via OLE or through tempfiles, so
-the URL in the browser will look weird. 
+the URL in the browser will look weird.
 
 =head1 FILLING FORMS VIA CUSTOM CODE
 

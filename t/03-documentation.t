@@ -16,15 +16,6 @@ use Test::More tests => scalar @methods*3 +2;
 $ENV{PERL_RL} = 0;
 
 SKIP: {
-  #skip "Can't load Term::ReadKey without a terminal", 2 + scalar @methods*3
-  #  unless -t STDIN;
-  #eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
-  #if ($@) {
-  #  no warnings 'redefine';
-  #  *Term::ReadKey::GetTerminalSize = sub {80,24};
-  #  diag "Term::ReadKey seems to want a terminal";
-  #};
-
   eval { require Pod::Constants;};
   skip "Need Pod::Constants to test the documentation", 2 + scalar @methods*3
     if $@;

@@ -24,6 +24,7 @@ t/11-browse-without-request.t
 t/12-comments.t
 t/13-command-au.t
 t/14-command-identity.t
+t/15-history-save.t
 t/98-bin.t
 t/99-pod.t
 t/401-server

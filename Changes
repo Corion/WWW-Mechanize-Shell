@@ -4,6 +4,9 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - Fixed error in one-liner usage
   - Fixed embarassing errors in 'forms' and 'save' commands
   - other documentation fixes
+  - The history can now be saved directly to a file
+  - The script can now be saved directly to a file
+  - The generated scripts now have a correct shebang line
 
 0.20
   - made t/00a*.t a TODO test so that CPAN install (silently) works
