@@ -74,7 +74,7 @@ sub disable {
   my ($namespace,$subname) = @_;
   no strict 'refs';
   no warnings 'redefine';
-  *{$namespace."::".$subname} = sub {};
+  *{"$namespace\::$subname"} = sub { return };
 };
 
 { no warnings 'redefine';

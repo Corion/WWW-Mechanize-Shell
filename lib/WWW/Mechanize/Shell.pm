@@ -719,11 +719,15 @@ sub run_forms {
   my ($self,$number) = @_;
 
   my $count = 1;
-  my @forms = $self->agent->forms;
+  my $agent = $self->agent;
+  my @forms = $agent->forms;
   if (@forms) {
-    for my $form (@forms) {
+    use Data::Dumper;
+    warn Dumper \@forms;
+    for (@forms) {
       print "Form [",$count++,"]\n";
-      $form->dump;
+      warn $_;
+      $_->dump;
     };
   } else {
     print "No forms on current page.\n";
