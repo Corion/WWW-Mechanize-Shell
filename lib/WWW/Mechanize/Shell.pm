@@ -14,7 +14,7 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.34';
+$VERSION = '0.35';
 @EXPORT = qw( &shell );
 
 =head1 NAME
