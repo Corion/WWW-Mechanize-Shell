@@ -10,7 +10,7 @@ HTML::Display::OSX::Camino - display HTML via Camino
 =for example begin
 
   my $browser = HTML::Display->new(
-    class => 'HTML::Display::Dump';
+    class => 'HTML::Display::Dump',
   );
   $browser->display("<html><body><h1>Hello world!</h1></body></html>");
 

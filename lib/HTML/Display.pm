@@ -9,6 +9,9 @@ HTML::Display - display HTML locally in a browser
 
 =head1 SYNOPSIS
 
+=for example
+  my $html = "foo\n";
+
 =for example begin
 
   use strict;
@@ -28,8 +31,7 @@ HTML::Display - display HTML locally in a browser
 
 =for example_testing
   %os_default = ();
-  $html = "foo\n";
-  is($_STDOUT_,"foo\n<html><body><h1>Hello world!</h1></body></html>");
+  is($::_STDOUT_,"foo\n<html><body><h1>Hello world!</h1></body></html>");
 
 =head1 DESCRIPTION
 

@@ -34,14 +34,15 @@ this constructor as well :
 =for example end
 
 =for example_testing
-  my $class = HTML::Display::WhizBang->new();
-  isa_ok($class,"HTML::Display::Common");
+  package main;
+  my $browser = HTML::Display->new( class => "HTML::Display::WhizBang");
+  isa_ok($browser,"HTML::Display::Common");
 
 =cut
 
 sub new {
   my ($class) = shift;
-  croak "Odd number" if @_ % 2;
+  #croak "Odd number" if @_ % 2;
   my $self = { @_ };
   bless $self,$class;
   $self;
