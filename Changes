@@ -1,6 +1,6 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
-0.15 20030429
+0.16 20030429
   - Changed double quotes around parameters to single quotes
     to allow for urls like http://mark@foo.com (thanks Mark)
   - Added tests to check that created scripts at least compile
