@@ -5,6 +5,9 @@ Todo:
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
 
+0.36
+  - Fixed the actual bug too.
+
 0.35
   - Fixed documentation in HTML::Display::Debian about C<x-www-browser>.
 

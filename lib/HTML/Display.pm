@@ -3,7 +3,7 @@ use strict;
 use HTML::TokeParser;
 use Carp qw( croak );
 use vars qw( $VERSION );
-$VERSION = '0.02';
+$VERSION = '0.36';
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ add a new class or replace a class (or the rule), modify C<%os_default> :
   																	 };
   																	 $have_ole and $^O =~ qr/mswin32/i
   																 },
-  "HTML::Display::Debian" 		=> sub { -x "/bin/x-www-browser" },
+  "HTML::Display::Debian" 		=> sub { -x "/usr/bin/x-www-browser" },
   "HTML::Display::OSX"				=> sub { $^O =~ qr/darwin/i },
 );
 
