@@ -6,6 +6,7 @@ WWW-Mechanize-Shell-*
 WWW-Mechanize-Shell-*/
 CVS/
 pm_to_blib
+pm_to_blib.ts
 cvstest
 Makefile
 cover_db/

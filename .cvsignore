@@ -5,6 +5,7 @@ WWW-Mechanize-Shell-*
 *.old
 *.tar.gz
 pm_to_blib
+pm_to_blib.ts
 .lwpcookies
 cover_db
 META.yml
