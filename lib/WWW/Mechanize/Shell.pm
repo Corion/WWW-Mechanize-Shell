@@ -13,7 +13,7 @@ use Hook::LexWrap;
 use HTML::Display qw();
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.29';
+$VERSION = '0.30';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -311,7 +311,7 @@ precedence) :
 
     $link->text
     $link->name
-    $link->url 
+    $link->url
 
 =cut
 
@@ -360,7 +360,7 @@ use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
 use URI::URL;
 
-my $agent = WWW::Mechanize->new();
+my $agent = WWW::Mechanize->new( autocheck => 1 );
 my $formfiller = WWW::Mechanize::FormFiller->new();
 $agent->env_proxy();
 HEADER
@@ -1133,6 +1133,21 @@ sub run_script {
   $self->display($filename,$self->script("  "));
 };
 
+=head2 comment
+
+Adds a comment to the script and the history. The comment
+is prepended with a \n to increase readability.
+
+=cut
+
+sub run_comment {
+  my $self = shift;
+  if (@_)
+  {
+        $self->add_history("\n# @_ ");
+  }
+}
+
 =head2 fillout
 
 Fill out the current form
@@ -1721,6 +1736,14 @@ To fake an input field from within a shell session, use the C<eval> command :
   eval $self->agent->current_form->push_input(submit=>{name=>"submit",value=>"submit"});
 
 And yes, the generated script should do the Right Thing for this eval as well.
+
+=head1 LOCAL FILES
+
+If you want to use the shell on a local file without setting up a C<http> server
+to serve the file, you can use the C<file:> URI scheme to load it into the "browser":
+
+  get file:local.html
+  forms
 
 =head1 PROXY SUPPORT
 

@@ -7,6 +7,10 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - Provide better text for all links (for example when the content is an image)
   - Now moved to use WWW::Mechanize::Link instead of direct array access
   - This means it requires WWW::Mechanize 0.57 or higher
+  - added "comment" command, which allows to add comments to both, the shell
+    script and the generated script.
+  - accomodated for most recent version of LWP, which dosen't die on failing host
+    lookups but returns error 500.
 
 0.29
   - Fixed bug when autocompletion did crash the shell (S. Rezic)
