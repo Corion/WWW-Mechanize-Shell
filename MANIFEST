@@ -1,7 +1,6 @@
 Changes
 MANIFEST			This list of files
 MANIFEST.skip
-Makefile.PL
 README
 bin/banking.postbank.de.mech
 bin/hotmail.signup.mech
@@ -49,3 +48,18 @@ t/19-value-multi.t
 t/401-server
 t/98-bin.t
 t/99-pod.t
+t/embedded-HTML-Display-Common.t
+t/embedded-HTML-Display-Debian.t
+t/embedded-HTML-Display-Dump.t
+t/embedded-HTML-Display-Galeon.t
+t/embedded-HTML-Display-Mozilla.t
+t/embedded-HTML-Display-OSX-Camino.t
+t/embedded-HTML-Display-OSX-Safari.t
+t/embedded-HTML-Display-OSX.t
+t/embedded-HTML-Display-Opera.t
+t/embedded-HTML-Display-Phoenix.t
+t/embedded-HTML-Display-TempFile.t
+t/embedded-HTML-Display-Win32-IE.t
+t/embedded-HTML-Display-Win32-OLE.t
+t/embedded-HTML-Display-Win32.t
+t/embedded-HTML-Display.t

@@ -19,7 +19,7 @@ HTML::Display::Win32::OLE - use an OLE object to display HTML
   };
 
   my $browser = HTML::Display->new(
-    class => 'HTML::Display::Win32::OleControl';
+    class => 'HTML::Display::Win32::OleControl',
   );
   $browser->display("<html><body><h1>Hello world!</h1></body></html>");
 

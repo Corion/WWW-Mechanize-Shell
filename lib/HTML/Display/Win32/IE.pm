@@ -10,7 +10,7 @@ HTML::Display::Win32::IE - use IE to display HTML pages
 =for example begin
 
   my $browser = HTML::Display->new(
-    class => 'HTML::Display::Dump';
+    class => 'HTML::Display::Dump',
   );
   $browser->display("<html><body><h1>Hello world!</h1></body></html>");
 
@@ -31,9 +31,9 @@ sub control {
   my $self = shift;
   my $control;
   if ($self->{control}) {
-    $control = $self->SUPER::control;  
+    $control = $self->SUPER::control;
   } else {
-    $control = $self->SUPER::control;  
+    $control = $self->SUPER::control;
     $control->{'Visible'} = 1;
     $control->Navigate('about:blank');
   };
