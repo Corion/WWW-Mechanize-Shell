@@ -6,6 +6,8 @@ use LWP::Simple;
 use FindBin;
 use File::Spec;
 use File::Temp;
+use URI::URL qw();
+use Carp qw(carp croak);
 
 =head 2 C<Test::HTTP::LocalServer-E<gt>spawn %ARGS>
 
@@ -27,11 +29,11 @@ sub spawn {
   my ($class,%args) = @_;
   my $self = { %args };
   bless $self,$class;
-  
-  if (delete $args{debug}) {
-    $ENV{TEST_HTTP_VERBOSE} = 1;
-  };
 
+  local $ENV{TEST_HTTP_VERBOSE} = 1
+    if (delete $args{debug});
+
+  $self->{delete} = [];
   if (my $html = delete $args{html}) {
     # write the html to a temp file
     my ($fh,$tempfile) = File::Temp::tempfile();
@@ -39,9 +41,13 @@ sub spawn {
     print $fh $html
       or die "Couldn't write tempfile $tempfile : $!";
     close $fh;
-    $self->{delete} = $tempfile;
+    push @{$self->{delete}},$tempfile;
     $args{file} = $tempfile;
   };
+  my ($fh,$logfile) = File::Temp::tempfile();
+  $fh->close;
+  push @{$self->{delete}},$logfile;
+  $self->{logfile} = $logfile;
   my $web_page = delete $args{file};
   if (defined $web_page) {
     $web_page = qq{"$web_page"}
@@ -51,13 +57,14 @@ sub spawn {
 
   my $server_file = File::Spec->catfile( $FindBin::Bin,File::Spec->updir,'inc','Test','HTTP','log-server' );
 
-  open my $server, qq'$^X $server_file $web_page |'
+  open my $server, qq'$^X $server_file "$web_page" "$logfile" |'
     or die "Couldn't spawn fake server $server_file : $!";
   my $url = <$server>;
   chomp $url;
-
+  die "Couldn't find fake server url" unless $url;
+  
   $self->{_fh} = $server;
-  $self->{_server_url} = $url;
+  $self->{_server_url} = URI::URL->new($url);
 
   $self;
 };
@@ -70,7 +77,10 @@ if you need to compare results from two runs.
 
 =cut
 
-sub port { URI::URL->new($_[0]->url)->port };
+sub port { 
+  carp __PACKAGE__ . "::port called without a server" unless $_[0]->{_server_url};
+  $_[0]->{_server_url}->port
+};
 
 =head2 C<$server-E<gt>url>
 
@@ -82,7 +92,9 @@ or
 
 =cut
 
-sub url { $_[0]->{_server_url} };
+sub url { 
+  $_[0]->{_server_url}->abs
+};
 
 =head2 C<$server-E<gt>stop>
 
@@ -91,7 +103,10 @@ url.
 
 =cut
 
-sub stop { get( $_[0]->{_server_url} . "quit_server" )};
+sub stop { 
+  get( $_[0]->{_server_url} . "quit_server" ); 
+  undef $_[0]->{_server_url}
+};
 
 =head2 C<$server-E<gt>get_output>
 
@@ -105,10 +120,18 @@ as a string.
 sub get_output {
   my ($self) = @_;
   $self->stop;
-  my $fh = $self->{_fh};
-  my $result = join "\n", <$fh>;
-  $self->{_fh}->close;
-  $result;
+  local $/;
+  local *LOG;
+  open LOG, "<", $self->{logfile}
+    or die "Couldn't retrieve logfile";
+  join "", <LOG>;
+};
+
+sub DESTROY { 
+  $_[0]->stop if $_[0]->{_server_url};
+  for my $file (@{$_[0]->{delete}}) {
+    unlink $file or warn "Couldn't remove tempfile $file : $!\n";
+  };
 };
 
 =head1 EXPORT

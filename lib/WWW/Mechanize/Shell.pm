@@ -12,7 +12,7 @@ use Hook::LexWrap;
 use HTML::Display qw();
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.24';
+$VERSION = '0.25';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1276,10 +1276,10 @@ sub run_versions {
   no strict 'refs';
   my @modules = qw( WWW::Mechanize::Shell WWW::Mechanize::FormFiller WWW::Mechanize
   							    Term::Shell
-                    HTML::Parser HTML::TableExtract HTML::Parser
+                    HTML::Parser HTML::TableExtract HTML::Parser HTML::Display
                     Pod::Constants
                     File::Modified );
-  eval "use $_" foreach @modules;
+  eval "require $_" foreach @modules;
   $self->print_pairs( [@modules], [map { defined ${"${_}::VERSION"} ? ${"${_}::VERSION"} : "<undef>" } @modules]);
 };
 

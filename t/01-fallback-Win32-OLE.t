@@ -9,7 +9,7 @@ SKIP: {
     require Test::Without::Module;
     Test::Without::Module->import('Win32::OLE')
   };
-  skip "Need Test::Without::Module to test the fallback", 4
+  skip "Need Test::Without::Module to test the fallback", 3
     if $@;
 
   use_ok("WWW::Mechanize::Shell");

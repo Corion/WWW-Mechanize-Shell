@@ -149,7 +149,7 @@ BEGIN {
 
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /^fillout_mul/;
+  #  delete $tests{$_} unless /^back/;
   #};
 };
 
@@ -179,7 +179,7 @@ use vars qw( $actual_requests $dumped_requests );
   };
 
   *WWW::Mechanize::Shell::status = sub {};
-  *WWW::Mechanize::Shell::request_dumper = sub { $dumped_requests++ };  
+  *WWW::Mechanize::Shell::request_dumper = sub { $dumped_requests++ };
 };
 
 for my $name (sort keys %tests) {
@@ -191,6 +191,7 @@ for my $name (sort keys %tests) {
   my $requests = $tests{$name}->{requests};
 
   my $server = Test::HTTP::LocalServer->spawn();
+	my $code_port = $server->port;
 
   my $result_location = sprintf $tests{$name}->{location}, $server->url;
 	my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
@@ -207,10 +208,10 @@ for my $name (sort keys %tests) {
 	is($actual_requests,$requests,"$requests requests were made for $name");
 	is($dumped_requests,$requests,"$requests requests were dumped for $name");
 	my $code_requests = $server->get_output;
-	my $code_port = $server->port;
 
-  my $script_server = Test::HTTP::LocalServer->spawn();
-	my $script_port = $script_server->port;
+  # Get a clean start
+  $server = Test::HTTP::LocalServer->spawn();
+	my $script_port = $server->port;
 
   # Modify the generated Perl script to match the new? port
   my $script = join "\n", $s->script;
@@ -227,7 +228,7 @@ for my $name (sort keys %tests) {
   chomp $compile;
   SKIP: {
     unless (is($compile,"$tempname syntax OK","$name compiles")) {
-      $script_server->stop;
+      $server->stop;
       diag $script;
       skip "Script $name didn't compile", 2;
     };
@@ -236,9 +237,10 @@ for my $name (sort keys %tests) {
     $output = `$command`;
     is( $output, $code_output, "Output of $name is identical" )
       or diag "Script:\n$script";
-    my $script_requests = $script_server->get_output;
+    my $script_requests = $server->get_output;
     $code_requests =~ s!\b$code_port\b!$script_port!smg;
-    is($code_requests,$script_requests,"$name produces identical queries");
+    is($code_requests,$script_requests,"$name produces identical queries")
+      or diag $script;
   };
   unlink $tempname
     or diag "Couldn't remove tempfile '$name' : $!";

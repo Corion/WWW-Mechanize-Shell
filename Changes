@@ -1,5 +1,11 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.25
+  - The "versions" command also lists HTML::Display now
+  - hunted down and fixed error in skipping too many tests in t/01-Win32-OLE-fallback.t
+  - fixed redefinition warning in t/00-use.t
+  
+
 0.24 - fixup release for 0.23
   - Added $VERSION to all HTML::Display modules
   - patched handing of BASE tags, so that more cases are caught.

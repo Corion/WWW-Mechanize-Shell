@@ -27,6 +27,7 @@ SKIP: {
 
   # Check that trying to set an unknown option gives an error
   {
+    no warnings 'redefine';
     my $called;
     local *Carp::carp = sub {
       $called++;
@@ -36,6 +37,7 @@ SKIP: {
   }
 
   {
+    no warnings 'redefine';
     my $called;
     my $filename;
     local *WWW::Mechanize::Shell::source_file = sub {
@@ -52,6 +54,7 @@ SKIP: {
   };
 
   {
+    no warnings 'redefine';
     my $called = 0;
     my $filename;
     local *WWW::Mechanize::Shell::source_file = sub {
