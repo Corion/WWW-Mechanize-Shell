@@ -17,7 +17,7 @@ HTML::Display::Debian - display HTML using the Debian default
 =for example end
 
 This module implements displaying HTML through the Debian default web browser
-referenced as the program C</bin/x-www-browser>.
+referenced as the program C<x-www-browser>.
 
 =cut
 

@@ -5,6 +5,9 @@ Todo:
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
 
+0.35
+  - Fixed documentation in HTML::Display::Debian about C<x-www-browser>.
+
 0.34
   - Fixed a bug where C<form 2> resulted in an error. Now selecting a form by
     number actually works. Thanks for the report via RT.
