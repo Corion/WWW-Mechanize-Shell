@@ -3,6 +3,7 @@ use strict;
 
 use lib 'inc';
 use IO::Catch;
+use Test::More ();
 
 use File::Temp qw( tempfile );
 use WWW::Mechanize::Link;
@@ -10,12 +11,16 @@ use WWW::Mechanize::Link;
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
+BEGIN {
+  # Choose a nonannoying HTML displayer:
+  $ENV{PERL_HTML_DISPLAY_CLASS} = 'HTML::Display::Dump';
+  # Disable all ReadLine functionality
+  $ENV{PERL_RL} = 0;
+};
+
 use vars qw( %tests );
 
 BEGIN {
-  # Disable all ReadLine functionality
-  $ENV{PERL_RL} = 0;
-
   %tests = (
       'autofill' => 'autofill test Fixed value',
       'back' => 'back',
@@ -49,8 +54,8 @@ BEGIN {
 };
 
 use Test::More tests => scalar (keys %tests)*2 +1;
+BEGIN {   use_ok('WWW::Mechanize::Shell'); };
 SKIP: {
-use_ok('WWW::Mechanize::Shell');
 
 eval {
   require Test::MockObject;

@@ -16,9 +16,6 @@ BEGIN {
   );
 };
 
-#    useole
-#    browsercmd
-
 use Test::More tests => scalar @options*4 +1+4;
 
 SKIP: {
