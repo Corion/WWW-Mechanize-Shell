@@ -8,6 +8,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - The script can now be saved directly to a file
   - The generated scripts now have a correct shebang line
   - Fixed redirect behaviour in generated scripts
+  - Manually filled values (via 'fillout') now get created as 'value' commands
 
 0.20
   - made t/00a*.t a TODO test so that CPAN install (silently) works

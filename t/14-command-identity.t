@@ -44,11 +44,13 @@ BEGIN {
     eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ], location => '%s' },
     eval_sub => { requests => 2, lines => [
 						'# Fill in the "date" field with the current date/time as string',
-  					'eval sub custom_today { "20030511" };',
-  					'autofill text Callback WWW::Mechanize::Shell::custom_today',
+  					'eval sub ::custom_today { "20030511" };',
+  					'autofill session Callback ::custom_today',
   					'get %s',
   					'fillout',
+  					'eval $self->agent->current_form->value("session")',
   					'submit',
+  					'content',
     ], location => '%sformsubmit' },
     form => { requests => 2, lines => [ 'get %s','form 1','submit' ], location => '%sformsubmit' },
     formfiller_chars => { requests => 2,
@@ -84,6 +86,14 @@ BEGIN {
     				'value session 2',
     				'submit'
     ], location => '%sformsubmit' },
+    interactive_script_creation => { requests => 2,
+    									lines => [ 'eval @::list=qw(foo bar xxx)', 
+    														 'eval no warnings "once"; *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub { my $value=shift @::list; push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ]; $value }', 
+    														 'get %s', 
+    														 'fillout',
+    														 'submit',
+    														 'content' ],
+    									location => '%sformsubmit' },
     open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ], location => '%stest' },
     open_re => { requests => 2, lines => [ 'get %s','open "foo1"','content' ], location => '%sfoo1.save_log_server_test.tmp' },
     open_re2 => { requests => 2, lines => [ 'get %s','open "/foo1/"','content' ], location => '%sfoo1.save_log_server_test.tmp' },
@@ -101,6 +111,11 @@ BEGIN {
     $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ], location => '%s' };
     $tests{get_table_params} = { requests => 1, lines => [ 'get %s','table Col2 Col1' ], location => '%s' };
   };
+  
+  # To ease zeroing in on tests
+  #for (sort keys %tests) {
+  #  delete $tests{$_} unless /^i|^eval_sub/;
+  #};
 };
 
 use Test::More tests => 1 + (scalar keys %tests)*6;

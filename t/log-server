@@ -1,6 +1,7 @@
 # Thanks to merlyn for nudging me and giving me this snippet!
 use strict;
 use HTTP::Daemon;
+use CGI;
 
 $|++;
 
@@ -29,7 +30,12 @@ SERVERLOOP: {
         $res = HTTP::Response->new(302);
 				$res->header('location', $d->url . $1);
       } else {
-        $res = HTTP::Response->new(200, "OK", undef, sprintf($body,$location));
+        my ($session,$query);
+        my $q = CGI->new($r->uri->query);
+        $session = defined $q->param('session') ? $q->param('session') : 1;
+        $query = defined $q->param('query') ? $q->param('query') : "empty";
+        
+        $res = HTTP::Response->new(200, "OK", undef, sprintf($body,$location,$session,$query));
         $res->content_type('text/html');
         debug "Request " . ($r->uri->path || "/");
         if ( $location eq '/quit_server') {
@@ -70,8 +76,8 @@ __DATA__
     <tr><td>C1</td><td>C2</td><td>C3</td></tr>
   </table>
   <form action="/formsubmit">
-    <input type="hidden" name="session" value="1"/>
-    <input type="text" name="query" value="empty"/>
+    <input type="hidden" name="session" value="%s"/>
+    <input type="text" name="query" value="%s"/>
     <input type="submit" name="submit" value="Go"/>
   </form>
 </p>

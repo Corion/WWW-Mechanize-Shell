@@ -105,7 +105,7 @@ sub init {
 
   $self->{agent} = WWW::Mechanize->new();
   $self->agent->{__www_mechanize_shell} = $self;
-  
+
   $self->{browser} = undef;
   $self->{formfiller} = WWW::Mechanize::FormFiller->new(default => [ Ask => $self ]);
 
@@ -897,7 +897,7 @@ sub run_set {
 
 Display your current session history as the relevant commands.
 
-Syntax: 
+Syntax:
 
   history [FILENAME]
 
@@ -916,7 +916,7 @@ sub run_history {
 
 Display your current session history as a Perl script using WWW::Mechanize.
 
-Syntax: 
+Syntax:
 
   script [FILENAME]
 
@@ -943,11 +943,15 @@ value via the autofill command.
 
 sub run_fillout {
   my ($self) = @_;
+  my @interactive_values;
   eval {
+    $self->{answers} = [];
     $self->{formfiller}->fill_form($self->agent->current_form);
+    @interactive_values = @{$self->{answers}};
   };
   warn $@ if $@;
-  $self->add_history('$formfiller->fill_form($agent->current_form);');
+  $self->add_history( join( "\n", 
+                      map { sprintf( q[$formfiller->add_filler( '%s' => Fixed => '%s' );], @$_ ) } @interactive_values) . '$formfiller->fill_form($agent->current_form);');
 };
 
 =head2 auth
@@ -1143,7 +1147,7 @@ Examples:
 
   autofill login Fixed corion
   autofill password Ask
-  autofill selection Random
+  autofill selection Random red green orange
   autofill session Keep
 
 =cut
@@ -1155,7 +1159,7 @@ sub run_autofill {
   if ($class) {
     eval {
       $self->{formfiller}->add_filler($name,$class,@args);
-      $self->add_history( sprintf qq{\$formfiller->add_filler( %s => %s => %s ); }, $name, $class, join( ",", map {qq{'$_'}} @args));
+      $self->add_history( sprintf qq{\$formfiller->add_filler( "%s" => "%s" => %s ); }, $name, $class, join( ",", map {qq{'$_'}} @args));
     };
     warn $@
       if $@;
@@ -1259,11 +1263,13 @@ sub shell {
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
   use vars qw( $VERSION );
-  $VERSION = '0.20';
+  $VERSION = '0.21';
 
   sub new {
     my ($class,$name,$shell) = @_;
-    my $self = $class->SUPER::new($name, \&ask_value);
+    # Using the name here to allow for late binding and overriding via eval()
+    # from the shell command line
+    my $self = $class->SUPER::new($name, __PACKAGE__ . '::ask_value');
     $self->{shell} = $shell;
     Carp::carp "WWW::Mechanize::FormFiller::Value::Ask->new called without a value for the shell" unless $self->{shell};
 
@@ -1284,6 +1290,7 @@ sub shell {
                             ($input->value||''), @values );
     };
     undef $value if ($value eq "" and $input->type eq "checkbox");
+    push @{$self->{shell}->{answers}}, [ $input->name, $value ];
     $value;
   };
 };
@@ -1364,7 +1371,7 @@ namespace. You can inject new subroutines there and these get picked
 up by the Callback class of WWW::Mechanize::FormFiller :
 
   # Fill in the "date" field with the current date/time as string
-  eval sub custom_today { scalar localtime };
+  eval sub &::custom_today { scalar localtime };
   autofill date Callback WWW::Mechanize::Shell::custom_today
   fillout
 
@@ -1372,9 +1379,13 @@ This method can also be used to retrieve data from shell scripts :
 
   # Fill in the "date" field with the current date/time as string
   # works only if there is a program "date"
-  eval sub custom_today { chomp `date` };
+  eval sub &::custom_today { chomp `date` };
   autofill date Callback WWW::Mechanize::Shell::custom_today
   fillout
+  
+As the namespace is different between the shell and the generated
+script, make sure you always fully qualify your subroutine names,
+either in your own namespace or in the main namespace.
 
 =head1 GENERATED SCRIPTS
 
