@@ -14,7 +14,7 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.32';
+$VERSION = '0.33';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -288,14 +288,14 @@ sub sync_browser {
   my $html = '';
 
   # ugly fix:
-  # strip all target='_blank' attributes from the HTML:  
+  # strip all target='_blank' attributes from the HTML:
   my $p = HTML::TokeParser::Simple->new(\$unclean);
   while (my $token = $p->get_token) {
     $token->delete_attr('target')
       if $token->is_start_tag;
     $html .= $token->as_is;
   };
-  
+
   my $location = $self->agent->{uri};
   my $browser = $self->browser;
   $browser->display( html => $html, location => $location );
@@ -700,6 +700,8 @@ sub run_parse {
   my $content = $self->agent->content;
   my $p = HTML::TokeParser->new(\$content);
 
+	#$p->report_tags(qw(form input textarea select optgroup option));
+
   while (my $token = $p->get_token()) {
   #while (my $token = $p->get_tag("frame")) {
   #  print "<",$token->[0],":",ref $token->[1] ? $token->[1]->{src} : "",">";
@@ -709,25 +711,70 @@ sub run_parse {
 
 =head2 forms
 
-Display all forms on the current page
+Display all forms on the current page.
 
 =cut
 
 sub run_forms {
   my ($self,$number) = @_;
-  if ($number) {
-    $self->agent->form($number);
-    $self->status($self->agent->current_form->dump);
-    $self->add_history(sprintf q{$agent->form(%s);}, $number);
+  
+  my $count = 1;
+  my @forms = $self->agent->forms;
+  if (@forms) {
+    for my $form (@forms) {
+      print "Form [",$count++,"]\n";
+      $form->dump;
+    };
+  } else {
+    print "No forms on current page.\n";
+  };
+};
+
+=head2 form
+
+Select the form named NAME
+
+If NAME matches C</^\d+$/>, it is assumed to be the (1-based) index 
+of the form to select. There is no way of selecting a numerically 
+named form by its name.
+
+=cut
+
+sub run_form {
+  my ($self,$name) = @_;
+  my $number;
+  
+  unless ($self->agent->current_form) {
+    print "There is no form on this page.\n";
+    return;
+  };
+  
+  if ($name) {
+    my ($method,$val);
+    $val = $name;
+    if ($name =~ /^\d+$/) {
+      $method = 'form_number';
+    } else {
+      $method = 'form_name';
+      $val = qq{'$name'};
+    };
+    eval {
+      $self->agent->current_form->$method($name);
+      $self->status($self->agent->current_form->dump);
+      $self->add_history(sprintf q{$agent->%s(%s);}, $method, $val);
+    };
+    $self->display_user_warning( $@ )
+      if ($@);
   } else {
     my $count = 1;
-    my $formref = $self->agent->forms;
-    if ($formref) {
-      my @forms = @$formref;
+    my @forms = $self->agent->forms;
+    if (@forms) {
       for my $form (@forms) {
-        print "Form [",$count++,"]\n";
+        print sprintf "Form [%s] (%s)\n", $count++, ($form->attr('name') || "<no name>");
         $form->dump;
       };
+    } else {
+      print "No forms found on the current page.\n";
     };
   };
 };
@@ -1155,9 +1202,14 @@ sub run_fillout {
   my ($self) = @_;
   my @interactive_values;
   eval {
-    $self->{answers} = [];
-    $self->{formfiller}->fill_form($self->agent->current_form);
-    @interactive_values = @{$self->{answers}};
+    $self->{answers} = [];    
+    my $form = $self->agent->current_form;
+    if ($form) {
+      $self->{formfiller}->fill_form($self->agent->current_form);
+      @interactive_values = @{$self->{answers}};
+    } else {
+      $self->display_user_warning( "No form found on the current page." )
+    };
   };
   warn $@ if $@;
   $self->add_history( join( "\n",

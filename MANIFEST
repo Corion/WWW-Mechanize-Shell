@@ -53,6 +53,7 @@ t/22-complete-command.t
 t/23-check-dumpresponses.t
 t/24-source-file.t
 t/25-save-file-nolink.t
+t/26-form-no-form.t
 t/401-server
 t/98-bin.t
 t/99-pod.t

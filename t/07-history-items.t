@@ -22,6 +22,8 @@ BEGIN {
       'content' => 'content',
       'eval' => 'eval 1',
       'fillout' => 'fillout',
+      'form' => 'form 1',
+      'form' => 'form test',
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
       'open' => 'open foo',
@@ -63,7 +65,9 @@ $mock_result->set_always( code => 200 );
 my $mock_form = Test::MockObject->new;
 $mock_form->mock( value => sub {} )
           ->set_list( inputs => ())
-          ->set_list( find_input => ());
+          ->set_list( find_input => ())
+          ->mock( dump => sub {} )
+          ->set_always( form_name => 'foo' );
 
 my $mock_uri = Test::MockObject->new;
 $mock_uri->set_always( abs => 'http://example.com/' )

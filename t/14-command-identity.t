@@ -55,7 +55,10 @@ BEGIN {
     														        "from ",$self->agent->uri',
     														 'content' ],
     									location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$' },
-    form => { requests => 2, lines => [ 'get %s','form 1','submit' ],
+    form_name => { requests => 2, lines => [ 'get %s','form f','submit' ],
+              location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$'
+            },
+    form_num => { requests => 2, lines => [ 'get %s','form 1','submit' ],
               location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$'
             },
     formfiller_chars => { requests => 2,
