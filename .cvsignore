@@ -1,4 +1,6 @@
-blib/
-WWW-Mechanize-Shell-*/
+blib
+Makefile
+WWW-Mechanize-Shell-0.05
+WWW-Mechanize-Shell-*
 *.old
-
+*.tar.gz
