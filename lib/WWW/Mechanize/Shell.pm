@@ -14,7 +14,7 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.33';
+$VERSION = '0.34';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -717,7 +717,7 @@ Display all forms on the current page.
 
 sub run_forms {
   my ($self,$number) = @_;
-  
+
   my $count = 1;
   my @forms = $self->agent->forms;
   if (@forms) {
@@ -734,8 +734,8 @@ sub run_forms {
 
 Select the form named NAME
 
-If NAME matches C</^\d+$/>, it is assumed to be the (1-based) index 
-of the form to select. There is no way of selecting a numerically 
+If NAME matches C</^\d+$/>, it is assumed to be the (1-based) index
+of the form to select. There is no way of selecting a numerically
 named form by its name.
 
 =cut
@@ -743,12 +743,12 @@ named form by its name.
 sub run_form {
   my ($self,$name) = @_;
   my $number;
-  
+
   unless ($self->agent->current_form) {
     print "There is no form on this page.\n";
     return;
   };
-  
+
   if ($name) {
     my ($method,$val);
     $val = $name;
@@ -759,9 +759,9 @@ sub run_form {
       $val = qq{'$name'};
     };
     eval {
-      $self->agent->current_form->$method($name);
-      $self->status($self->agent->current_form->dump);
+      $self->agent->$method($name);
       $self->add_history(sprintf q{$agent->%s(%s);}, $method, $val);
+      $self->status($self->agent->current_form->dump);
     };
     $self->display_user_warning( $@ )
       if ($@);
@@ -1202,7 +1202,7 @@ sub run_fillout {
   my ($self) = @_;
   my @interactive_values;
   eval {
-    $self->{answers} = [];    
+    $self->{answers} = [];
     my $form = $self->agent->current_form;
     if ($form) {
       $self->{formfiller}->fill_form($self->agent->current_form);

@@ -5,6 +5,10 @@ Todo:
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
 
+0.34
+  - Fixed a bug where C<form 2> resulted in an error. Now selecting a form by
+    number actually works. Thanks for the report via RT.
+
 0.33
   - The C<form> command now got a life of its own instead of being a lazy abbreviation
     of the C<forms> command. It takes a form name or form number.
