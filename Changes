@@ -1,12 +1,13 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
-0.24
+0.24 - fixup release for 0.23
   - Added $VERSION to all HTML::Display modules
   - patched handing of BASE tags, so that more cases are caught.
     This adds HTML::TokeParser::Simple as a prerequisite. Thanks to
     Mark Stosberg for the initial patch!
   - fixed loading of classes in HTML::Display. Classes are only required
     if there is no method "display_html" in that namespace already.
+  - fixed embarassing Linux compatibility bugs
 
 0.23
   - "submit" didn't reload the browser HTML. Thanks to Slaven Rezic.
