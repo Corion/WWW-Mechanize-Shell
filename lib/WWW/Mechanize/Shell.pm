@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ WWW::Mechanize::Shell - A crude shell for WWW::Mechanize
 
 =head1 SYNOPSIS
 
-=begin example
+=for example begin
 
   #!/usr/bin/perl -w
   use strict;
@@ -28,7 +28,7 @@ WWW::Mechanize::Shell - A crude shell for WWW::Mechanize
     $shell->cmdloop;
   };
 
-=end example
+=for example end
 
 =for example_testing
   BEGIN {
@@ -702,7 +702,7 @@ for my $ts ($table->table_states) {
 };
 PRINTTABLE
   };
-  warn $@ if ($@);
+  warn "Couldn't load HTML::TableExtract: $@" if ($@);
 };
 
 =head2 tables
