@@ -45,6 +45,7 @@ SKIP: {
   };
 
   my $warned;
+  no warnings 'redefine';
   local *Carp::carp = sub { $warned = $_[0] };
   my $res = $s->option('doesnotexist');
   is( $res, undef, "Nonexisting option returns undef");
