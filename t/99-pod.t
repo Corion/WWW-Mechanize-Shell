@@ -19,16 +19,18 @@ my @files;
 if ($@) {
   plan skip_all => "Test::Pod required for testing POD";
 }
+elsif ($Test::Pod::VERSION < 0.95) {
+  plan skip_all => "Test::Pod 0.95 required for testing POD";
+}
 else {
   my $blib = File::Spec->catfile(qw(blib lib));
   find(\&wanted, $blib);
   plan tests => scalar @files;
   foreach my $file (@files) {
-    pod_ok($file);
+    pod_file_ok($file);
   }
 }
 
 sub wanted {
   push @files, $File::Find::name if /\.p(l|m|od)$/;
 }
-
