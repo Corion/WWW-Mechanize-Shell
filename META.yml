@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Mechanize-Shell
+version:      0.30
+version_from: lib/WWW/Mechanize/Shell.pm
+installdirs:  site
+requires:
+    Hook::LexWrap:                 0.2
+    HTML::TokeParser::Simple:      2
+    Term::Shell:                   0.01
+    Test::Harness:                 2.3
+    URI::URL:                      0
+    WWW::Mechanize:                0.63
+    WWW::Mechanize::FormFiller:    0.05
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

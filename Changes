@@ -5,6 +5,9 @@ Todo:
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
 
+0.31
+  - test t/13* didn't work when the CPAN build directory contains a space
+
 0.30
   - Now needs the latest? Test::Harness because otherwise some tests failed
     from time to time for no apparent reason.

@@ -13,7 +13,7 @@ use Hook::LexWrap;
 use HTML::Display qw();
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.30';
+$VERSION = '0.31';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1561,8 +1561,8 @@ Alias for referrer
 
 =cut
 
-sub run_referer { 
-  goto &WWW::Mechanize::Shell::run_referrer 
+sub run_referer {
+  goto &WWW::Mechanize::Shell::run_referrer
 };
 # sub alias_referrer { qw(referer) };
 

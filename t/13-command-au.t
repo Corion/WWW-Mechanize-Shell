@@ -25,7 +25,7 @@ skip "HTTP::Daemon required to test basic authentication",7
 delete $ENV{HTTP_PROXY};
 
 # Now start a fake webserver, fork, and connect to ourselves
-open SERVER, qq'"$^X" $FindBin::Bin/401-server |'
+open SERVER, qq'"$^X" "$FindBin::Bin/401-server" |'
   or die "Couldn't spawn fake server : $!";
 sleep 1; # give the child some time
 my $url = <SERVER>;
