@@ -42,14 +42,19 @@ BEGIN {
       'fillout' => 'fillout',
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
-      'open' => 'open',
-      'save' => 'save foo',
+      'open' => 'open foo',
+      'save' => 'save /foo/',
       'submit' => 'submit',
-      'table' => 'table',
-      'table params' => 'table foo bar',
       'value' => 'value key value',
       'ua' => 'ua foo/1.0',
   );
+  
+  eval {
+    require HTML::TableExtract;
+    $tests{table} = 'table';
+    $tests{table params} = 'table foo bar';
+    ;
+  };
 };
 
 use Test::More tests => scalar (keys %tests) +1;
@@ -82,14 +87,15 @@ $mock_form->mock( value => sub {} )
 
 my $mock_agent = Test::MockObject->new;
 $mock_agent->set_true($_)
-  for qw( back content get open  );
+  for qw( back content get mirror open follow );
 $mock_agent->set_false($_)
   for qw( form forms );
 $mock_agent->set_always( res => $mock_result )
            ->set_always( submit => $mock_result )
            ->set_always( click => $mock_result )
            ->set_always( current_form => $mock_form )
-           ->set_always( links => ());
+           ->set_always( links => ([1,'foo']))
+           ->set_always( agent => 'mocked/1.0');
 
 # Silence all warnings
 my $s = do {

@@ -401,10 +401,11 @@ sub run_save {
     print "No link given to save\n";
     return
   };
+  my @history;
 
   my @links = ();
   my @all_links = $self->agent->links;
-  $self->add_history( q{my @links;} );
+  push @history, q{my @links;};
 
   if ($user_link =~ m!^/(.*)/$!) {
     my $re = $1;
@@ -413,13 +414,13 @@ sub run_save {
     if (@links == 0) {
       print "No match.\n";
     };
-    $self->add_history( sprintf q{@links = map { /%s/ } $agent->links();}, $re);
+    push @history, sprintf q{@links = map { /%s/ } $agent->links();}, $re;
   } else {
-    $self->add_history( sprintf q{@links = '%s'}, $user_link);
+    push @history, sprintf q{@links = '%s'}, $user_link;
   };
 
   if (@links) {
-    $self->add_history( <<'CODE' );
+    $self->add_history( @history,<<'CODE' );
   my @all_links = $agent->links();
   for my $link (@links) {
     my $target = $all_links[$link]->[0];
@@ -672,7 +673,7 @@ sub run_open {
         $self->sync_browser;
       } else {
         #print $self->agent->{res}->as_string;
-        print "(",$self->agent->{res}->code,")\n";
+        print "(",$self->agent->res->code,")\n";
       };
     };
     warn $@ if $@;
@@ -813,9 +814,13 @@ sub run_fillout {
   $self->add_history('$formfiller->fill_form($agent->current_form);');
 };
 
-=head2 C<auth [authority realm] user password>
+=head2 auth
 
 Set basic authentication credentials.
+
+Syntax:
+
+  auth [authority realm] user password
 
 If you get back a 401, you can simply supply the matching
 user and password, as the authority and realm are already
@@ -904,8 +909,8 @@ sub run_table {
       };
     };
 
-    $self->add_history( sprintf 'my @columns = ( %s );', join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns )));
-    $self->add_history( <<'PRINTTABLE' );
+    $self->add_history( sprintf( 'my @columns = ( %s );', join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns ))),
+                        <<'PRINTTABLE' );
 my $table = HTML::TableExtract->new( headers => [ @columns ]);
 (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
 $table->parse($content);
@@ -1036,6 +1041,7 @@ sub run_eval {
   my ($self) = @_;
   my $code = $self->line;
   $code =~ /^eval\s+(.*)$/ and do {
+    $self->add_history("print do { $1 };");
     print eval $1,"\n";
   };
 };
@@ -1053,7 +1059,10 @@ Syntax:
 sub run_source {
   my ($self,$file) = @_;
   if ($file) {
-    $self->source_file($file);
+    eval { $self->source_file($file); };
+    if ($@) {
+      print "Could not source file '$file' : $@";
+    };
   } else {
     print "Syntax: source FILENAME\n";
   };

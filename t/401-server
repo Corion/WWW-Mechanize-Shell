@@ -1,0 +1,25 @@
+# Thanks to merlyn for nudging me and giving me this snippet!
+
+use HTTP::Daemon;
+
+$|++;
+
+my $d = HTTP::Daemon->new or die;
+print $d->url, "\n";
+
+$counter = 3;
+while ($counter-- and my $c = $d->accept) {
+  while (my $r = $c->get_request) {
+    if (my ($user, $pass) = $r->authorization_basic) {
+      $c->send_response(HTTP::Response->new(200, "OK", undef,
+					    "user = '$user' pass = '$pass'"));
+    } else {
+      my $res = HTTP::Response->new(401, "Auth Required", undef,
+				    "auth required");
+      $res->www_authenticate("Basic realm=\"testing realm\"");
+      $c->send_response($res);
+    }
+  }
+  $c->close;
+  undef($c);
+}

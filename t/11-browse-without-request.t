@@ -22,7 +22,7 @@ $s->cmd('set useole 0');
 $s->cmd('set browsercmd ""');
 
 # Now test
-$s->cmd('browse');
-ok(1,"Browsing without requesting anything does not crash the shell");
+eval { $s->cmd('browse'); };
+is($@, "", "Browsing without requesting anything does not crash the shell");
 
 };
