@@ -27,16 +27,10 @@ sub new {
   $self;
 };
 
-sub control {
-  my $self = shift;
-  my $control;
-  if ($self->{control}) {
-    $control = $self->SUPER::control;
-  } else {
-    $control = $self->SUPER::control;
-    $control->{'Visible'} = 1;
-    $control->Navigate('about:blank');
-  };
+sub setup {
+  my ($self,$control) = shift;
+  $control->{'Visible'} = 1;
+  $control->Navigate('about:blank');
 };
 
 sub display_html {

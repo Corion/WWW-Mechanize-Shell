@@ -28,14 +28,22 @@ HTML::Display::Win32::OLE - use an OLE object to display HTML
 =cut
 
 sub new {
-  eval "use Win32::OLE";
-  die $@ if $@;
   my ($class) = shift;
   my %args = @_;
 
   my $self = $class->SUPER::new( %args );
   $self;
 };
+
+=head2 setup
+
+C<setup> is a method you can override to provide initial
+setup of your OLE control. It is called after the control
+is instantiated for the first time.
+
+=cut
+
+sub setup {};
 
 =head2 control
 
@@ -47,7 +55,13 @@ to store it separately.
 
 sub control {
   my $self = shift;
-  $self->{control} ||= Win32::OLE->CreateObject($self->{app_string});
+  unless ($self->{control}) {
+    eval "use Win32::OLE";
+    die $@ if $@;
+    my $control = Win32::OLE->CreateObject($self->{app_string});    
+    $self->setup($control);
+    $self->{control} = $control;
+  };
   $self->{control};
 };
 
