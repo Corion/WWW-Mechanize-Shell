@@ -89,7 +89,7 @@ BEGIN {
     									location => '%sformsubmit' },
     get => { requests => 1, lines => [ 'get %s' ], location => '%s' },
     get_content => { requests => 1, lines => [ 'get %s', 'content' ], location => '%s' },
-    get_redirect => { requests => 1, lines => [ 'get %sredirect/startpage' ], location => '%sstartpage' },
+    get_redirect => { requests => 2, lines => [ 'get %sredirect/startpage' ], location => '%sstartpage' },
     get_save => { requests => 4, lines => [ 'get %s','save "/\.save_log_server_test\.tmp$/"' ], location => '%s' },
     get_value_click => { requests => 2, lines => [ 'get %s','value query foo', 'click submit' ], location => '%sformsubmit' },
     get_value_submit => { requests => 2, lines => [ 'get %s','value query foo', 'submit' ], location => '%sformsubmit' },
@@ -129,7 +129,7 @@ BEGIN {
 
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /^e/;
+  #  delete $tests{$_} unless /^get_red/;
   #};
 };
 
@@ -152,10 +152,10 @@ delete $ENV{HTTP_PROXY};
 my $actual_requests;
 {
   no warnings 'redefine';
-  my $old_do_request = *WWW::Mechanize::_do_request{CODE};
-  *WWW::Mechanize::_do_request = sub {
+  my $old_request = *WWW::Mechanize::request{CODE};
+  *WWW::Mechanize::request = sub {
     $actual_requests++;
-    goto &$old_do_request;
+    goto &$old_request;
   };
 
   *WWW::Mechanize::Shell::status = sub {};

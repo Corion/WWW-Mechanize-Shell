@@ -6,7 +6,7 @@ WriteMakefile(
     'VERSION_FROM'  => 'lib/WWW/Mechanize/Shell.pm', # finds $VERSION
     'PREREQ_PM'    => {'Term::Shell' => 0.01,
     									 'URI::URL' => 0.00,
-                       'WWW::Mechanize' => 0.40,
+                       'WWW::Mechanize' => 0.43,
                        'WWW::Mechanize::FormFiller' => 0.04}, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'lib/WWW/Mechanize/Shell.pm', # retrieve abstract from module

@@ -16,7 +16,9 @@ if ($filename) {
 my $body = join "", <DATA>;
 
 sub debug($) {
-  warn "#SERVER: $_[0]\n"
+  my $message = $_[0];
+  $message =~ s!\n!\n#SERVER:!g;
+  warn "#SERVER: $message"
     if $ENV{TEST_HTTP_VERBOSE};
 };
 
@@ -49,6 +51,7 @@ SERVERLOOP: {
           $quitserver = 1;
         };
       };
+      debug $res->as_string;
       $c->send_response($res);
       last if $quitserver;
     }

@@ -41,13 +41,13 @@ BEGIN {
   %tests = (
     interactive_script_creation => { requests => 2,
     									lines => [ 'eval @::list=qw(1 2 3 4 5 6 7 8 9 10 foo NY 11 DE 13 V 15 16 2038-01-01)',
-    														 'eval 
+    														 'eval
     														    no warnings "once";
     														    *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub {
-    														      #warn "Filled out ",$_[1]->name; 
-    														      my $value=shift @::list || "empty"; 
-    														      push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ]; 
-    														      $value 
+    														      #warn "Filled out ",$_[1]->name;
+    														      my $value=shift @::list || "empty";
+    														      push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ];
+    														      $value
     														    }',
     														 'get %s',
     														 'fillout',
@@ -78,10 +78,10 @@ delete $ENV{HTTP_PROXY};
 my $actual_requests;
 {
   no warnings 'redefine';
-  my $old_do_request = *WWW::Mechanize::_do_request{CODE};
-  *WWW::Mechanize::_do_request = sub {
+  my $old_request = *WWW::Mechanize::request{CODE};
+  *WWW::Mechanize::request = sub {
     $actual_requests++;
-    goto &$old_do_request;
+    goto &$old_request;
   };
 
   *WWW::Mechanize::Shell::status = sub {};

@@ -97,7 +97,7 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( links => [['foo','foo link','foo_link'],['foo2','foo2 link','foo2_link']])
            ->set_always( agent => 'mocked/1.0')
            ->set_always( uri => $mock_uri )
-           ->set_always( _do_request => 1 );
+           ->set_always( request => $mock_result );
 
 use_ok('WWW::Mechanize::Shell');
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef, watchfiles => undef );

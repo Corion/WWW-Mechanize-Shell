@@ -1,6 +1,9 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
 0.22
+  - The module now requires WWW::Mechanize v0.43, as the internal
+    API of WWW::Mechanize changed. Mixing W::M::S 0.21 or below with W::M v0.43+
+    will not work as will mixing W::M::S 0.22+ with W::M v0.41-
   - Added new command "reload", which repeats the last request
     (intended for testing/modifying server side code)
   - Altered fillout command - now _all_ fields that aren't predefined

@@ -852,8 +852,8 @@ is mostly intended to be used when testing server side code.
 sub run_reload {
   my ($self) = @_;
   eval {
-    $self->agent->_do_request;
-    $self->add_history('$agent->_do_request();');
+    $self->agent->request($self->agent->{req});
+    $self->add_history('$agent->request($agent->{req});');
     $self->sync_browser
       if ($self->option('autosync'));
   };
@@ -1017,20 +1017,20 @@ sub run_auth {
       if ($self->agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) {
         $realm = $2
       } else {
-        $self->warn_user();
+        #$self->warn_user();
         $realm = "";
       };
-      $authority = $self->agent->req->uri->authority();
+      $authority = $self->agent->{req}->uri->authority();
 
       $self->add_history(          q{($agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) or die "Couldn't find realm";},
-        						   q{my $realm = $2;},
-                                   q{my $authority = $agent->req->uri->authority();},
-                          sprintf( q{$agent->credentials($authority,$realm,'%s','%s');}, $user,$password ));
+        						               q{my $realm = $2;},
+                                   q{my $authority = $agent->{req}->uri->authority();},
+                          sprintf( q{$agent->credentials($authority,$realm,'%s' => '%s');}, $user,$password ));
     } else {
       ($authority, $realm, $user, $password) = @_;
       $self->add_history( sprintf q{$self->agent->credentials('%s','%s','%s','%s')}, $authority,$realm,$user,$password);
     };
-    $self->agent->credentials($authority,$realm,$user,$password);
+    $self->agent->credentials($authority,$realm,$user => $password);
 };
 
 =head2 table
