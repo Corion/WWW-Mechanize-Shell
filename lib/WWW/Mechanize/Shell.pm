@@ -705,7 +705,38 @@ Syntax:
 =cut
 
 sub run_value {
-  my ($self,$key,$value) = @_;
+  my ($self,$key,@values) = @_;
+  
+  # dwim on @values
+  my $value = join " ", @values;
+
+  # Look if we are filling a checkbox set:
+  #my $field = $self->agent->current_form->find_input($key);
+  #if ($field and ($field->type eq 'checkbox')) {
+  #  # We want to explicitly multiple checkboxes. This means we
+  #  # have to clear all checkboxes and then set them explicitly.
+ # 
+ #   for my $value (@values) {
+  #    # Blatantly stolen from WWW::Mechanize::Ticky by
+  #    # Mark Fowler E<lt>mark@twoshortplanks.comE<gt>
+  #    my $input;
+  #    my $index = 0;
+  #    INPUT: while($input = $self->agent->current_form->find_input($name,"checkbox",$index)) {
+  #      # can't guarentee that the first element will be undef and the second
+  #      # element will be the right name
+  #      foreach my $val ($input->possible_values()) {
+  #        next unless defined $val;
+  #        if ($val eq $value) {
+  #          $input->value($set ? $value : undef);
+  #          last INPUT;
+  #        }
+  #      }
+  #
+  #      # move onto the next input
+  #      $index++;
+  #    }
+  #  };
+  #};
 
   eval {
     local $^W;
@@ -1331,12 +1362,6 @@ sub shell {
   };
 };
 
-package WWW::Mechanize::Shell::Unwrap;
-
-sub DESTROY {$_[0]->()};
-
-1;
-
 __END__
 
 =head1 SAMPLE SESSIONS
@@ -1380,10 +1405,10 @@ you have to use quotes around it if the expression contains spaces :
 
   /link_foo/       # will match as (?-xims:link_foo)
   "/link foo/"     # will match as (?-xims:link foo)
-  
+
 Slashes do not need to be escaped, as the shell knows that a RE starts and
 ends with a slash :
-  
+
   /link/foo/       # will match as (?-xims:link/foo)
   "/link/ /foo/"   # will match as (?-xims:link/\s/foo)
 
@@ -1542,7 +1567,7 @@ Optionally silence the HTML::Parser / HTML::Forms warnings about invalid HTML.
 
 =item *
 
-Support setting of multiple values for checkboxes and selection lists (WWW::Mechanize::Ticker
+Support setting of multiple values for checkboxes and selection lists (WWW::Mechanize::Ticky
 does this for checkboxes. Steal that code.)
 
 =back

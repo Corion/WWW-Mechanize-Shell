@@ -31,28 +31,27 @@ use strict;
 tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
 
 use Test::More tests => 1 +3;
-SKIP: {
+
 BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
   use_ok('WWW::Mechanize::Shell');
 };
 
-  TODO: {
-    local $TODO = "Implement passing of multiple values";
+TODO: {
+  local $TODO = "Implement passing of multiple values";
 
-    my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
-    $s->agent->{content} = join "", <DATA>;
-    $s->agent->{forms} = [ HTML::Form->parse($s->agent->{content}, 'http://localhost/test/') ];
-    $s->agent->{form}  = @{$s->agent->{forms}} ? $s->agent->{forms}->[0] : undef;
-    $s->cmd('value cat cat_foo cat_bar cat_baz');
-    is_deeply([$s->agent->current_form->find_input('cat')->form_name_value],[qw[cat cat_foo cat cat_bar cat cat_baz]])
-      or diag $s->agent->current_form->find_input('cat')->form_name_value;
-    $s->cmd('value cat ""');
-    is_deeply([$s->agent->current_form->find_input('cat')],[]);
-    $s->cmd('value cat "cat_bar"');
-    is_deeply([$s->agent->current_form->find_input('cat')],[qw[cat_bar]]);
-  };
+  my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
+  $s->agent->{content} = join "", <DATA>;
+  $s->agent->{forms} = [ HTML::Form->parse($s->agent->{content}, 'http://localhost/test/') ];
+  $s->agent->{form}  = @{$s->agent->{forms}} ? $s->agent->{forms}->[0] : undef;
+  $s->cmd('value cat cat_foo cat_bar cat_baz');
+  is_deeply([$s->agent->current_form->find_input('cat')->form_name_value],[qw[cat cat_foo cat cat_bar cat cat_baz]])
+    or diag $s->agent->current_form->find_input('cat')->form_name_value;
+  $s->cmd('value cat ""');
+  is_deeply([$s->agent->current_form->find_input('cat')],[]);
+  $s->cmd('value cat "cat_bar"');
+  is_deeply([$s->agent->current_form->find_input('cat')],[qw[cat_bar]]);
 };
 __DATA__
 <html>

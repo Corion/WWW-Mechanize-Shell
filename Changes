@@ -1,5 +1,11 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.27
+  - removed ::Unwrap class that was not used anywhere
+  - If more than one value is passed to the "value" command, the parameters
+    are concatenated with spaces
+  - added test that all released files are in Unix text format
+
 0.26
   - added RE support to autofill
   - fixed broken HTML display as the filename was passed doubled

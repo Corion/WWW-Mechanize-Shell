@@ -52,6 +52,7 @@ t/401-server
 t/98-bin.t
 t/99-pod.t
 t/99-todo.t
+t/unix-text.t
 t/00-HTML-Display-use.t
 t/01-HTML-Display-TempFile-share.t
 t/embedded-HTML-Display-Common.t
