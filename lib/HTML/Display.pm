@@ -11,6 +11,7 @@ HTML::Display - display HTML locally in a browser
 
 =for example
   my $html = "foo\n";
+  %HTML::Display::os_default = ();
 
 =for example begin
 
@@ -30,7 +31,6 @@ HTML::Display - display HTML locally in a browser
 =for example end
 
 =for example_testing
-  %os_default = ();
   is($::_STDOUT_,"foo\n<html><body><h1>Hello world!</h1></body></html>");
 
 =head1 DESCRIPTION

@@ -35,6 +35,7 @@ this constructor as well :
 
 =for example_testing
   package main;
+  use HTML::Display;
   my $browser = HTML::Display->new( class => "HTML::Display::WhizBang");
   isa_ok($browser,"HTML::Display::Common");
 
