@@ -7,12 +7,13 @@ use WWW::Mechanize::FormFiller;
 use HTTP::Cookies;
 use base qw( Term::Shell Exporter );
 use FindBin;
+use File::Temp qw(tempfile);
 use URI::URL;
 use Hook::LexWrap;
 use HTML::Display qw();
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.27';
+$VERSION = '0.28';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -199,6 +200,37 @@ sub display_user_warning {
     if $self->option('warnings');
 };
 
+=head2 C<$shell-E<gt>print_paged LIST> 
+
+Prints the text in LIST using C<$ENV{PAGER}>. If C<$ENV{PAGER}>
+is empty, prints directly to C<STDOUT>. Most of this routine
+comes from the C<perldoc> utility.
+
+=cut
+
+sub print_paged {
+  my $self = shift;
+  
+  if ($ENV{PAGER} and -t STDOUT) {
+    my ($fh,$filename) = tempfile();
+    print $fh $_ for @_;
+    close $fh;
+    
+    my @pagers = ($ENV{PAGER});
+		foreach my $pager (@pagers) {
+			if ($^O eq 'VMS') {
+				last if system("$pager $filename") == 0; # quoting prevents logical expansion
+			} else {
+				last if system(qq{$pager "$filename"}) == 0;
+			}
+		};    
+    unlink $filename 
+      or $self->display_user_warning("Couldn't unlink tempfile $filename : $!\n");
+  } else {
+    print $_ for @_;
+  };
+};
+
 sub agent { $_[0]->{agent}; };
 
 sub option {
@@ -344,7 +376,7 @@ sub display {
     };
     warn $@ if $@;
   } else {
-    print join( "", map { "$_\n" } (@lines) );
+    $self->print_paged( join( "", map { "$_\n" } (@lines) ));
   };
 };
 
@@ -560,7 +592,7 @@ CODE
 
 =head2 content
 
-Display the content for the current page. 
+Display the content for the current page.
 
 Syntax: content [FILENAME]
 
@@ -575,19 +607,17 @@ manual editing of the produced script.
 sub run_content {
   my ($self, $filename) = @_;
   $self->display($filename, $self->agent->content);
-  if ($filename) {
-    $self->add_history( sprintf '{ my $filename = q{%s};
-  local *F; 
+if ($filename) {
+  $self->add_history( sprintf '{ my $filename = q{%s};
+	local *F;
   open F, "> $filename" or die "$filename: $!";
-  binmode F;
-  print F $agent->content,"\n"; 
-  close F 
+	binmode F;
+	print F $agent->content,"\n";
+	close F
 };', $filename );
   } else {
     $self->add_history('print $agent->content,"\n";');
   };
-  #  print $self->agent->content,"\n";
-  #}
 };
 
 =head2 ua
@@ -1185,12 +1215,14 @@ sub run_table {
     my $table = HTML::TableExtract->new( headers => [ @columns ] );
     (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
     $table->parse($content);
-    print join(", ", @columns),"\n";
+    my @lines;
+    push @lines, join(", ", @columns),"\n";
     for my $ts ($table->table_states) {
       for my $row ($ts->rows) {
-        print join(", ", @$row), "\n";
+        push @lines, join(", ", @$row), "\n";
       };
     };
+    $self->print_paged(@lines);
 
     $self->add_history( sprintf( 'my @columns = ( %s );'."\n", join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns ))),
                         <<'PRINTTABLE' );
@@ -1239,12 +1271,14 @@ sub run_tables {
     my $table = HTML::TableExtract->new( subtables => 1 );
     (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
     $table->parse($content);
+    my @lines;
     for my $ts ($table->table_states) {
       my ($row) = $ts->rows;
       if (grep { /\S/ } (@$row)) {
-        print "Table ", join( ",",$ts->coords ), " : ", join(",", @$row),"\n";
+        push @lines, join( "", "Table ", join( ",",$ts->coords ), " : ", join(",", @$row),"\n" );
       };
     };
+    $self->print_paged(@lines);
   };
   $self->display_user_warning( $@ )
     if $@;
@@ -1470,7 +1504,10 @@ sub run_referrer {
     };
     $self->add_history( sprintf q{$agent->add_header('Referer', '%s');}, $referrer);
   } else {
-    print "syntax: referer|referrer URL\n";
+    # print "syntax: referer|referrer URL\n";
+    eval {
+			print "Referer: ", $self->agent->{req}->header('Referer'),"\n";
+    };
   }
 };
 
@@ -1484,7 +1521,7 @@ display the last server response
 
 sub run_response {
   my ($self) = @_;
-  eval { print $self->agent->res->as_string };
+  eval { $self->print_paged( $self->agent->res->as_string )};
 };
 
 sub shell {
