@@ -432,13 +432,14 @@ CODE
       my $target = $all_links[$link]->[0];
       $target =~ s!^(.*/)([^/]+)$!$1!;
       eval {
+        print "$all_links[$link] => $target";
         $self->agent->mirror($all_links[$link]->[0],$target); 
+        print "\n";
       };
       warn $@ if $@;
     };
   }
 };
-
 
 =head2 content
 
