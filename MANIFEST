@@ -8,6 +8,7 @@ bin/hotmail.signup.mech
 bin/wwwshell.pl
 inc/Test/HTTP/LocalServer.pm
 inc/Test/HTTP/log-server
+inc/IO/Catch.pm
 lib/HTML/Display.pm
 lib/HTML/Display/Common.pm
 lib/HTML/Display/Debian.pm
