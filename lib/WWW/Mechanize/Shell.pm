@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 =head1 NAME
 
@@ -73,7 +73,7 @@ your current browser cookies.
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
   use vars qw( $VERSION );
-  $VERSION = 0.05;
+  $VERSION = 0.07;
 
   sub new {
     my ($class,$name,$shell) = @_;
