@@ -125,8 +125,7 @@ sub new {
     eval "require $best_class"
       unless defined *{"${best_class}::display_html"}{CODE};
   };
-  croak $@ if $@;
-  #warn "Using $best_class\n";
+  croak "While trying to load $best_class: $@" if $@;
   return $best_class->new(@_);
 };
 
