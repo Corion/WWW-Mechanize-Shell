@@ -5,6 +5,8 @@ use lib 'inc';
 use IO::Catch;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
+$SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
+tie *STDERR, 'IO::Catch', '_STDERR_' or die $!;
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
 use Test::More tests => 1 +3;

@@ -10,6 +10,7 @@ use URI::URL;
 use LWP::Simple;
 
 # Catch output:
+$SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 tie *STDERR, 'IO::Catch', '_STDERR_' or die $!;
 
@@ -152,9 +153,9 @@ BEGIN {
   };
 
   # To ease zeroing in on tests
-  for (sort keys %tests) {
-    delete $tests{$_} unless /eval_/;
-  };
+  #for (sort keys %tests) {
+  #  delete $tests{$_} unless /eval_/;
+  #};
 };
 
 use Test::More tests => 1 + (scalar keys %tests)*7;

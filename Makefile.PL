@@ -5,7 +5,8 @@ WriteMakefile(
     'NAME'    => 'WWW::Mechanize::Shell',
     'VERSION_FROM'  => 'lib/WWW/Mechanize/Shell.pm', # finds $VERSION
     'PREREQ_PM'    => {'Term::Shell' => 0.01,
-    									 'URI::URL' => 0.00,
+		       'URI::URL' => 0.00,
+		       'Test::Harness' => 2.30,
                        'WWW::Mechanize' => 0.64,
                        'WWW::Mechanize::FormFiller' => 0.05,
                        'Hook::LexWrap' => 0.20,
