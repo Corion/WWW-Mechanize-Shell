@@ -1,0 +1,19 @@
+Revision history for Perl extension WWW::Mechanize::Shell.
+
+0.05 20030307
+  - Fixed the dependency on Win32::OLE - the module now handles other
+    environments gracefully
+  - Added some tests for the module fallbacks (these tests need Test::Without::Module)
+
+0.04 20030301
+  - reupload as the 0.02 and 0.03 upload was broken
+
+0.02 20030228
+  - Made the shell much more robust against wrong parameters and
+    internal failures.
+  - Open /foo/ now goes into the Perl code as "follow(/foo/)",
+    as it should be
+
+0.01  Thu Nov  7 23:04:20 2002
+  - original version; created by h2xs 1.21 with options
+    -X WWW::Mechanize::Shell
