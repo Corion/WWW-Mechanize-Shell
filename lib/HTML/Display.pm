@@ -92,7 +92,8 @@ add a new class or replace a class (or the rule), modify C<%os_default> :
 =cut
 
 sub new {
-  my ($class,%args) = @_;
+  my $class = shift;
+  my (%args) = @_;
 
   # First see whether the programmer or user specified a class
   my $best_class = delete $args{class} || $ENV{PERL_HTML_DISPLAY_CLASS};
@@ -102,7 +103,8 @@ sub new {
     my $command = delete $args{browsercmd} || $ENV{PERL_HTML_DISPLAY_COMMAND};
     if ($command) {
       $best_class = "HTML::Display::TempFile";
-      push @_, browsercmd => $command;
+      $args{browsercmd} = $command;
+      @_ = %args;
     };
   };
 

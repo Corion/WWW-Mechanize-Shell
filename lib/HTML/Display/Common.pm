@@ -17,17 +17,17 @@ the hash. If you need to do other things in your constructor, remember to call
 this constructor as well :
 
 =for example begin
-  
+
   package HTML::Display::WhizBang;
   use base 'HTML::Display::Common';
-  
+
   sub new {
     my ($class) = shift;
-    my %args = @_;    
+    my %args = @_;
     my $self = $class->SUPER::new(%args);
-    
+
     # do stuff
-    
+
     $self;
   };
 
@@ -41,6 +41,7 @@ this constructor as well :
 
 sub new {
   my ($class) = shift;
+  croak "Odd number" if @_ % 2;
   my $self = { @_ };
   bless $self,$class;
   $self;
@@ -94,7 +95,7 @@ it to the user, the C<location> parameter comes in very handy :
 
   my $html = '<html><body><img src="/images/hp0.gif"></body>';
   my $browser = HTML::Display->new();
-  
+
   # This will display part of the Google logo
   $browser->display( html => $html, location => 'http://www.google.com' );
 
@@ -102,7 +103,7 @@ it to the user, the C<location> parameter comes in very handy :
 
 =for example_testing
   isa_ok($browser, "HTML::Display::Dump","The browser");
-  is( $main::_STDOUT_,'<html><body><img src="/images/hp0.gif"></body>',"HTML gets output");  
+  is( $main::_STDOUT_,'<html><body><img src="/images/hp0.gif"></body>',"HTML gets output");
 
 =cut
 
