@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 =head1 NAME
 
@@ -73,7 +73,7 @@ your current browser cookies.
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
   use vars qw( $VERSION );
-  $VERSION = '0.09';
+  $VERSION = '0.10';
 
   sub new {
     my ($class,$name,$shell) = @_;
@@ -180,6 +180,9 @@ sub init {
   };
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
 
+  # Load the proxy settings from the environment
+  $self->agent->env_proxy();
+
   $self->source_file($sourcefile) if $sourcefile; # and -f $sourcefile and -r $sourcefile;
 };
 
@@ -241,18 +244,20 @@ sub browser {
 
 sub sync_browser {
   my ($self) = @_;
+  my $browser = $self->browser;
+  if ($browser) {
+    my $document = $browser->{Document};
+    $document->open("text/html","replace");
+    my $html = $self->agent->{res}->content;
+    my $location = $self->agent->{uri};
 
-  my $document = $self->browser->{Document};
-  $document->open("text/html","replace");
-  my $html = $self->agent->{res}->content;
-  my $location = $self->agent->{uri};
+    # If there is no <BASE> tag, set one
 
-  # If there is no <BASE> tag, set one
+    $html =~ s!(</head>)!<base href="$location" />$1!i
+      unless ($html =~ /<BASE/i);
 
-  $html =~ s!(</head>)!<base href="$location" />$1!i
-    unless ($html =~ /<BASE/i);
-
-  $document->write($html);
+    $document->write($html);
+  };
 };
 
 sub prompt_str { $_[0]->agent->{uri} . ">" };
@@ -370,7 +375,6 @@ Display all links on a page
 
 sub run_links {
   my ($self) = @_;
-  #my $links = $self->agent->extract_links();
   my $links = $self->agent->links;
   my $count = 0;
   for my $link (@$links) {
@@ -409,10 +413,13 @@ sub run_forms {
     $self->add_history('$agent->form('.$number.');');
   } else {
     my $count = 1;
-    my @forms = @{$self->agent->{forms}};
-    for my $form (@forms) {
-      print "Form [",$count++,"]\n";
-      $form->dump;
+    my $formref = $self->agent->forms;
+    if ($formref) {
+      my @forms = @$formref;
+      for my $form (@forms) {
+        print "Form [",$count++,"]\n";
+        $form->dump;
+      };
     };
   };
 };
@@ -425,7 +432,12 @@ Dump the values of the current form
 
 sub run_dump {
   my ($self) = @_;
-  $self->agent->current_form->dump;
+  my $form = $self->agent->current_form;
+  if ($form) {
+    $form->dump
+  } else {
+    warn "There is no form on the current page\n";
+  };
 };
 
 =head2 value
@@ -612,13 +624,15 @@ Displays your current session history
 
 sub run_history {
   my ($self) = @_;
-  #print join( "", map { $_->[0] } @{$self->{history}}), "\n";
-  print <<'HEADER';
+  print sprintf <<'HEADER', $^X;
+#%s -w
+use strict;
 use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
 
 my $agent = WWW::Mechanize->new();
 my $formfiller = WWW::Mechanize::FormFiller->new();
+$agent->env_proxy();
 HEADER
   print join( "", map { "  " . $_->[1] . "\n" } @{$self->{history}}), "\n";
   print <<'FOOTER';
@@ -639,6 +653,94 @@ sub run_fillout {
   my ($self) = @_;
   $self->{formfiller}->fill_form($self->agent->current_form);
   $self->add_history('$formfiller->fill_form($agent->current_form);');
+};
+
+=head2 table
+
+Display a table described by the columns COLUMNS.
+
+Syntax:
+  table COLUMNS
+
+Example:
+  table Product Price Description
+
+If there is a table on the current page that has in its first row the three
+columns C<Product>, C<Price> and C<Description> (not necessarily in that order),
+the script will display these columns of the whole table.
+
+L<HTML::TableExtract> is needed for this feature.
+
+=cut
+
+sub run_table {
+  my ($self,@columns) = @_;
+
+  eval {
+    require HTML::TableExtract;
+
+    my $table = HTML::TableExtract->new( headers => [ @columns ] );
+    (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
+    $table->parse($content);
+    print join(", ", @columns),"\n";
+    for my $ts ($table->table_states) {
+      for my $row ($ts->rows) {
+        print join(", ", @$row), "\n";
+      };
+    };
+
+    $self->add_history('my @columns = ( ' . map( { s/(['\\])/\\$1/g; qq('$_') } @columns ) . ' );' );
+    $self->add_history( <<'PRINTTABLE' );
+my $table = HTML::TableExtract->new( headers => [ @columns ]);');
+(my $content = $self->agent->content) =~ s/\&nbsp;?//g;
+$table->parse($content);
+print join(", ", @columns),"\n";
+for my $ts ($table->table_states) {
+  for my $row ($ts->rows) {
+    print join(", ", @$row), "\n";
+  };
+};
+PRINTTABLE
+  };
+  warn $@ if ($@);
+};
+
+=head2 tables
+
+Display a list of tables.
+
+Syntax:
+  tables
+
+This command will display the top row for every
+table on the current page. This is convenient if you want
+to find out what the exact spellings for each column are.
+
+The command does not always work nice, for example if a
+site uses tables for layout, it will be harder to guess
+what tables are irrelevant and what tables are relevant.
+
+L<HTML::TableExtract> is needed for this feature.
+
+=cut
+
+sub run_tables {
+  my ($self,@columns) = @_;
+
+  eval {
+    require HTML::TableExtract;
+
+    my $table = HTML::TableExtract->new( subtables => 1 );
+    (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
+    $table->parse($content);
+    for my $ts ($table->table_states) {
+      my ($row) = $ts->rows;
+      if (grep { /\S/ } (@$row)) {
+        print "Table ", join( ",",$ts->coords ), " : ", join(",", @$row),"\n";
+      };
+    };
+  };
+  warn $@ if $@;
 };
 
 =head2 cookies
@@ -728,12 +830,69 @@ Syntax:
 
 sub run_source {
   my ($self,$file) = @_;
-  $self->source_file($file);
+  if ($file) {
+    $self->source_file($file);
+  } else {
+    print "Syntax: source FILENAME\n";
+  };
 };
 
 1;
 
 __END__
+
+=head1 SAMPLE SESSIONS
+
+=head2 Entering values
+
+  # Search for a term on Google
+  get http://www.google.com
+  value q "Corions Homepage"
+  click btnG
+  history
+  # (yes, this is a bad example of automating, as Google
+  #  already has a Perl API. But other sites don't)
+
+
+=head2 Retrieving a table
+
+  get http://www.perlmonks.org
+  open "/Saints in/"
+  table User Experience Level
+  history
+  # now you have a program that gives you a csv file of
+  # that table.
+
+=head1 GENERATED SCRIPTS
+
+The C<history> command outputs a skeleton script that reproduces
+your actions as done in the current session. It pulls in
+L<WWW::Mechanize::FormFiller>, which is possibly not needed. You
+should add some error and connection checking afterwards.
+
+=head1 PROXY SUPPORT
+
+Currently, the proxy support is realized via a call to
+the C<env_proxy> method of the WWW::Mechanize object, which
+loads the proxies from the environment. There is no provision made
+to prevent using proxies (yet). The generated scripts also
+load their proxies from the environment.
+
+=head1 ONLINE HELP
+
+The online help feature is currently a bit broken in C<Term::Shell>,
+but a fix is in the works. Until then, you can reenable the
+dynamic online help by patching L<Term::Shell> :
+
+Remove the three lines
+
+      my $smry = exists $o->{handlers}{$h}{smry}
+    ? $o->summary($h)
+    : "undocumented";
+
+in C<sub run_help> and replace them by
+
+      my $smry = $o->summary($h);
 
 =head1 EXPORT
 

@@ -1,5 +1,15 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.10 20030312
+  - Added the "table" command to display/dump HTML tables using HTML::TableExtract
+  - Added "table" history
+  - Added tests for history
+  - Brought README file up to date with the suggested support modules
+  - Added example showing off tables
+  - Added proxy support to the shell and the produced scripts
+  - Added documentation on proxy
+  - Added table lister
+
 0.09 20030308
   - I should go back and use the web interface. It was made for people like me.
 

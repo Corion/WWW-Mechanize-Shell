@@ -1,4 +1,4 @@
-WWW/Mechanize/Shell version 0.05
+WWW/Mechanize/Shell version 0.10
 ================================
 
 This is a small shell around WWW::Mechanize
@@ -30,8 +30,11 @@ This module requires these other modules and libraries:
 
 Nice to have are :
 
-  Pod::Constants - for the online help
+  Win32::OLE - for automating IE
 
+  Pod::Constants - for the online help
+  
+  HTML::TableExtract - for extracting stuff out of tables
 
 COPYRIGHT AND LICENCE
 

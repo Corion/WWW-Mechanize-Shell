@@ -28,6 +28,7 @@ SKIP: {
   for my $method (@methods) {
     my $helptext = $shell->catch_smry($method);
     is($@,'',"No error");
-    isnt( $helptext, undef, "Documentation for $method");
+    isnt( $helptext, undef, "Documentation for $method is there");
+    isnt( $helptext, '', "Documentation for $method is not empty");
   };
 };
