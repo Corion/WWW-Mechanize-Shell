@@ -7,7 +7,7 @@ $|++;
 my $d = HTTP::Daemon->new or die;
 print $d->url, "\n";
 
-$counter = 3;
+$counter = 4;
 while ($counter-- and my $c = $d->accept) {
   while (my $r = $c->get_request) {
     if (my ($user, $pass) = $r->authorization_basic) {
