@@ -1545,6 +1545,7 @@ sub run_referrer {
     if ($@) {
       print "Could not set referrer : $@";
     };
+    # warn "Added $referrer";
     $self->add_history( sprintf q{$agent->add_header('Referer', '%s');}, $referrer);
   } else {
     # print "syntax: referer|referrer URL\n";
