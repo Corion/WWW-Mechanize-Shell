@@ -182,7 +182,7 @@ sub source_file {
   while (<F>) {
     $self->cmd($_);
     warn "cmd: $_"
-			if $self->{options}->{verbose};
+      if $self->{options}->{verbose};
   };
   close F;
 };
@@ -722,11 +722,8 @@ sub run_forms {
   my $agent = $self->agent;
   my @forms = $agent->forms;
   if (@forms) {
-    use Data::Dumper;
-    warn Dumper \@forms;
     for (@forms) {
       print "Form [",$count++,"]\n";
-      warn $_;
       $_->dump;
     };
   } else {
