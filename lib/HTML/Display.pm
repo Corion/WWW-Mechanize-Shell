@@ -121,10 +121,11 @@ sub new {
   $best_class ||= "HTML::Display::Dump";
 
   { no strict 'refs';
+    #undef $@;
     eval "require $best_class"
       unless defined *{"${best_class}::display_html"}{CODE};
+    croak "While trying to load $best_class: $@" if $@;
   };
-  croak "While trying to load $best_class: $@" if $@;
   return $best_class->new(@_);
 };
 
