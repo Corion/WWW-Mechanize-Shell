@@ -1,4 +1,6 @@
 package WWW::Mechanize::Shell;
+# $revision$
+
 use strict;
 use Carp;
 use WWW::Mechanize;
@@ -142,8 +144,6 @@ sub init {
     $sourcefile = "$userhome/.mechanizerc";
   };
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
-
-  #$self->add_handlers( '#' );
 
   # Load the proxy settings from the environment
   $self->agent->env_proxy();
@@ -1225,7 +1225,7 @@ Add a convenience C<shell> method to allow for command line invocation :
 Add C<auth> command to add basic authentification to the current page.
 
   auth user password
-  
+
   ==> $a->credentials("$host:$port", $realm, $user, $password);
   (where $host,$port and $realm come from the current page)
 
