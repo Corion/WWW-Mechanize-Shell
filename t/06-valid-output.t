@@ -53,7 +53,7 @@ BEGIN {
       'value' => 'value key value',
       'ua' => 'ua foo/1.1',
   );
-  
+
   eval {
     require HTML::TableExtract;
     $tests{table} = 'table';
@@ -78,7 +78,7 @@ eval {
   require Test::MockObject;
   Test::MockObject->import();
 };
-skip "Test::MockObject not installed", scalar keys %tests
+skip "Test::MockObject not installed", scalar (keys %tests)*2
   if $@;
 
 my $mock_result = Test::MockObject->new;

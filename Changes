@@ -7,6 +7,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - various documentation fixes
   - fixed behaviour of "open" with regard to regular expressions
   - extensive testing of shell behaviour regarding the navigation added
+  - Fixed t/06* when Test::MockObject is not installed
 
 0.19
   - Added t/00a*.t to check for a Term::Shell bug to the MANIFEST
