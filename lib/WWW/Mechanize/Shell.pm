@@ -108,9 +108,9 @@ sub init {
   # Install the request dumper :
   $self->{request_wrapper} = wrap *LWP::UserAgent::request,
                                pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); },
-                               post => sub { 
+                               post => sub {
                                  #warn scalar @_, " arguments";
-                                 #warn $_ for @_; 
+                                 #warn $_ for @_;
                                  $self->response_dumper($_[-1]) if $self->option("dumpresponses");
                                };
 
@@ -176,7 +176,8 @@ sub source_file {
   my ($self,$filename) = @_;
   local $_; # just to be on the safe side that we don't clobber outside users of $_
   local *F;
-  open F, "< $filename" or die "Couldn't open '$filename' : $!\n";
+  open F, "< $filename"
+    or die "Couldn't open '$filename' : $!\n";
   while (<F>) {
     $self->cmd($_);
     warn "cmd: $_"
@@ -301,6 +302,26 @@ sub re_or_string {
     $arg = eval "qr/$re/$mode";
   };
   $arg;
+};
+
+=head2 C<< $shell->link_text LINK >>
+
+Returns a meaningfull text from a WWW::Mechanize::Link object. This is (in order of
+precedence) :
+
+    $link->text
+    $link->name
+    $link->url 
+
+=cut
+
+sub link_text {
+  my ($self,$link) = @_;
+  my $result;
+  for (qw( text name url )) {
+    $result = $link->$_ and last;
+  };
+  $result;
 };
 
 =head2 C<$shell-E<gt>history>
@@ -533,12 +554,12 @@ sub run_save {
   if (ref $user_link) {
     my $count = -1;
     my $re = $user_link;
-    @links = map { $count++; (($_->[0] =~ /$re/)||($_->[1] =~ /$re/)) ? $count : () } @all_links;
+    @links = map { $count++; (($_->text =~ /$re/)||($_->url =~ /$re/)) ? $count : () } @all_links;
     if (@links == 0) {
       print "No match for /$re/.\n";
     };
     push @history, q{my $count = -1;} . "\n";
-    push @history, sprintf q{@links = map { $count++; (($_->[0] =~ qr(%s))||($_->[1] =~ qr(%s))) ? $count : () } @all_links;} . "\n", $re, $re;
+    push @history, sprintf q{@links = map { $count++; (($_->text =~ qr(%s))||($_->url =~ qr(%s))) ? $count : () } @all_links;} . "\n", $re, $re;
   } else {
     @links = $user_link;
     push @history, sprintf q{@links = '%s';} . "\n", $user_link;
@@ -548,7 +569,7 @@ sub run_save {
     $self->add_history( @history,<<'CODE' );
   my $base = $agent->uri;
   for my $link (@links) {
-    my $target = $all_links[$link]->[0];
+    my $target = $all_links[$link]->url;
     my $url = URI::URL->new($target,$base);
     $target = $url->path;
     $target =~ s!^(.*/)?([^/]+)$!$2!;
@@ -569,7 +590,7 @@ sub run_save {
 CODE
     my $base = $self->agent->uri;
     for my $link (@links) {
-      my $target = $all_links[$link]->[0];
+      my $target = $all_links[$link]->url;
       my $url = URI::URL->new($target,$base);
       $target = $url->path;
       $target =~ s!^(.*/)?([^/]+)$!$2!;
@@ -666,10 +687,11 @@ select a link to follow.
 
 sub run_links {
   my ($self) = @_;
-  my $links = $self->agent->links;
+  my @links = $self->agent->links;
   my $count = 0;
-  for my $link (@$links) {
-    print "[", $count++, "] ", $link->[1],"\n";
+  for my $link (@links) {
+    # print "[", $count++, "] ", $link->[1],"\n";
+    print sprintf "[%s] %s\n", $count++, $self->link_text($link);
   };
 };
 
@@ -941,8 +963,8 @@ sub run_open {
   if (ref $link) {
     my $re = $link;
     my $count = -1;
-    my @possible_links = @{$self->agent->links()};
-    my @links = map { $count++; $_->[1] =~ /$re/ ? $count : () } @possible_links;
+    my @possible_links = $self->agent->links();
+    my @links = map { $count++; $_->text =~ /$re/ ? $count : () } @possible_links;
     if (@links > 1) {
       $self->print_pairs([ @links ],[ map {$possible_links[$_]->[1]} @links ]);
       undef $link;
@@ -952,7 +974,7 @@ sub run_open {
     } else {
       $self->status( "Found $links[0]\n" );
       $link = $links[0];
-      if ($possible_links[$count]->[0] =~ /^javascript:(.*)/i) {
+      if ($possible_links[$count]->url =~ /^javascript:(.*)/i) {
         print "Can't follow javascript link $1\n";
         undef $link;
       };
@@ -977,7 +999,7 @@ sub run_open {
 sub comp_open {
   my ($self,$word,$line,$start) = @_;
   # return grep {/^$word/} map {$_->[1]} (@{$self->agent->extract_links()});
-  my @completions = eval { grep {/^$word/} map {$_->[1]} (@{$self->agent->find_all_links()}) };
+  my @completions = eval { grep {/^$word/} map { $self->link_text( $_ )} ($self->agent->find_all_links()) };
   $self->display_user_warning($@) if $@;
   return @completions;
 };
@@ -1415,7 +1437,7 @@ sub run_source {
   if ($file) {
     eval { $self->source_file($file); };
     if ($@) {
-      print "Could not source file '$file' : $@";
+      $self->display_user_warning( "Could not source file '$file' : $@" );
     };
   } else {
     print "Syntax: source FILENAME\n";
@@ -1751,12 +1773,6 @@ in Perl, either in the final script or through C<eval> commands.
 The shell currently detects when you want to follow a JavaScript link and tells you
 that this is not supported. It would be nicer if there was some callback mechanism
 to (automatically?) extract URLs from JavaScript-infected links.
-
-=item *
-
-The embedded test C<t/embedded-WWW-Mechanize-Shell.t> currently dies under Perl 5.8
-and Solaris after successfully running all tests. I can't test this myself so I don't
-know where the reason for that lies - any hints are welcome !
 
 =back
 

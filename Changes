@@ -1,7 +1,14 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
-0.29
+0.30
   + Think about HTML::FillInForm for displaying changed form values interactively
+  - using Devel::Cover. Code coverage of WWW/Mechanize/Shell.pm is now at 75.00%
+    through the test suite
+  - Provide better text for all links (for example when the content is an image)
+  - Now moved to use WWW::Mechanize::Link instead of direct array access
+  - This means it requires WWW::Mechanize 0.57 or higher
+
+0.29
   - Fixed bug when autocompletion did crash the shell (S. Rezic)
   - HTML::Display::Opera does not open a new window anymore (S. Rezic)
   - Moved private package "Catch" to IO::Catch and made all tests use that package

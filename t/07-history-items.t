@@ -4,6 +4,7 @@ use strict;
 use lib 'inc';
 use IO::Catch;
 use File::Temp qw( tempfile );
+use WWW::Mechanize::Link;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
@@ -81,7 +82,8 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( reload => $mock_result )
            ->set_always( current_form => $mock_form )
            ->set_always( follow => 1 )
-           ->set_always( links => [['foo','foo link','foo_link'],['foo2','foo2 link','foo2_link']])
+           ->set_list( links => WWW::Mechanize::Link->new('foo','foo link','foo_link',""),
+                                WWW::Mechanize::Link->new('foo2','foo2 link','foo2_link',""))
            ->set_always( agent => 'mocked/1.0')
            ->set_always( uri => $mock_uri )
            ->set_always( request => $mock_result )

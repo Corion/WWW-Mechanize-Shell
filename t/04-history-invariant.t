@@ -82,13 +82,15 @@ sub disable {
     shift;
     push @history, join "", @_;
   };
+  
+  *WWW::Mechanize::links = sub {()};
 };
 
 disable( "WWW::Mechanize::Shell", $_ )
   for (qw( restart_shell browser ));
 
 disable( "WWW::Mechanize",$_ )
-  for (qw( links cookie_jar current_form forms ));
+  for (qw( cookie_jar current_form forms ));
 
 disable( "Term::Shell",$_ )
   for (qw( print_pairs ));
