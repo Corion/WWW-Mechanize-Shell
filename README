@@ -1,4 +1,4 @@
-WWW/Mechanize/Shell version 0.10
+WWW/Mechanize/Shell version 0.14
 ================================
 
 This is a small shell around WWW::Mechanize
@@ -26,15 +26,15 @@ This module requires these other modules and libraries:
 
   Term::Shell
 
-  Test::Inline - for the tests
-
 Nice to have are :
 
   Win32::OLE - for automating IE
 
   Pod::Constants - for the online help
-  
+
   HTML::TableExtract - for extracting stuff out of tables
+
+  Test::Inline - for the tests
 
 COPYRIGHT AND LICENCE
 

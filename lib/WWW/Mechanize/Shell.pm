@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 =head1 NAME
 
@@ -552,6 +552,10 @@ sub run_open {
     } else {
       print "Found $links[0]\n";
       $link = $links[0];
+      if ($possible_links[$count]->[0] =~ /^javascript:(.*)/i) {
+        print "Can't follow javascript link $1\n";
+        undef $link;
+      };
     };
   };
 
