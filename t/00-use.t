@@ -7,6 +7,7 @@ SKIP: {
   eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
   if ($@) {
     diag "Term::ReadKey seems to want a terminal";
+    no warnings 'redefine';
     *Term::ReadKey::GetTerminalSize = sub {80,24};
   };
 
