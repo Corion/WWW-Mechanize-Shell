@@ -19,6 +19,12 @@ WWW::Mechanize::Shell - An interactive shell for WWW::Mechanize
 
 =head1 SYNOPSIS
 
+From the command line as
+
+  perl WWW::Mechanize::Shell -eshell
+
+or alternatively as a custom shell program via :
+
 =for example begin
 
   #!/usr/bin/perl -w
@@ -273,7 +279,7 @@ sub sync_browser {
 
 sub prompt_str { ($_[0]->agent->uri || "") . ">" };
 
-=head2 C<$shell-E<gt>history [PREFIX]>
+=head2 C<$shell-E<gt>history>
 
 Returns the (relevant) shell history, that is, all commands
 that were not solely for the information of the user. The
@@ -284,8 +290,7 @@ lines are returned as a list.
 =cut
 
 sub history {
-  my ($self,$prefix) = @_;
-  $prefix ||= "";
+  my ($self) = @_;
   map { $_->[0] } @{$self->{history}}
 };
 
@@ -317,7 +322,6 @@ HEADER
 
   push @result, map { $prefix.$_->[1] } @{$self->{history}};
   @result;
-  #push @result, q{ print $agent->content };
 };
 
 =head2 C<$shell-E<gt>status>
@@ -496,7 +500,9 @@ sub run_save {
     $target = $url->path;
     $target =~ s!^(.*/)?([^/]+)$!$2!;
     $url = $url->abs;
-    $agent->get($url);
+    # use this instead in case you want to use smart mirroring
+    #$agent->mirror($url,$target);
+    $agent->follow($link);
     local *FILE;
     if (open FILE, "> $target") {
       binmode FILE;
@@ -517,7 +523,8 @@ CODE
       $url = $url->abs;
       eval {
         $self->status( "$url => $target" );
-        $self->agent->get($url);
+		    $self->agent->follow($link);
+        #$self->agent->get($url);
         local *FILE;
         if (open FILE, "> $target") {
           binmode FILE;
@@ -543,7 +550,7 @@ Display the HTML for the current page
 sub run_content {
   my ($self,$url) = @_;
   print $self->agent->content,"\n";
-  $self->add_history('print $agent->content,"\n"');
+  $self->add_history('print $agent->content,"\n";');
 };
 
 =head2 ua
@@ -734,6 +741,7 @@ Syntax:
 sub run_open {
   my ($self,$user_link) = @_;
   my $link = $user_link;
+  my $user_link_expr = qq{'$user_link'};
   unless (defined $link) {
     print "No link given\n";
     return
@@ -756,18 +764,20 @@ sub run_open {
         print "Can't follow javascript link $1\n";
         undef $link;
       };
+      # Quote all unescaped slashes
+      $re =~ s!([^\\])/([^\\]|$)!$1\\/$2!g;
+      $user_link_expr = sprintf 'qr/%s/', $re;
     };
   };
 
   if (defined $link) {
     eval {
       $self->agent->follow($link);
-      $self->add_history( sprintf qq{\$agent->follow('%s');}, $link);
+      $self->add_history( sprintf qq{\$agent->follow(%s);}, $user_link_expr);
       $self->activate_first_form;
       if ($self->option('autosync')) {
         $self->sync_browser;
       } else {
-        #print $self->agent->{res}->as_string;
         $self->status( "(".$self->agent->res->code.")\n" );
       };
     };
@@ -791,9 +801,9 @@ sub run_back {
   my ($self) = @_;
   eval {
     $self->agent->back();
+    $self->add_history('$agent->back();');
     $self->sync_browser
       if ($self->option('autosync'));
-    $self->add_history('$agent->back();');
   };
   warn $@ if $@;
 };
@@ -1300,6 +1310,29 @@ The communication is done either via OLE or through tempfiles, so
 the URL in the browser will look weird. There is currently no
 support for Mac specific display of HTML, and I don't know enough
 about AppleScript events to remotely control a browser there.
+
+=head1 FILLING FORMS VIA CUSTOM CODE
+
+If you want to stay within the confines of the shell, but still
+want to fill out forms using custom Perl code, here is a recipe
+how to achieve this :
+
+Code passed to the C<eval> command gets evalutated in the WWW::Mechanize::Shell
+namespace. You can inject new subroutines there and these get picked
+up by the Callback class of WWW::Mechanize::FormFiller :
+
+  # Fill in the "date" field with the current date/time as string
+  eval sub custom_today { scalar localtime };
+  autofill date Callback WWW::Mechanize::Shell::custom_today
+  fillout
+
+This method can also be used to retrieve data from shell scripts :
+
+  # Fill in the "date" field with the current date/time as string
+  # works only if there is a program "date"
+  eval sub custom_today { chomp `date` };
+  autofill date Callback WWW::Mechanize::Shell::custom_today
+  fillout
 
 =head1 GENERATED SCRIPTS
 

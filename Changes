@@ -1,5 +1,13 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.20
+  - made t/00a*.t a TODO test so that CPAN install (silently) works
+  - updated documentation on how to specify custom callbacks from
+    within the shell (having an interpreter with eval rules!)
+  - various documentation fixes
+  - fixed behaviour of "open" with regard to regular expressions
+  - extensive testing of shell behaviour regarding the navigation added
+
 0.19
   - Added t/00a*.t to check for a Term::Shell bug to the MANIFEST
   - renamed the "history" command to "script"

@@ -38,40 +38,50 @@ tie *STDERR, 'Catch', '_STDERR_' or die $!;
 
 BEGIN {
   %tests = (
-    autofill => { requests => 2, lines => [ 'get %s', 'autofill query Fixed foo', 'fillout', 'submit' ]},
-    back => { requests => 2, lines => [ 'get %s','get %s/back1','back' ] },
-    eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ] },
-    eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ] },
-    get => { requests => 1, lines => [ 'get %s' ] },
-    get_content => { requests => 1, lines => [ 'get %s', 'content' ] },
-    get_save => { requests => 4, lines => [ 'get %s','save "/\.save_log_server_test\.tmp$/"' ] },
-    get_value_click => { requests => 2, lines => [ 'get %s','value query foo', 'click submit' ] },
-    get_value_submit => { requests => 2, lines => [ 'get %s','value query foo', 'submit' ] },
-    get_value2_submit => { requests => 2, lines => [ 'get %s','value query foo', 'value session 2', 'submit' ] },
-    open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ] },
-    open_re => { requests => 2, lines => [ 'get %s','open "foo1"','content' ] },
-    ua_get => { requests => 1, lines => [ 'ua foo/1.1', 'get %s' ] },
-    ua_get_content => { requests => 1, lines => [ 'ua foo/1.1', 'get %s', 'content' ] },
+    autofill => { requests => 2, lines => [ 'get %s', 'autofill query Fixed foo', 'fillout', 'submit' ], location => '%sformsubmit'},
+    back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => '%s' },
+    eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ], location => '%s' },
+    eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ], location => '%s' },
+    eval_sub => { requests => 2, lines => [
+						'# Fill in the "date" field with the current date/time as string',
+  					'eval sub custom_today { "20030511" };',
+  					'autofill text Callback WWW::Mechanize::Shell::custom_today',
+  					'get %s',
+  					'fillout',
+  					'submit',
+    ], location => '%sformsubmit' },
+    get => { requests => 1, lines => [ 'get %s' ], location => '%s' },
+    get_content => { requests => 1, lines => [ 'get %s', 'content' ], location => '%s' },
+    get_save => { requests => 4, lines => [ 'get %s','save "/\.save_log_server_test\.tmp$/"' ], location => '%s' },
+    get_value_click => { requests => 2, lines => [ 'get %s','value query foo', 'click submit' ], location => '%sformsubmit' },
+    get_value_submit => { requests => 2, lines => [ 'get %s','value query foo', 'submit' ], location => '%sformsubmit' },
+    get_value2_submit => { requests => 2, lines => [ 
+    				'get %s',
+    				'value query foo', 
+    				'value session 2', 
+    				'submit' 
+    ], location => '%sformsubmit' },
+    open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ], location => '%stest' },
+    open_re => { requests => 2, lines => [ 'get %s','open "foo1"','content' ], location => '%sfoo1.save_log_server_test.tmp' },
+    open_re2 => { requests => 2, lines => [ 'get %s','open "/foo1/"','content' ], location => '%sfoo1.save_log_server_test.tmp' },
+    open_re3 => { requests => 2, lines => [ 'get %s','open "/Link /foo/"','content' ], location => '%sfoo' },
+    open_re4 => { requests => 2, lines => [ 'get %s','open "/Link \/foo/"','content' ], location => '%sfoo' },
+    open_re5 => { requests => 2, lines => [ 'get %s','open "/Link /$/"','content' ], location => '%sslash_end' },
+    open_re6 => { requests => 2, lines => [ 'get %s','open "/^/Link$/"','content' ], location => '%sslash_front' },
+    open_re7 => { requests => 2, lines => [ 'get %s','open "/^/Link in slashes//"','content' ], location => '%sslash_both' },
+    ua_get => { requests => 1, lines => [ 'ua foo/1.1', 'get %s' ], location => '%s' },
+    ua_get_content => { requests => 1, lines => [ 'ua foo/1.1', 'get %s', 'content' ], location => '%s' },
   );
 
   eval {
     require HTML::TableExtract;
-    $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ] };
-    $tests{get_table_params} = { requests => 1, lines => [ 'get %s','table Col2 Col1' ] };
+    $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ], location => '%s' };
+    $tests{get_table_params} = { requests => 1, lines => [ 'get %s','table Col2 Col1' ], location => '%s' };
   };
 };
 
-use Test::More tests => 1 + (scalar keys %tests)*5;
+use Test::More tests => 1 + (scalar keys %tests)*6;
 SKIP: {
-#skip "Can't load Term::ReadKey without a terminal", 1 +(scalar keys %tests)*5
-#  unless -t STDIN;
-
-#eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
-#if ($@) {
-#  no warnings 'redefine';
-#  *Term::ReadKey::GetTerminalSize = sub {80,24};
-#  diag "Term::ReadKey seems to want a terminal";
-#};
 
 # start a fake webserver, fork, and connect to ourselves
 {
@@ -141,12 +151,17 @@ for my $name (sort keys %tests) {
   my $requests = $tests{$name}->{requests};
 
   my $server = Test::HTTP::LocalServer->spawn();
+
+  my $result_location = sprintf $tests{$name}->{location}, $server->url;
 	my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 	for my $line (@lines) {
 	  $line = sprintf $line, $server->url;
   	$s->cmd($line);
 	};
+	$s->cmd('eval $self->agent->uri');
   my $code_output = $_STDOUT_;
+  diag join( "\n", $s->history )
+    unless is($s->agent->uri,$result_location,"Shell moved to the specified url for $name");
 	is($_STDERR_,undef,"Shell produced no error output for $name");
 	is($actual_requests,$requests,"$requests requests were made for $name");
 	my $code_requests = $server->get_output;
@@ -157,7 +172,8 @@ for my $name (sort keys %tests) {
 
   # Modify the generated Perl script to match the new? port
   my $script = join "\n", $s->script;
-  $script =~ s!\b$code_port\b!$script_port!smg;
+  s!\b$code_port\b!$script_port!smg for ($script, $code_output);
+  undef $s;
 
 	# Write the generated Perl script
   my ($fh,$tempname) = tempfile();
