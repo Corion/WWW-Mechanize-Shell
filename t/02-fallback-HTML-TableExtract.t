@@ -21,7 +21,7 @@ SKIP: {
 
   use_ok("WWW::Mechanize::Shell");
   my $shell = do {
-    WWW::Mechanize::Shell->new("shell", rcfile => undef, warnings => undef );
+    WWW::Mechanize::Shell->new("shell", rcfile => undef );
   };
 
   isa_ok($shell,"WWW::Mechanize::Shell");

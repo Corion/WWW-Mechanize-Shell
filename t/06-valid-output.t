@@ -89,7 +89,8 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( submit => $mock_result )
            ->set_always( click => $mock_result )
            ->set_always( current_form => $mock_form )
-           ->set_always( links => ());
+           ->set_always( links => ())
+           ->set_always( agent => 'foo/1.0' );
 
 # Silence all warnings
 my $s = do {
