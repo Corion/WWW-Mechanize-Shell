@@ -1171,7 +1171,7 @@ __END__
   get http://www.google.com
   value q "Corions Homepage"
   click btnG
-  history
+  script
   # (yes, this is a bad example of automating, as Google
   #  already has a Perl API. But other sites don't)
 
@@ -1180,7 +1180,7 @@ __END__
   get http://www.perlmonks.org
   open "/Saints in/"
   table User Experience Level
-  history
+  script
   # now you have a program that gives you a csv file of
   # that table.
 
@@ -1189,6 +1189,12 @@ __END__
   get http://aliens:xxxxx/
   value f path/to/file
   click "upload"
+  
+=head2 Batch download
+
+  # download prerelease versions of my modules
+  get http://www.corion.net/perl-dev
+  save /.tar.gz$/
 
 =head1 DISPLAYING HTML
 
@@ -1305,6 +1311,10 @@ or maybe easier, by tacking Class::XPath onto an HTML tree)
 =item *
 
 Add C<head> as a command ?
+
+=item * 
+
+Add C<referer> and C<referrer> as commands to set the C<Referer> (sic) header
 
 =item *
 
