@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 16;
 use vars qw( $display $captured_html );
 
 {
@@ -17,6 +17,9 @@ sub display_ok {
 
 SKIP: {
   use_ok("HTML::Display");
+
+  $display = HTML::Display->new();
+  isa_ok($display,"HTML::Display::Common","Default class");
 
   $display = HTML::Display->new( class => 'HTML::Display::Capture' );
   isa_ok($display,"HTML::Display::Common");
