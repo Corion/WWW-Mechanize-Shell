@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 =head1 NAME
 
@@ -153,13 +153,13 @@ sub init {
     watchfiles => defined $args{watchfiles} ? $args{watchfiles} : 1,
     cookiefile => 'cookies.txt',
     dumprequests => 0,
-    useole => $^O =~ /mswin/i,
+    useole => ($^O =~ /mswin/i) ? 1:0,
     browsercmd => 'galeon -n %s',
   };
 
   # Keep track of the files we consist of, to enable automatic reloading
   $self->{files} = undef;
-  if ($self->{options}->{watchfiles}) {
+  if ($self->option('watchfiles')) {
     eval {
       require File::Modified;
       $self->{files} = File::Modified->new(files=>[values %INC, $0]);
@@ -199,6 +199,7 @@ sub option {
     $result;
   } else {
     Carp::carp "Unknown option '$option'";
+    undef;
   };
 };
 
@@ -907,14 +908,14 @@ of the following lines in your .mechanizerc :
 
   # for galeon
   set browsercmd "galeon -n %s"
-  
+
   # for Win32, using Phoenix instead of IE
   set useole 0
   set browsercmd "phoenix.exe %s"
-  
+
   # More lines for other browsers are welcome
 
-The communication is done either via OLE or through tempfiles, so 
+The communication is done either via OLE or through tempfiles, so
 the URL in the browser will look weird. There is currently no
 support for Mac specific display of HTML, and I don't know enough
 about AppleScript events to remotely control a browser there.
