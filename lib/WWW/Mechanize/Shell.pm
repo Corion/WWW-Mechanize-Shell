@@ -1375,6 +1375,7 @@ __END__
   save /.tar.gz$/
 
 =begin oldversion
+
 #=head1 DISPLAYING HTML
 
 WWW::Mechanize::Shell can display the HTML of the current page

@@ -2,6 +2,7 @@ Changes
 MANIFEST			This list of files
 MANIFEST.skip
 README
+Makefile.PL
 bin/banking.postbank.de.mech
 bin/hotmail.signup.mech
 bin/wwwshell.pl
