@@ -65,7 +65,7 @@ BEGIN {
 cover:
 \trm -rf cover_db
 \tPERL5OPT=-MDevel::Cover \$(MAKE) test || true
-\tcover cover_db -report html
+\tcover cover_db -report html +inc inc/ +inc t/
 EOF
 		}
 }
