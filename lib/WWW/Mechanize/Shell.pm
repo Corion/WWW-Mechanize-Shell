@@ -363,7 +363,7 @@ sub run_get {
   $self->agent->form(1)
     if $self->agent->forms and scalar @{$self->agent->forms};
   $self->sync_browser if $self->option('autosync');
-  $self->add_history('$agent->get("'.$url.'");'."\n",'  $agent->form(1) if $agent->forms;');
+  $self->add_history( sprintf qq{\$agent->get('%s');\n  \$agent->form(1) if \$agent->forms;}, $url);
 };
 
 =head2 content
@@ -423,7 +423,7 @@ sub run_forms {
   if ($number) {
     $self->agent->form($number);
     $self->agent->current_form->dump;
-    $self->add_history('$agent->form('.$number.');');
+    $self->add_history(sprintf q{$agent->form(%s));}, $number);
   } else {
     my $count = 1;
     my $formref = $self->agent->forms;
@@ -466,10 +466,11 @@ Syntax:
 
 sub run_value {
   my ($self,$key,$value) = @_;
+  
   eval {
     $self->agent->current_form->value($key,$value);
     # Hmm - neither $key nor $value may contain backslashes nor single quotes ...
-    $self->add_history('$agent->current_form->value(\''.$key.'\',\''.$value.'\');');
+    $self->add_history( sprintf qq{\$agent->current_form->value('%s', '%s');}, $key, $value);
   };
   warn $@ if $@;
 };
@@ -513,7 +514,7 @@ sub run_click {
     if ($self->option('autosync')) {
       $self->sync_browser;
     };
-    $self->add_history('$agent->click(\''.$button.'\');');
+    $self->add_history( sprintf qq{\$agent->click('%s');}, $button );
   };
   warn $@ if $@;
 };
@@ -562,7 +563,7 @@ sub run_open {
   if (defined $link) {
     eval {
       $self->agent->follow($link);
-      $self->add_history('$agent->follow(\''.$user_link.'\');');
+      $self->add_history( sprintf qq{\$agent->follow('%s');}, $user_link);
       $self->agent->form(1);
       if ($self->option('autosync')) {
         $self->sync_browser;
@@ -727,9 +728,9 @@ sub run_table {
       };
     };
 
-    $self->add_history('my @columns = ( ' . map( { s/(['\\])/\\$1/g; qq('$_') } @columns ) . ' );' );
+    $self->add_history( sprintf 'my @columns = ( %s );', join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns )));
     $self->add_history( <<'PRINTTABLE' );
-my $table = HTML::TableExtract->new( headers => [ @columns ]);');
+my $table = HTML::TableExtract->new( headers => [ @columns ]);
 (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
 $table->parse($content);
 print join(", ", @columns),"\n";
@@ -834,7 +835,7 @@ sub run_autofill {
   if ($class) {
     eval {
       $self->{formfiller}->add_filler($name,$class,@args);
-      $self->add_history('$formfiller->add_filler( ',$name, ' => ',$class, ' => ', join( ",", @args), ');' );
+      $self->add_history( sprintf qq{\$formfiller->add_filler( %s => %s => %s ); }, $name, $class, join( ",", @args));
     };
     warn $@
       if $@;
@@ -915,7 +916,7 @@ of the following lines in your .mechanizerc :
 
   # for galeon
   set browsercmd "galeon -n %s"
-  
+
   # for opera (thanks to Tina Mueller)
   set browsercmd "opera -newwindow %s"
 

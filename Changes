@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.15 20030429
+  - Changed double quotes around parameters to single quotes
+    to allow for urls like http://mark@foo.com (thanks Mark)
+  - Added tests to check that created scripts at least compile
+
 0.14 20030414
   - Fixed a bad list bug introduced with my unix-browser patch to the options system. Slaven Rezics
     submitted patch had nothing to do with this, I only grabbed the idea from him but did botch
@@ -7,7 +12,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - Added a test that all options can be set and reset
   - Reenabled all warnings in the tests
   - Removed one warning for an unavailable module
-  - Added first part of JavaScript handling : 
+  - Added first part of JavaScript handling :
       The shell detects when you want to follow a javascript: link,
       and says that you can't do that.
 
