@@ -1555,7 +1555,15 @@ sub run_referrer {
   }
 };
 
-sub run_referer { goto &{$_[0]->run_referrer} };
+=head2 referer
+
+Alias for referrer
+
+=cut
+
+sub run_referer { 
+  goto &WWW::Mechanize::Shell::run_referrer 
+};
 # sub alias_referrer { qw(referer) };
 
 =head2 response
