@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 =head1 NAME
 
@@ -893,6 +893,24 @@ Remove the three lines
 in C<sub run_help> and replace them by
 
       my $smry = $o->summary($h);
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Add method (to L<WWW::Mechanize>) to specify binary (file) uploads
+
+=item *
+
+Add command to specify a file value to a form
+
+=item *
+
+Add xpath expressions (by moving L<WWW::Mechanize> from HTML::Parser to XML::XMLlib)
+
+=back
 
 =head1 EXPORT
 
