@@ -45,7 +45,7 @@ sub spawn {
     $args{file} = $tempfile;
   };
   my ($fh,$logfile) = File::Temp::tempfile();
-  $fh->close;
+  close $fh;
   push @{$self->{delete}},$logfile;
   $self->{logfile} = $logfile;
   my $web_page = delete $args{file};
