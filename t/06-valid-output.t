@@ -42,8 +42,9 @@ BEGIN {
       'fillout' => 'fillout',
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
-      'open' => 'open',
-      'save' => 'save foo',
+      'open' => 'open foo',
+      'save' => 'save 0',
+      'save re' => 'save /.../',
       'submit' => 'submit',
       'table' => 'table',
       'table params' => 'table foo bar',
@@ -52,9 +53,9 @@ BEGIN {
   );
 };
 
-use Test::More tests => scalar (keys %tests) +1;
+use Test::More tests => scalar (keys %tests)*2 +1;
 SKIP: {
-skip "Can't load Term::ReadKey without a terminal", scalar (keys %tests) +1
+skip "Can't load Term::ReadKey without a terminal", scalar (keys %tests)*2 +1
   unless -t STDIN;
 
 eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
@@ -85,18 +86,21 @@ $mock_agent->set_true($_)
   for qw( back content get open  );
 $mock_agent->set_false($_)
   for qw( form forms );
+my $mock_uri = Test::MockObject->new;
+$mock_uri->set_always( abs => 'http://example.com/' )
+         ->set_always( path => '/' );
+$mock_uri->fake_module( 'URI::URL', new => sub {$mock_uri} );
+
 $mock_agent->set_always( res => $mock_result )
            ->set_always( submit => $mock_result )
            ->set_always( click => $mock_result )
            ->set_always( current_form => $mock_form )
-           ->set_always( links => ())
-           ->set_always( agent => 'foo/1.0' );
+           ->set_always( follow => 1 )
+           ->set_always( links => [['foo','foo link','foo_link'],['foo2','foo2 link','foo2_link']])
+           ->set_always( agent => 'foo/1.0' )
+           ->set_always( uri => $mock_uri );
 
-# Silence all warnings
-my $s = do {
-  local $SIG{__WARN__} = sub {};
-  WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
-};
+my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 $s->{agent} = $mock_agent;
 
 my @history;
@@ -111,15 +115,17 @@ sub compiles_ok {
   my ($command,$testname) = @_;
   $testname ||= $command;
   @history = ();
+  $s->cmd('links');
   $s->cmd($command);
   local $, = "\n";
   my ($fh,$name) = tempfile();
   print $fh ( "@history" );
   close $fh;
+  ok( scalar @history != 0, "$testname is history relevant");
 
-  my $output = `$^X -c $name 2>&1`;
+  my $output = `$^X -Ilib -c $name 2>&1`;
   chomp $output;
-  is( $output, "$name syntax OK", $testname )
+  is( $output, "$name syntax OK", "$testname compiles")
     or diag "Created file was :\n@history";
   unlink $name
     or diag "Couldn't remove tempfile '$name' : $!";

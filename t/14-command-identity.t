@@ -41,10 +41,15 @@ BEGIN {
     get => { requests => 1, lines => [ 'get %s' ] },
     get_content => { requests => 1, lines => [ 'get %s', 'content' ] },
     get_save => { requests => 4, lines => [ 'get %s','save /\.save$/' ] },
-    get_table => { requests => 1, lines => [ 'get %s','table Col2 Col1' ] },
     ua_get => { requests => 1, lines => [ 'ua foo/1.1', 'get %s' ] },
     ua_get_content => { requests => 1, lines => [ 'ua foo/1.1', 'get %s', 'content' ] },
   )
+  
+  eval {
+    require HTML::TableExtract;
+    $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ] };
+    $tests{get_table_params} = { requests => 1, lines => [ 'get %s','table Col2 Col1' ] };
+  };
 };
 
 use Test::More tests => 1 + (scalar keys %tests)*5; 

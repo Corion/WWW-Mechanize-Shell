@@ -85,7 +85,7 @@ if ($@) {
 use_ok('WWW::Mechanize::Shell');
 
 # Silence all warnings
-$SIG{__WARN__} = sub {};
+#$SIG{__WARN__} = sub {};
 
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 $s->agent->{content} = '';

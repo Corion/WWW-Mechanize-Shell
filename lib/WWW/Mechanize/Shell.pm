@@ -69,7 +69,7 @@ your current browsers cookies.
 
 # Blindly allow redirects
 {
-  no warnings;
+  no warnings 'redefine';
   *WWW::Mechanize::redirect_ok = sub { print "\nRedirecting to ",$_[1]->uri; $_[0]->{uri} = $_[1]->uri; 1 };
 }
 
@@ -269,6 +269,65 @@ sub sync_browser {
 
 sub prompt_str { ($_[0]->agent->uri || "") . ">" };
 
+=head2 C<$shell-E<gt>history [PREFIX]>
+
+Returns the (relevant) shell history, that is, all commands
+that were not solely for the information of the user. The
+lines are returned as a list. 
+
+  print join "\n", $shell->history;
+
+=cut
+
+sub history {
+  my ($self,$prefix) = @_;
+  $prefix ||= "";
+  map { $_->[0] } @{$self->{history}}
+};
+
+=head2 C<$shell-E<gt>script>
+
+Returns the shell history as a Perl program. The
+lines are returned as a list. The lines do not have
+a one-by-one correspondence to the lines in the history.
+
+  print join "\n", $shell->script;
+
+=cut
+
+sub script {
+  my ($self,$prefix) = @_;
+  $prefix ||= "";
+  
+  my @result = sprintf <<'HEADER', $^X;
+#%s -w
+use strict;
+use WWW::Mechanize;
+use WWW::Mechanize::FormFiller;
+use URI::URL;
+
+my $agent = WWW::Mechanize->new();
+my $formfiller = WWW::Mechanize::FormFiller->new();
+$agent->env_proxy();
+HEADER
+
+  push @result, map { $prefix.$_->[1] } @{$self->{history}};
+  @result;
+  #push @result, q{ print $agent->content };
+};
+
+=head2 C<$shell-E<gt>status>
+
+C<status> is called for status updates.
+
+=cut
+
+sub status {
+  my $self = shift;
+  print join "", @_;
+};
+
+
 # sub-classed from Term::Shell to handle all run_ requests that have no corresponding sub
 # This is used for comments
 sub catch_run {
@@ -366,20 +425,20 @@ Syntax:
 
 sub run_get {
   my ($self,$url) = @_;
-  print "Retrieving $url";
+  $self->status( "Retrieving $url" );
   my $code;
   eval { $code = $self->agent->get($url)->code};
   if ($@) {
     print "\n$@\n" if $@;
     $self->agent->back;
   } else {
-    print "($code)\n"
+    $self->status( "($code)\n" );
   };
 
   $self->agent->form(1)
     if $self->agent->forms and scalar @{$self->agent->forms};
   $self->sync_browser if $self->option('autosync');
-  $self->add_history( sprintf qq{\$agent->get('%s');\n  \$agent->form(1) if \$agent->forms;}, $url);
+  $self->add_history( sprintf q{$agent->get('%s');}."\n".q{  $agent->form(1) if $agent->forms and scalar @{$agent->forms};}, $url);
 };
 
 =head2 save
@@ -418,22 +477,25 @@ sub run_save {
     };
     push @history, sprintf q{@links = map { /%s/ } $agent->links();}, $re;
   } else {
-    push @history, sprintf q{@links = '%s'}, $user_link;
+    @links = $user_link;
+    push @history, sprintf q{@links = '%s';}, $user_link;
   };
 
   if (@links) {
     $self->add_history( @history,<<'CODE' );
   my @all_links = $agent->links();
-  my $base = $self->agent->uri;
+  my $base = $agent->uri;
   for my $link (@links) {
     my $target = $all_links[$link]->[0];
-    my $url = URI::URL->new($target,$base)->abs;
-    $target =~ s!^(.*/)([^/]+)$!$1!;
+    my $url = URI::URL->new($target,$base);
+    $target = $url->path;
+    $target =~ s!^(.*/)?([^/]+)$!$2!;
+    $url = $url->abs;
     $agent->get($url);
     local *FILE;
     if (open FILE, "> $target") {
       binmode FILE;
-      print FILE $self->agent->content;
+      print FILE $agent->content;
       close FILE;
     } else {
       warn "Couldn't create $target : $!\n";
@@ -444,19 +506,21 @@ CODE
     my $base = $self->agent->uri;
     for my $link (@links) {
       my $target = $all_links[$link]->[0];
-      my $url = URI::URL->new($target,$base)->abs;
-      $target =~ s!^(.*/)([^/]+)$!$1!;
+      my $url = URI::URL->new($target,$base);
+      $target = $url->path;
+      $target =~ s!^(.*/)?([^/]+)$!$2!;
+      $url = $url->abs;
       eval {
-        print "$url => $target";
+        $self->status( "$url => $target" );
         $self->agent->get($url);
         local *FILE;
         if (open FILE, "> $target") {
           binmode FILE;
           print FILE $self->agent->content;
           close FILE;
-          print "\n";
+          $self->status( "\n" );
         } else {
-          print ": $!\n";
+          $self->status( ": $!\n" );
         };
         $self->agent->back;
       };
@@ -473,7 +537,7 @@ Display the HTML for the current page
 
 sub run_content {
   my ($self,$url) = @_;
-  print $self->agent->content;
+  print $self->agent->content,"\n";
   $self->add_history('print $agent->content,"\n"');
 };
 
@@ -536,7 +600,8 @@ sub run_parse {
 
   while (my $token = $p->get_token()) {
   #while (my $token = $p->get_tag("frame")) {
-    print "<",$token->[0],":",ref $token->[1] ? $token->[1]->{src} : "",">";
+  #  print "<",$token->[0],":",ref $token->[1] ? $token->[1]->{src} : "",">";
+    print "<",$token->[0],":",$token->[1],">";
   }
 };
 
@@ -791,7 +856,7 @@ to the history.
 
 sub run_history {
   my ($self) = @_;
-  print join( "", map { "  " . $_->[0] . "\n" } @{$self->{history}}), "\n";
+  print join( "", map { "$_\n" } ($self->history) ), "\n";
 };
 
 =head2 script
@@ -804,21 +869,7 @@ This command was formerly known as C<history>.
 
 sub run_script {
   my ($self) = @_;
-  print sprintf <<'HEADER', $^X;
-#%s -w
-use strict;
-use WWW::Mechanize;
-use WWW::Mechanize::FormFiller;
-use URI::URL;
-
-my $agent = WWW::Mechanize->new();
-my $formfiller = WWW::Mechanize::FormFiller->new();
-$agent->env_proxy();
-HEADER
-  print join( "", map { "  " . $_->[1] . "\n" } @{$self->{history}}), "\n";
-  print <<'FOOTER';
-print $agent->content;
-FOOTER
+  print join( "\n", $self->script("  ")), "\n";
 };
 
 =head2 fillout
@@ -934,10 +985,11 @@ sub run_table {
       };
     };
 
-    $self->add_history( sprintf( 'my @columns = ( %s );', join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns ))),
+    $self->add_history( sprintf( 'my @columns = ( %s );'."\n", join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns ))),
                         <<'PRINTTABLE' );
+require HTML::TableExtract;
 my $table = HTML::TableExtract->new( headers => [ @columns ]);
-(my $content = $self->agent->content) =~ s/\&nbsp;?//g;
+(my $content = $agent->content) =~ s/\&nbsp;?//g;
 $table->parse($content);
 print join(", ", @columns),"\n";
 for my $ts ($table->table_states) {
@@ -1190,7 +1242,7 @@ __END__
   get http://aliens:xxxxx/
   value f path/to/file
   click "upload"
-  
+
 =head2 Batch download
 
   # download prerelease versions of my modules
@@ -1313,7 +1365,7 @@ or maybe easier, by tacking Class::XPath onto an HTML tree)
 
 Add C<head> as a command ?
 
-=item * 
+=item *
 
 Add C<referer> and C<referrer> as commands to set the C<Referer> (sic) header
 
