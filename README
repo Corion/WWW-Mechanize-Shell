@@ -25,6 +25,8 @@ This module requires these other modules and libraries:
   WWW::Mechanize::FormFiller
 
   Term::Shell
+  
+  Hook::LexWrap
 
 Nice to have are :
 

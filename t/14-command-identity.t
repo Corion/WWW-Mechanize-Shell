@@ -153,7 +153,7 @@ BEGIN {
   #};
 };
 
-use Test::More tests => 1 + (scalar keys %tests)*6;
+use Test::More tests => 1 + (scalar keys %tests)*7;
 SKIP: {
 
 # Disable all ReadLine functionality
@@ -169,7 +169,7 @@ require Test::HTTP::LocalServer; # from inc
 # We want to be safe from non-resolving local host names
 delete $ENV{HTTP_PROXY};
 
-my $actual_requests;
+use vars qw( $actual_requests $dumped_requests );
 {
   no warnings 'redefine';
   my $old_request = *WWW::Mechanize::request{CODE};
@@ -179,12 +179,14 @@ my $actual_requests;
   };
 
   *WWW::Mechanize::Shell::status = sub {};
+  *WWW::Mechanize::Shell::request_dumper = sub { $dumped_requests++ };  
 };
 
 for my $name (sort keys %tests) {
   $_STDOUT_ = '';
   undef $_STDERR_;
   $actual_requests = 0;
+  $dumped_requests = 0;
   my @lines = @{$tests{$name}->{lines}};
   my $requests = $tests{$name}->{requests};
 
@@ -192,6 +194,7 @@ for my $name (sort keys %tests) {
 
   my $result_location = sprintf $tests{$name}->{location}, $server->url;
 	my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
+	$s->option("dumprequests",1);
 	for my $line (@lines) {
 	  $line = sprintf $line, $server->url;
   	$s->cmd($line);
@@ -202,6 +205,7 @@ for my $name (sort keys %tests) {
     unless is($s->agent->uri,$result_location,"Shell moved to the specified url for $name");
 	is($_STDERR_,undef,"Shell produced no error output for $name");
 	is($actual_requests,$requests,"$requests requests were made for $name");
+	is($dumped_requests,$requests,"$requests requests were dumped for $name");
 	my $code_requests = $server->get_output;
 	my $code_port = $server->port;
 
@@ -211,6 +215,7 @@ for my $name (sort keys %tests) {
   # Modify the generated Perl script to match the new? port
   my $script = join "\n", $s->script;
   s!\b$code_port\b!$script_port!smg for ($script, $code_output);
+  $s->release_agent;
   undef $s;
 
 	# Write the generated Perl script

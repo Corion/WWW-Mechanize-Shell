@@ -8,9 +8,13 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - made WWW::Mechanize::Shell use the "reload" method of WWW::Mechanize
     (after all, I asked for that method ...)
   - Test for multivalues added, but it's not testing the right stuff yet
-    (see CPAN RT # at https://rt.cpan.org )
+    (see https://rt.cpan.org/Ticket/Display.html?id=2700 ). Not in MANIFEST
+    and/or distribution, but the Changes file is also for me :-)
   - clarified documentation about "watchfiles" and "autoreload" (thanks to
     Mark Stosberg)
+  - The dumprequests feature needs Hook::LexWrap - it didn't work
+    properly before. The feature is tested in t/14
+  - factored out the HTML display into a module of its own
 
 0.22
   - The module now requires WWW::Mechanize v0.43, as the internal

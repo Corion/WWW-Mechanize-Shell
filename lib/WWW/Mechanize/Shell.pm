@@ -8,6 +8,8 @@ use HTTP::Cookies;
 use base qw( Term::Shell Exporter );
 use FindBin;
 use URI::URL;
+use Hook::LexWrap;
+use HTML::Display qw();
 
 use vars qw( $VERSION @EXPORT );
 $VERSION = '0.23';
@@ -64,6 +66,7 @@ and also has the capability to output crude Perl code that recreates
 the recorded session. Its main use is as an interactive starting point
 for automating a session through WWW::Mechanize.
 
+=for old_version
 It has "live" display support for Microsoft Internet Explorer on Win32
 and thanks to Slaven Rezic for other systems as well. Non-IE browsers
 will use tempfiles while IE will be controled via OLE.
@@ -80,6 +83,7 @@ your current browsers cookies.
   *WWW::Mechanize::redirect_ok = sub { $_[0]->{__www_mechanize_shell}->status( "\nRedirecting to ".$_[1]->uri ); $_[0]->{uri} = $_[1]->uri; 1 };
 }
 
+=for old_version
 eval { require Win32::OLE; Win32::OLE->import() };
 my $have_ole = $@ eq '';
 
@@ -104,7 +108,7 @@ sub init {
   $self->{agent} = WWW::Mechanize->new();
   $self->agent->{__www_mechanize_shell} = $self;
 
-  $self->{browser} = undef;
+  $self->{browser} = HTML::Display->new(); # undef;
   $self->{formfiller} = WWW::Mechanize::FormFiller->new(default => [ Ask => $self ]);
 
   $self->{history} = [];
@@ -116,9 +120,13 @@ sub init {
     watchfiles => (exists $args{watchfiles} ? $args{watchfiles} : 1),
     cookiefile => 'cookies.txt',
     dumprequests => 0,
-    useole => ($^O =~ /mswin/i) ? 1:0,
-    browsercmd => 'galeon -n %s',
+    #useole => ($^O =~ /mswin/i) ? 1:0,
+    #browsercmd => 'galeon -n %s',
   };
+  # Install the request dumper :
+  $self->{request_wrapper} = wrap 'WWW::Mechanize::request', 
+                               pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); }; 
+  
   # Load the proxy settings from the environment
   $self->agent->env_proxy();
 
@@ -161,6 +169,7 @@ circular reference. This method does this.
 
 sub release_agent {
   my ($self) = @_;
+  undef $self->{request_wrapper};
   $self->{agent} = undef;
 };
 
@@ -238,14 +247,14 @@ sub precmd {
 
 sub browser {
   my ($self) = @_;
-  return unless $have_ole and $self->option('useole');
+  #return unless $have_ole and $self->option('useole');
   my $browser = $self->{browser};
-  unless ($browser) {
-    $browser = Win32::OLE->CreateObject("InternetExplorer.Application");
-    $browser->{'Visible'} = 1;
-    $self->{browser} = $browser;
-    $browser->Navigate('about:blank');
-  };
+  #unless ($browser) {
+  #  $browser = Win32::OLE->CreateObject("InternetExplorer.Application");
+  #  $browser->{'Visible'} = 1;
+  #  $self->{browser} = $browser;
+  #  $browser->Navigate('about:blank');
+  #};
   $browser;
 };
 
@@ -258,9 +267,13 @@ sub sync_browser {
   # Prepare the HTML for local display :
   my $html = $self->agent->res->content;
   my $location = $self->agent->{uri};
-  $html =~ s!(</head>)!<base href="$location" />$1!i
-    unless ($html =~ /<BASE/i);
+  my $browser = $self->browser;
+  $browser->display( html => $html, location => $location );
+  #$html =~ s!(</head>)!<base href="$location" />$1!i
+  #  unless ($html =~ /<BASE/i);
+};
 
+=for old_version
   my $browser;
   $browser = $self->browser;
   if ($browser) {
@@ -280,6 +293,8 @@ sub sync_browser {
 };
 
 sub prompt_str { ($_[0]->agent->uri || "") . ">" };
+
+sub request_dumper { print $_[1]->as_string if $_[0]->option("dumprequests"); };
 
 =head2 C<$shell-E<gt>history>
 
@@ -742,8 +757,6 @@ Syntax:
 sub run_click {
   my ($self,$button) = @_;
   $button ||= "";
-  print $self->agent->current_form->click($button, 1, 1)
-    if ($self->option("dumprequests"));
   eval {
     my $res = $self->agent->click($button);
     $self->activate_first_form;
@@ -1316,6 +1329,10 @@ sub shell {
     $value;
   };
 };
+
+package WWW::Mechanize::Shell::Unwrap;
+
+sub DESTROY {$_[0]->()};
 
 1;
 
