@@ -15,8 +15,6 @@ use Test::More tests => 7;
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
 
-SKIP: {
-
 use_ok('WWW::Mechanize::Shell');
 
 sub command_ok {
@@ -34,4 +32,3 @@ command_ok('eval "Hello",
  " World"', "Hello World\n","Multiline eval");
 command_ok('eval "Hello from ",
  $self->agent->uri || ""', "Hello from \n","Multiline eval substitution");
-};

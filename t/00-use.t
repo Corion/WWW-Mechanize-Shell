@@ -1,10 +1,17 @@
 use strict;
+use lib 'inc';
+use IO::Catch;
 use Test::More tests => 22;
+
+tie *STDOUT,'IO::Catch','_STDOUT_';
+tie *STDERR,'IO::Catch','_STDERR_';
 
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
 
-use_ok("WWW::Mechanize::Shell");
+BEGIN {
+  use_ok("WWW::Mechanize::Shell");
+};
 
 my $s = do {
   WWW::Mechanize::Shell->new("shell",rcfile => undef, warnings => undef);

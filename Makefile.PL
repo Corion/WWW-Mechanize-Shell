@@ -64,8 +64,8 @@ BEGIN {
     	return <<EOF
 cover:
 \trm -rf cover_db
-\tPERL5OPT=-MDevel::Cover \$(MAKE) test || true
-\tcover cover_db -report html +inc inc/ +inc t/
+\tHARNESS_PERL_SWITCHES=-MDevel::Cover=-coverage,statement,branch,-silent,1,-select,^blib/lib,+inc,Win32,-summary,0 \$(MAKE) test || true
+\t/usr/bin/cover cover_db -report html 
 EOF
 		}
 }
