@@ -112,7 +112,7 @@ sub init {
 
   $self->{options} = {
     autosync => 0,
-    warnings => defined $args{warnings} ? $args{warnings} : 1,,
+    warnings => exists $args{warnings} ? $args{warnings} : 1,
     autorestart => 0,
     watchfiles => defined $args{watchfiles} ? $args{watchfiles} : 1,
     cookiefile => 'cookies.txt',
