@@ -29,7 +29,6 @@ t/16-form-fillout.t
 t/98-bin.t
 t/99-pod.t
 t/401-server
-t/log-server
 t/embedded-WWW-Mechanize-Shell.t
 inc/Test/HTTP/LocalServer.pm
 inc/Test/HTTP/log-server
