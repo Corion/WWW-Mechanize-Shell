@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 19;
+use Test::More tests => 15;
 use vars qw( $display $captured_html );
 
 {

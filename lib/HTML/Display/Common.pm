@@ -18,6 +18,10 @@ Creates a new object as a blessed hash. The passed arguments are stored within
 the hash. If you need to do other things in your constructor, remember to call
 this constructor as well :
 
+=for example
+  no warnings 'redefine';
+  *HTML::Display::WhizBang::display_html = sub {};
+
 =for example begin
 
   package HTML::Display::WhizBang;
@@ -120,7 +124,7 @@ sub display {
     %args = @_;
   };
 
-  $args{location} ||= "";
+  #$args{location} ||= "";
   if ($args{file}) {
     my $filename = delete $args{file};
     local $/;
@@ -130,52 +134,55 @@ sub display {
     $args{html} = <FILE>;
   };
 
-  # trim to directory create BASE HREF
-  # We are carefull to not trim if we just have http://domain.com
-  #$location =~ s%(?<!/)/[^/]*$%/%;
-  my $location = URI::URL->new( $args{location} );
-  my $path = $location->path;
-  $path =~ s%(?<!/)/[^/]*$%/%;
-  $location = sprintf "%s://%s%s", $location->scheme, $location->authority , $path;
-
-  require HTML::TokeParser::Simple;
-  my $p = HTML::TokeParser::Simple->new(\$args{html}) || die 'could not create HTML::TokeParser::Simple object';  
-  my ($has_head,$has_base);
-  while (my $token = $p->get_token) {
-		if ( $token->is_start_tag('head') ) {
-			$has_head++;
-		}	elsif ( $token->is_start_tag('base')) {
-		  $has_base++;
-		  last;
-		};
-	};
-  
-  # restart parsing
-  $p = HTML::TokeParser::Simple->new(\$args{html}) || die 'could not create HTML::TokeParser::Simple object';
   my $new_html;
-  while (my $token = $p->get_token) {
-    if ( $token->is_start_tag('html') and not $has_head) {
-      $new_html .= $token->as_is . qq{<head><base href="$location" /></head>};
-    } elsif ( $token->is_start_tag('head') and not $has_base) {
-      # handle an empty <head /> :
-      if ($token->as_is =~ m!^<\s*head\s*/>$!i) {
-				$new_html .= qq{<head><base href="$location" /></head>}
-      } else {
-        $new_html .= $token->as_is . qq{<base href="$location" />};
+  if (exists $args{location}) {
+    # trim to directory create BASE HREF
+    # We are carefull to not trim if we just have http://domain.com
+    my $location = URI::URL->new( $args{location} );
+    my $path = $location->path;
+    $path =~ s%(?<!/)/[^/]*$%/%;
+    $location = sprintf "%s://%s%s", $location->scheme, $location->authority , $path;
+
+    require HTML::TokeParser::Simple;
+    my $p = HTML::TokeParser::Simple->new(\$args{html}) || die 'could not create HTML::TokeParser::Simple object';
+    my ($has_head,$has_base);
+    while (my $token = $p->get_token) {
+      if ( $token->is_start_tag('head') ) {
+        $has_head++;
+      } elsif ( $token->is_start_tag('base')) {
+        $has_base++;
+        last;
       };
-    } elsif ( $token->is_start_tag('base') ) {
-			# If they already have a <base href>, give up
-			if ($token->return_attr->{href}) {
-				$new_html = $args{html};
-				last;
-			} else {
-			  $token->set_attr('href',$location);
-				$new_html .= $token->as_is;
-			};			
-		}	else {
-			$new_html .= $token->as_is;
-		}
-	};
+    };
+
+    # restart parsing
+    $p = HTML::TokeParser::Simple->new(\$args{html}) || die 'could not create HTML::TokeParser::Simple object';
+    while (my $token = $p->get_token) {
+      if ( $token->is_start_tag('html') and not $has_head) {
+        $new_html .= $token->as_is . qq{<head><base href="$location" /></head>};
+      } elsif ( $token->is_start_tag('head') and not $has_base) {
+        # handle an empty <head /> :
+        if ($token->as_is =~ m!^<\s*head\s*/>$!i) {
+          $new_html .= qq{<head><base href="$location" /></head>}
+        } else {
+          $new_html .= $token->as_is . qq{<base href="$location" />};
+        };
+      } elsif ( $token->is_start_tag('base') ) {
+        # If they already have a <base href>, give up
+        if ($token->return_attr->{href}) {
+          $new_html = $args{html};
+          last;
+        } else {
+          $token->set_attr('href',$location);
+          $new_html .= $token->as_is;
+        };
+      } else {
+        $new_html .= $token->as_is;
+      }
+    };
+  } else {
+    $new_html = $args{html};
+  };
 
   $self->display_html($new_html);
 };
