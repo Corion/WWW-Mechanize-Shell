@@ -274,6 +274,7 @@ sub re_or_string {
   my ($self,$arg) = @_;
   if ($arg =~ m!^/(.*)/([imsx]?)$!) {
     my ($re,$mode) = ($1,$2);
+    $re =~ s!([^\\])/!$1\\/!g;
     $arg = eval "qr/$re/$mode";
   };
   $arg;
@@ -516,7 +517,7 @@ sub run_save {
       print "No match for /$re/.\n";
     };
     push @history, q{my $count = -1;} . "\n";
-    push @history, sprintf q{@links = map { $count++; (($_->[0] =~ /%s/)||($_->[1] =~ /%s/)) ? $count : () } @all_links;} . "\n", $re, $re;
+    push @history, sprintf q{@links = map { $count++; (($_->[0] =~ qr(%s))||($_->[1] =~ qr(%s))) ? $count : () } @all_links;} . "\n", $re, $re;
   } else {
     @links = $user_link;
     push @history, sprintf q{@links = '%s';} . "\n", $user_link;
@@ -778,7 +779,7 @@ sub run_open {
   my ($self,$user_link) = @_;
   $user_link = $self->re_or_string($user_link);
   my $link = $user_link;
-  my $user_link_expr = ref $link ? qq{qr/$link/} : qq{'$link'};
+  my $user_link_expr = ref $link ? qq{qr($link)} : qq{'$link'};
   unless (defined $link) {
     print "No link given\n";
     return
@@ -1186,7 +1187,7 @@ sub run_autofill {
     my $name_vis;
     $name = $self->re_or_string($name);
     if (ref $name) {
-      $name_vis = qq{qr/$name/};
+      $name_vis = qq{qr($name)};
       warn "autofill RE detected $name";
     } else {
       $name_vis = qq{"$name"};

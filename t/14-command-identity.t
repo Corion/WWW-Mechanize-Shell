@@ -154,7 +154,7 @@ BEGIN {
 
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /^formfiller_re/;
+  #  delete $tests{$_} unless /_re/;
   #};
 };
 
