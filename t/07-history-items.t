@@ -39,11 +39,12 @@ BEGIN {
       'back' => 'back',
       'click' => 'click',
       'content' => 'content',
+      'eval' => 'eval 1',
       'fillout' => 'fillout',
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
       'open' => 'open foo',
-      'save' => 'save /foo/',
+      'save' => 'save /.../',
       'submit' => 'submit',
       'value' => 'value key value',
       'ua' => 'ua foo/1.0',
@@ -84,7 +85,8 @@ $mock_form->mock( value => sub {} )
           ->set_list( inputs => ());
 
 my $mock_uri = Test::MockObject->new;
-$mock_uri->set_always( abs => 'http://example.com/' );
+$mock_uri->set_always( abs => 'http://example.com/' )
+         ->set_always( path => '/' );
 $mock_uri->fake_module( 'URI::URL', new => sub {$mock_uri} );
 
 my $mock_agent = Test::MockObject->new;
@@ -102,7 +104,7 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( uri => $mock_uri );
 
 use_ok('WWW::Mechanize::Shell');
-my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
+my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef, watchfiles => undef );
 $s->{agent} = $mock_agent;
 
 my @history;

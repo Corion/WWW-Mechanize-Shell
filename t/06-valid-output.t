@@ -39,6 +39,7 @@ BEGIN {
       'back' => 'back',
       'click' => 'click',
       'content' => 'content',
+      'eval' => 'eval 1',
       'fillout' => 'fillout',
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
@@ -100,7 +101,7 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( agent => 'foo/1.0' )
            ->set_always( uri => $mock_uri );
 
-my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
+my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef, watchfiles => undef );
 $s->{agent} = $mock_agent;
 
 my @history;

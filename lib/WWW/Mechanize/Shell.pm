@@ -411,6 +411,8 @@ sub run_restart {
   $self->restart_shell;
 };
 
+sub activate_first_form { $_[0]->agent->form(1) if $_[0]->agent->forms and scalar @{$_[0]->agent->forms}; };
+
 =head2 get
 
 Download a specific URL.
@@ -435,8 +437,7 @@ sub run_get {
     $self->status( "($code)\n" );
   };
 
-  $self->agent->form(1)
-    if $self->agent->forms and scalar @{$self->agent->forms};
+  $self->activate_first_form;
   $self->sync_browser if $self->option('autosync');
   $self->add_history( sprintf q{$agent->get('%s');}."\n".q{  $agent->form(1) if $agent->forms and scalar @{$agent->forms};}, $url);
 };
@@ -677,7 +678,7 @@ Clicks on the button labeled "submit"
 sub run_submit {
   my ($self) = @_;
   eval {
-    print $self->agent->submit->code;
+    $self->status( $self->agent->submit->code."\n" );
     $self->add_history('$agent->submit();');
   };
   warn $@ if $@;
@@ -702,8 +703,8 @@ sub run_click {
     if ($self->option("dumprequests"));
   eval {
     my $res = $self->agent->click($button);
-    $self->agent->form(1);
-    print "(",$res->code,")\n";
+    $self->activate_first_form;
+    $self->status( "(".$res->code.")\n");
     if ($self->option('autosync')) {
       $self->sync_browser;
     };
@@ -744,7 +745,7 @@ sub run_open {
       print "No match.\n";
       undef $link;
     } else {
-      print "Found $links[0]\n";
+      $self->status( "Found $links[0]\n" );
       $link = $links[0];
       if ($possible_links[$count]->[0] =~ /^javascript:(.*)/i) {
         print "Can't follow javascript link $1\n";
@@ -756,13 +757,13 @@ sub run_open {
   if (defined $link) {
     eval {
       $self->agent->follow($link);
-      $self->add_history( sprintf qq{\$agent->follow('%s');}, $user_link);
-      $self->agent->form(1);
+      $self->add_history( sprintf qq{\$agent->follow('%s');}, $link);
+      $self->activate_first_form;
       if ($self->option('autosync')) {
         $self->sync_browser;
       } else {
         #print $self->agent->{res}->as_string;
-        print "(",$self->agent->res->code,")\n";
+        $self->status( "(".$self->agent->res->code.")\n" );
       };
     };
     warn $@ if $@;
@@ -1095,7 +1096,7 @@ sub run_autofill {
   if ($class) {
     eval {
       $self->{formfiller}->add_filler($name,$class,@args);
-      $self->add_history( sprintf qq{\$formfiller->add_filler( %s => %s => %s ); }, $name, $class, join( ",", @args));
+      $self->add_history( sprintf qq{\$formfiller->add_filler( %s => %s => '%s' ); }, $name, $class, join( ",", @args));
     };
     warn $@
       if $@;
@@ -1112,14 +1113,30 @@ Syntax:
 
   eval CODE
 
+For the generated scripts, anything matching the regular expression
+C</\$self-E<gt>agent\b/> is automatically
+replaced by C<$agent> in your eval code, to do the Right Thing.
+
+Examples:
+
+  # Say hello
+  eval "Hello World"
+  
+  # And take a look at the current content type
+  eval $self->agent->ct
+
 =cut
 
 sub run_eval {
   my ($self) = @_;
   my $code = $self->line;
   $code =~ /^eval\s+(.*)$/ and do {
-    $self->add_history("print do { $1 };");
-    print eval $1,"\n";
+    my $code = $1;
+    my $script_code = $code;
+    $script_code =~ s/\$self->agent\b/\$agent/g;
+    $script_code =~ s/\$shell->agent\b/\$agent/g;
+    $self->add_history( sprintf q{ print( do { %s },"\n" );}, $script_code);
+    print eval $code,"\n";
   };
 };
 
@@ -1183,7 +1200,7 @@ sub shell {
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
   use vars qw( $VERSION );
-  $VERSION = '0.18';
+  $VERSION = '0.19';
 
   sub new {
     my ($class,$name,$shell) = @_;
@@ -1300,12 +1317,15 @@ submit button for you (understandably). If you want to create such
 a submit button from within your automation script, use the following
 code :
 
-    $agent->current_form->push_input( submit => { name => "submit", value =>"submit" } );
+  $agent->current_form->push_input( submit => { name => "submit", value =>"submit" } );
 
 This also works for other dynamically generated input fields.
 
-Currently there is no built in shell command for faking HTML input
-fields.
+To fake an input field from within a shell session, use the C<eval> command :
+
+  eval $self->agent->current_form->push_input(submit=>{name=>"submit",value=>"submit"});
+
+And yes, the generated script should do the Right Thing for this eval as well.
 
 =head1 PROXY SUPPORT
 
@@ -1371,7 +1391,12 @@ Add C<referer> and C<referrer> as commands to set the C<Referer> (sic) header
 
 =item *
 
+Add C<ct> as a convenience command instead of C<eval $self-E<gt>agent-E<gt>ct>
+
+=item *
+
 Optionally silence the HTML::Parser / HTML::Forms warnings about invalid HTML.
+
 =back
 
 =head1 EXPORT

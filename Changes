@@ -11,8 +11,12 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - added a "save" command to save links into files
   - added "auth" command for basic authentication (suggested by merlyn)
   - added live test of the auth command against HTTP::Daemon (code provided by merlyn)
+  - added test that 'url' basic authentication also works (http://login:password@example.com)
   - added convenience "shell" module method :
       perl -MWWW::Mechanize::Shell -e "shell"
+  - added full end-to-end testing for many commands and their generated scripts
+  - fixed many bugs in the generated scripts
+  - many documentation fixes
 
 0.18
   - No functional changes to v0.17

@@ -38,13 +38,22 @@ tie *STDERR, 'Catch', '_STDERR_' or die $!;
 
 BEGIN {
   %tests = (
+    autofill => { requests => 2, lines => [ 'get %s', 'autofill query Fixed foo', 'fillout', 'submit' ]},
+    back => { requests => 2, lines => [ 'get %s','get %s/back1','back' ] },
+    eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ] },
+    eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ] },
     get => { requests => 1, lines => [ 'get %s' ] },
     get_content => { requests => 1, lines => [ 'get %s', 'content' ] },
-    get_save => { requests => 4, lines => [ 'get %s','save /\.save$/' ] },
+    get_save => { requests => 4, lines => [ 'get %s','save /\.save_log_server_test\.tmp$/' ] },
+    get_value_click => { requests => 2, lines => [ 'get %s','value query foo', 'click submit' ] },
+    get_value_submit => { requests => 2, lines => [ 'get %s','value query foo', 'submit' ] },
+    get_value2_submit => { requests => 2, lines => [ 'get %s','value query foo', 'value session 2', 'submit' ] },
+    open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ] },
+    open_re => { requests => 2, lines => [ 'get %s','open "foo1"','content' ] },
     ua_get => { requests => 1, lines => [ 'ua foo/1.1', 'get %s' ] },
     ua_get_content => { requests => 1, lines => [ 'ua foo/1.1', 'get %s', 'content' ] },
-  )
-  
+  );
+
   eval {
     require HTML::TableExtract;
     $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ] };
@@ -52,7 +61,7 @@ BEGIN {
   };
 };
 
-use Test::More tests => 1 + (scalar keys %tests)*5; 
+use Test::More tests => 1 + (scalar keys %tests)*5;
 SKIP: {
 skip "Can't load Term::ReadKey without a terminal", 1 +(scalar keys %tests)*5
   unless -t STDIN;
@@ -65,27 +74,27 @@ if ($@) {
 };
 
 # start a fake webserver, fork, and connect to ourselves
-{ 
+{
   package Test::HTTP::LocalServer;
   use LWP::Simple;
-  
+
   sub spawn {
     my ($class,%args) = @_;
     my $self = { %args };
     bless $self,$class;
-    
+
     open my $server, qq'"$^X" $FindBin::Bin/log-server|'
       or die "Couldn't spawn fake server : $!";
     sleep 1; # give the child some time
     my $url = <$server>;
     chomp $url;
-    
+
     $self->{_fh} = $server;
     $self->{_server_url} = $url;
-    
+
     $self;
   };
-  
+
   sub port { URI::URL->new($_[0]->url)->port };
   sub url { $_[0]->{_server_url} };
   sub stop { get( $_[0]->{_server_url} . "quit_server" )};
@@ -117,7 +126,7 @@ my $actual_requests;
     $actual_requests++;
     goto &$old_do_request;
   };
-  
+
   *WWW::Mechanize::Shell::status = sub {};
 };
 
@@ -139,19 +148,19 @@ for my $name (sort keys %tests) {
 	is($actual_requests,$requests,"$requests requests were made for $name");
 	my $code_requests = $server->get_output;
 	my $code_port = $server->port;
-	
+
   my $script_server = Test::HTTP::LocalServer->spawn();
 	my $script_port = $script_server->port;
 
   # Modify the generated Perl script to match the new? port
   my $script = join "\n", $s->script;
   $script =~ s!\b$code_port\b!$script_port!smg;
-  
+
 	# Write the generated Perl script
   my ($fh,$tempname) = tempfile();
   print $fh $script;
   close $fh;
-  
+
   my ($compile) = `$^X -c "$tempname" 2>&1`;
   chomp $compile;
   unless (is($compile,"$tempname syntax OK","$name compiles")) {
@@ -163,9 +172,8 @@ for my $name (sort keys %tests) {
     my ($output);
     my $command = qq($^X -Ilib "$tempname" 2>&1);
     $output = `$command`;
-    #chomp $output;
     is( $output, $code_output, "Output of $name is identical" )
-      or diag $script;
+      or diag "Script:\n$script";
 		my $script_requests = $script_server->get_output;
 	  $code_requests =~ s!\b$code_port\b!$script_port!smg;
 		is($code_requests,$script_requests,"$name produces identical queries");
@@ -173,5 +181,7 @@ for my $name (sort keys %tests) {
   unlink $tempname
     or diag "Couldn't remove tempfile '$name' : $!";
 };
+
+unlink $_ for (<*.save_log_server_test.tmp>);
 
 };
