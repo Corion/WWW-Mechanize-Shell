@@ -2,6 +2,9 @@ use strict;
 use Test::More tests => 4;
 
 SKIP: {
+  skip "Can't load Term::ReadKey without a terminal", 4
+    unless -t STDIN;
+
   eval {
     require Test::Without::Module;
     Test::Without::Module->import('Pod::Constants')

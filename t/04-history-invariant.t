@@ -65,6 +65,10 @@ BEGIN {
 };
 
 use Test::More tests => scalar @history_invariant +1;
+SKIP: {
+skip "Can't load Term::ReadKey without a terminal", scalar @history_invariant +1
+  unless -t STDIN;
+
 
 eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
 if ($@) {
@@ -106,4 +110,5 @@ for my $cmd (@history_invariant) {
   @history = ();
   $s->cmd($cmd);
   is_deeply( \@history, [], "$cmd is history invariant");
+};
 };

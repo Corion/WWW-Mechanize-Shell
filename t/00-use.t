@@ -2,6 +2,8 @@ use strict;
 use Test::More tests => 18;
 
 SKIP: {
+  skip "Can't load Term::ReadKey without a terminal", 18
+    unless -t STDIN;
   eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
   if ($@) {
     diag "Term::ReadKey seems to want a terminal";

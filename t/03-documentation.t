@@ -2,10 +2,13 @@ use strict;
 use Test::More qw( no_plan );
 
 SKIP: {
+  skip "Can't load Term::ReadKey without a terminal", 1
+    unless -t STDIN;
+
   eval {
     require Pod::Constants;
   };
-  skip "Pod::Constants to test the documentation", 1
+  skip "Need Pod::Constants to test the documentation", 1
     if $@;
 
   eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
