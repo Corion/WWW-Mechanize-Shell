@@ -6,3 +6,4 @@ WWW-Mechanize-Shell-*
 *.tar.gz
 pm_to_blib
 .lwpcookies
+cover_db

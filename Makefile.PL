@@ -59,6 +59,15 @@ BEGIN {
 
         return $out;
     }
+    
+		sub postamble {
+    	return <<EOF
+cover:
+\trm -rf cover_db
+\tPERL5OPT=-MDevel::Cover \$(MAKE) test || true
+\tcover cover_db -report html
+EOF
+		}
 }
 
 # To make Test::Prereq happy
