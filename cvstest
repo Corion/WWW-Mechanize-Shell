@@ -1,9 +1,9 @@
 #!/bin/bash
-perl Makefile.PL 2>&1
-make disttest 2>&1
+for $PERL in (perl perl5.6.1 perl5.8.0); do
+  echo "--- $PERL"
+  $PERL Makefile.PL 2>&1
+  make 2>&1
+  make disttest 2>&1
+  echo "--- $PERL"
+done
 
-perl5.6.1 Makefile.PL 2>&1
-make disttest 2>&1
-
-perl5.8.0 Makefile.PL 2>&1
-make disttest 2>&1
