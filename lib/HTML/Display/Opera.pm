@@ -1,7 +1,7 @@
 package HTML::Display::Opera;
 use base 'HTML::Display::TempFile';
 use vars qw($VERSION);
-$VERSION='0.02';
+$VERSION='0.03';
 
 =head1 NAME
 
@@ -22,6 +22,6 @@ Tina Mueller provided the browser command line
 
 =cut
 
-sub browsercmd { "opera -newwindow %s" };
+sub browsercmd { "opera %s" };
 
 1;

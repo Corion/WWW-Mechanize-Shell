@@ -1,35 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
-
-package Catch;
-use strict;
-# ripped from pod2test
-
-sub TIEHANDLE {
-    my($class, $var) = @_;
-    return bless { var => $var }, $class;
-}
-
-sub PRINT  {
-    no strict 'refs';
-    my($self) = shift;
-    ${'main::'.$self->{var}} .= join '', @_;
-}
-
-sub OPEN  {}    # XXX Hackery in case the user redirects
-sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
-
-sub READ {}
-sub READLINE {}
-sub GETC {}
-sub BINMODE {}
-
-package main;
-use strict;
+use lib 'inc';
+use IO::Catch;
 use File::Temp qw( tempfile );
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
-tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
+tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
 use Test::More tests => 2;
 

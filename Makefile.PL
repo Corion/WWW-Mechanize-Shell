@@ -59,15 +59,6 @@ BEGIN {
 
         return $out;
     }
-    
-		sub postamble {
-    	return <<EOF
-cover:
-\trm -rf cover_db
-\tHARNESS_PERL_SWITCHES=-MDevel::Cover=-coverage,statement,time,-silent,1,-select,^blib/lib,+inc,Win32,-summary,0 \$(MAKE) test || true
-\t\$(PERL) /usr/bin/cover cover_db -report html 
-EOF
-		}
 }
 
 # To make Test::Prereq happy

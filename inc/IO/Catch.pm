@@ -41,11 +41,6 @@ sub PRINT  {
     ${'main::'.$self->{var}} .= join '', @_;
 }
 
-sub PRINTF {
-    my $fh = shift;
-    print $fh sprintf @_;
-}
-
 sub OPEN  {}    # XXX Hackery in case the user redirects
 sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
 

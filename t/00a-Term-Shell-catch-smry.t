@@ -1,15 +1,7 @@
 use strict;
 use Test::More tests => 1;
-
-{
-  package Catch;
-  sub TIEHANDLE {
-      my($class, $var) = @_;
-      return bless { var => $var }, $class;
-  }
-
-  sub PRINT {};
-};
+use lib 'inc';
+use IO::Catch;
 
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
@@ -17,14 +9,6 @@ $ENV{COLUMNS} = 80;
 $ENV{LINES} = 24;
 
 TODO: {
-  #skip "Can't load Term::ReadKey without a terminal", 1
-  #  unless -t STDIN;
-  #eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
-  #if ($@) {
-  #  diag "Term::ReadKey seems to want a terminal";
-  #  no warnings 'redefine';
-  #  *Term::ReadKey::GetTerminalSize = sub {80,24};
-  #};
   local $TODO = "Term::Shell::catch_smry is buggy";
 
   # Now check that the Term::Shell summary calls catch_smry
@@ -41,7 +25,7 @@ TODO: {
   bless $s, 'Term::Shell::Test';
 
   { local *STDOUT;
-    tie *STDOUT, 'Catch';
+    tie *STDOUT, 'IO::Catch', '_STDOUT_';
     $s->run_help();
   };
 

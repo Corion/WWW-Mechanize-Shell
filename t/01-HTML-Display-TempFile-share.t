@@ -21,6 +21,3 @@ SKIP: {
   $display->display("# Hello World");
   is($_STDERR_,undef,"Could launch tempfile program");
 };
-
-untie *STDOUT;
-untie *STDERR;

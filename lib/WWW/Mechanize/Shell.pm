@@ -108,9 +108,9 @@ sub init {
   # Install the request dumper :
   $self->{request_wrapper} = wrap *LWP::UserAgent::request,
                                pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); },
-                               post => sub {
+                               post => sub { 
                                  #warn scalar @_, " arguments";
-                                 #warn $_ for @_;
+                                 #warn $_ for @_; 
                                  $self->response_dumper($_[-1]) if $self->option("dumpresponses");
                                };
 
@@ -176,8 +176,7 @@ sub source_file {
   my ($self,$filename) = @_;
   local $_; # just to be on the safe side that we don't clobber outside users of $_
   local *F;
-  open F, "< $filename"
-    or die "Couldn't open '$filename' : $!\n";
+  open F, "< $filename" or die "Couldn't open '$filename' : $!\n";
   while (<F>) {
     $self->cmd($_);
     warn "cmd: $_"
@@ -1416,7 +1415,7 @@ sub run_source {
   if ($file) {
     eval { $self->source_file($file); };
     if ($@) {
-      $self->display_user_warning( "Could not source file '$file' : $@" );
+      print "Could not source file '$file' : $@";
     };
   } else {
     print "Syntax: source FILENAME\n";
@@ -1752,6 +1751,12 @@ in Perl, either in the final script or through C<eval> commands.
 The shell currently detects when you want to follow a JavaScript link and tells you
 that this is not supported. It would be nicer if there was some callback mechanism
 to (automatically?) extract URLs from JavaScript-infected links.
+
+=item *
+
+The embedded test C<t/embedded-WWW-Mechanize-Shell.t> currently dies under Perl 5.8
+and Solaris after successfully running all tests. I can't test this myself so I don't
+know where the reason for that lies - any hints are welcome !
 
 =back
 

@@ -1,34 +1,10 @@
 #!/usr/bin/perl -w
 use strict;
-
-package Catch;
-use strict;
-# ripped from pod2test
-
-sub TIEHANDLE {
-    my($class, $var) = @_;
-    return bless { var => $var }, $class;
-}
-
-sub PRINT  {
-    no strict 'refs';
-    my($self) = shift;
-    ${'main::'.$self->{var}} .= join '', @_;
-}
-
-sub OPEN  {}    # XXX Hackery in case the user redirects
-sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
-
-sub READ {}
-sub READLINE {}
-sub GETC {}
-sub BINMODE {}
-
-package main;
-use strict;
+use lib 'inc';
+use IO::Catch;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
-tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
+tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
 use vars qw( %tests );
 
@@ -47,10 +23,10 @@ BEGIN {
 use Test::More tests => scalar (keys %tests) +1;
 SKIP: {
 
-BEGIN { 
+BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
-  use_ok('WWW::Mechanize::Shell'); 
+  use_ok('WWW::Mechanize::Shell');
 
   eval { require HTTP::Daemon; };
   skip "HTTP::Daemon required to test browser synchronisation",(scalar keys %tests)*6
