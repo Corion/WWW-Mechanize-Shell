@@ -27,6 +27,10 @@ sub spawn {
   my ($class,%args) = @_;
   my $self = { %args };
   bless $self,$class;
+  
+  if (delete $args{debug}) {
+    $ENV{TEST_HTTP_VERBOSE} = 1;
+  };
 
   if (my $html = delete $args{html}) {
     # write the html to a temp file
@@ -37,7 +41,6 @@ sub spawn {
     close $fh;
     $self->{delete} = $tempfile;
     $args{file} = $tempfile;
-    warn $args{file};
   };
   my $web_page = delete $args{file};
   if (defined $web_page) {
@@ -48,7 +51,6 @@ sub spawn {
 
   my $server_file = File::Spec->catfile( $FindBin::Bin,File::Spec->updir,'inc','Test','HTTP','log-server' );
 
-  #warn qq{Spawning "$^X" $server_file $web_page |};
   open my $server, qq'$^X $server_file $web_page |'
     or die "Couldn't spawn fake server $server_file : $!";
   my $url = <$server>;
