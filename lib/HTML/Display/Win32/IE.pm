@@ -1,4 +1,5 @@
 package HTML::Display::Win32::IE;
+use Carp qw(carp);
 use base 'HTML::Display::Win32::OLE';
 use vars qw($VERSION);
 $VERSION='0.02';
@@ -31,17 +32,21 @@ sub new {
 
 sub setup {
   my ($self,$control) = @_;
-  warn "Setting up browser";
+  #warn "Setting up browser";
   $control->{'Visible'} = 1;
   $control->Navigate('about:blank');
 };
 
 sub display_html {
   my ($self,$html) = @_;
-  my $browser = $self->control;
-  my $document = $browser->{Document};
-  $document->open("text/html","replace");
-  $document->write($html);
+  if ($html) {
+    my $browser = $self->control;
+    my $document = $browser->{Document};
+    $document->open("text/html","replace");
+    $document->write($html);
+  } else {
+    carp "No HTML given" unless $html;
+  };
 };
 
 1;

@@ -45,6 +45,7 @@ BEGIN {
                                             'fillout',
                                             'submit' ], location => qr'^%s/formsubmit\?session=1&query=foo&cat=cat_foo&cat=cat_bar$'},
     back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => qr'^%s/$' },
+    content_save => { requests => 1, lines => [ 'get %s','content tmp.content','eval unlink "tmp.content"'], location => qr'^%s/$' },
     comment => { requests => 1, lines => [ '# a comment','get %s','# another comment' ], location => qr'^%s/$' },
     eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ], location => qr'^%s/$' },
     eval_shell => { requests => 1, lines => [ 'get %s', 'eval $self->agent->ct' ], location => qr'^%s/$' },
@@ -70,8 +71,8 @@ BEGIN {
     														        "from ",$self->agent->uri',
     														 'content' ],
     									location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$' },
-    form => { requests => 2, lines => [ 'get %s','form 1','submit' ], 
-              location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$' 
+    form => { requests => 2, lines => [ 'get %s','form 1','submit' ],
+              location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$'
             },
     formfiller_chars => { requests => 2,
     									lines => [ 'eval srand 0',
@@ -144,19 +145,20 @@ BEGIN {
     open_re7 => { requests => 2, lines => [ 'get %s','open "/^/Link in slashes//"','content' ], location => qr'^%s/slash_both$' },
     reload => { requests => 2, lines => [ 'get %s','reload','content' ], location => qr'^%s/$' },
     reload_2 => { requests => 3, lines => [ 'get %s','open "/Link \/foo/"','reload','content' ], location => qr'^%s/foo$' },
-    tick => { requests => 2, 
-              lines => [ 'get %s','tick cat cat_foo','submit','content' ], 
+    tick => { requests => 2,
+              lines => [ 'get %s','tick cat cat_foo','submit','content' ],
               location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar$' },
-    tick_all => { requests => 2, 
-              lines => [ 'get %s','tick cat','submit','content' ], 
+    tick_all => { requests => 2,
+              lines => [ 'get %s','tick cat','submit','content' ],
               location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_foo&cat=cat_bar&cat=cat_baz$' },
+    timeout => { requests => 1, lines => [ 'timeout 60', 'get %s', 'content' ], location => qr'^%s/' },
     ua_get => { requests => 1, lines => [ 'ua foo/1.1', 'get %s' ], location => qr'^%s/$' },
     ua_get_content => { requests => 1, lines => [ 'ua foo/1.1', 'get %s', 'content' ], location => qr'^%s/$' },
-    untick => { requests => 2, 
-              lines => [ 'get %s','untick cat cat_foo','submit','content' ], 
+    untick => { requests => 2,
+              lines => [ 'get %s','untick cat cat_foo','submit','content' ],
               location => qr'^%s/formsubmit\?session=1&query=\(empty\)&cat=cat_bar$' },
-    untick_all => { requests => 2, 
-              lines => [ 'get %s','untick cat','submit','content' ], 
+    untick_all => { requests => 2,
+              lines => [ 'get %s','untick cat','submit','content' ],
               location => qr'^%s/formsubmit\?session=1&query=\(empty\)$' },
   );
 
@@ -233,7 +235,6 @@ for my $name (sort keys %tests) {
 	my $code_requests = $server->get_output;
 
   # Get a clean start
-  #$server = Test::HTTP::LocalServer->spawn();
 	my $script_port = $server->port;
 
   # Modify the generated Perl script to match the new? port
@@ -251,7 +252,7 @@ for my $name (sort keys %tests) {
   chomp $compile;
   SKIP: {
     unless (is($compile,"$tempname syntax OK","$name compiles")) {
-      $server->stop;
+      $server->get_output;
       diag $script;
       skip "Script $name didn't compile", 2;
     };
@@ -268,6 +269,7 @@ for my $name (sort keys %tests) {
   unlink $tempname
     or diag "Couldn't remove tempfile '$name' : $!";
 };
+# $server->stop;
 
 unlink $_ for (<*.save_log_server_test.tmp>);
 

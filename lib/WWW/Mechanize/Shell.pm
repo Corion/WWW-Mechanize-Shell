@@ -89,7 +89,6 @@ sub init {
   my ($name,%args) = @{$self->{API}{args}};
 
   $self->{agent} = WWW::Mechanize->new();
-  $self->agent->{__www_mechanize_shell} = $self;
 
   $self->{formfiller} = WWW::Mechanize::FormFiller->new(default => [ Ask => $self ]);
 
@@ -102,13 +101,16 @@ sub init {
     watchfiles => (exists $args{watchfiles} ? $args{watchfiles} : 1),
     cookiefile => 'cookies.txt',
     dumprequests => 0,
+    dumpresponses => 0,
+		verbose => 0,
   };
   # Install the request dumper :
   $self->{request_wrapper} = wrap 'WWW::Mechanize::request',
-                               pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); };
+                               pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); },
+                               post => sub { $self->response_dumper($_[0]->res) if $self->option("dumpresponses"); };
 
   $self->{redirect_ok_wrapper} = wrap 'WWW::Mechanize::redirect_ok',
-  																post => sub { $self->status( "\nRedirecting to ".$_[1]->uri ); $_[-1] };
+  																post => sub { return unless $_[1]; $self->status( "\nRedirecting to ".$_[1]->uri."\n" ); $_[-1] };
 
   # Load the proxy settings from the environment
   $self->agent->env_proxy();
@@ -172,6 +174,8 @@ sub source_file {
   open F, "< $filename" or die "Couldn't open '$filename' : $!\n";
   while (<F>) {
     $self->cmd($_);
+    warn "cmd: $_"
+			if $self->{options}->{verbose};
   };
   close F;
 };
@@ -250,7 +254,8 @@ sub sync_browser {
 
 sub prompt_str { ($_[0]->agent->uri || "") . ">" };
 
-sub request_dumper { print $_[1]->as_string if $_[0]->option("dumprequests"); };
+sub request_dumper { print $_[1]->as_string };
+sub response_dumper { print $_[1]->as_string };
 
 sub re_or_string {
   my ($self,$arg) = @_;
@@ -298,16 +303,12 @@ use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
 use URI::URL;
 
-#{ no warnings 'redefine';
-#  *WWW::Mechanize::redirect_ok = sub { $_[0]->{uri} = $_[1]->uri; 1 };
-#};
-
 my $agent = WWW::Mechanize->new();
 my $formfiller = WWW::Mechanize::FormFiller->new();
 $agent->env_proxy();
 HEADER
 
-  push @result, map { $prefix.$_->[1] } @{$self->{history}};
+  push @result, map { my $x = $_->[1]; $x =~ s/^/$prefix/mg; $x } @{$self->{history}};
   @result;
 };
 
@@ -337,6 +338,7 @@ sub display {
     eval {
       open my $f, ">", $filename
         or die "Couldn't create $filename : $!";
+      binmode $f;
       print $f join( "", map { "$_\n" } (@lines) );
       close $f;
     };
@@ -448,11 +450,12 @@ sub run_get {
   my ($self,$url) = @_;
   $self->status( "Retrieving $url" );
   my $code;
-  eval { $code = $self->agent->get($url)->code };
+  eval { $self->agent->get($url) };
   if ($@) {
     print "\n$@\n" if $@;
     $self->agent->back;
   } else {
+    $code = $self->agent->res->code;
     $self->status( "($code)\n" );
   };
 
@@ -557,14 +560,34 @@ CODE
 
 =head2 content
 
-Display the HTML for the current page
+Display the content for the current page. 
+
+Syntax: content [FILENAME]
+
+If the FILENAME argument is provided, save the content to the file.
+
+A trailing "\n" is added to the end of the content when using the
+shell, so this might not be ideally suited to save binary files without
+manual editing of the produced script.
 
 =cut
 
 sub run_content {
-  my ($self,$url) = @_;
-  print $self->agent->content,"\n";
-  $self->add_history('print $agent->content,"\n";');
+  my ($self, $filename) = @_;
+  $self->display($filename, $self->agent->content);
+  if ($filename) {
+    $self->add_history( sprintf '{ my $filename = q{%s};
+  local *F; 
+  open F, "> $filename" or die "$filename: $!";
+  binmode F;
+  print F $agent->content,"\n"; 
+  close F 
+};', $filename );
+  } else {
+    $self->add_history('print $agent->content,"\n";');
+  };
+  #  print $self->agent->content,"\n";
+  #}
 };
 
 =head2 ua
@@ -809,14 +832,15 @@ sub run_untick {
 
 =head2 submit
 
-Clicks on the button labeled "submit"
+submits the form without clicking on any button
 
 =cut
 
 sub run_submit {
   my ($self) = @_;
   eval {
-    $self->status( $self->agent->submit->code."\n" );
+    my $res = $self->agent->submit;
+    $self->status( $res->code."\n" );
     $self->add_history('$agent->submit();');
     $self->sync_browser if $self->option('autosync');
   };
@@ -833,6 +857,13 @@ Syntax:
 
   click NAME
 
+If you have a button that has no name (displayed as NONAME),
+use
+
+  click ""
+
+to click on it.
+
 =cut
 
 sub run_click {
@@ -840,11 +871,9 @@ sub run_click {
   $button ||= "";
   eval {
     my $res = $self->agent->click($button);
-    $self->activate_first_form;
     $self->status( "(".$res->code.")\n");
-    if ($self->option('autosync')) {
-      $self->sync_browser;
-    };
+    $self->activate_first_form;
+    $self->sync_browser if ($self->option('autosync'));
     $self->add_history( sprintf qq{\$agent->click('%s');}, $button );
   };
   warn $@ if $@;
@@ -903,9 +932,8 @@ sub run_open {
       $self->activate_first_form;
       if ($self->option('autosync')) {
         $self->sync_browser;
-      } else {
-        $self->status( "(".$self->agent->res->code.")\n" );
       };
+      $self->status( "(".$self->agent->res->code.")\n" );
     };
     warn $@ if $@;
   };
@@ -980,12 +1008,15 @@ Syntax:
 The command lists all valid options. Here is a short overview over
 the different options available :
 
-    autosync     - automatically synchronize the browser window
-    autorestart  - restart the shell when any required module changes
-                   This does not work with C<-e> oneliners.
-    watchfiles   - watch all required modules for changes
-    cookiefile   - the file where to store all cookies
-    dumprequests - dump all requests to STDOUT
+    autosync      - automatically synchronize the browser window
+    autorestart   - restart the shell when any required module changes
+                    This does not work with C<-e> oneliners.
+    watchfiles    - watch all required modules for changes
+    cookiefile    - the file where to store all cookies
+    dumprequests  - dump all requests to STDOUT
+    dumpresponses - dump the headers of the responses to STDOUT
+    verbose       - print commands to STDERR as they are run,
+                    when sourcing from a file
 
 =cut
 
@@ -1372,6 +1403,90 @@ sub run_versions {
   $self->print_pairs( [@modules], [map { defined ${"${_}::VERSION"} ? ${"${_}::VERSION"} : "<undef>" } @modules]);
 };
 
+=head2 timeout
+
+Set new timeout value for the agent. Effects all subsequent
+requests. VALUE is in seconds.
+
+Syntax:
+
+  timeout VALUE
+
+=cut
+
+sub run_timeout {
+  my ($self, $timeout) = @_;
+  if ($timeout) {
+    eval { $self->agent->timeout($timeout); };
+    if ($@) {
+      print "Could not set new timeout value : $@";
+    };
+    $self->add_history( sprintf q{$agent->timeout(%s);}, $timeout);
+  } else {
+    print "Syntax: timeout VALUE\n";
+  };
+};
+
+=head2 ct
+
+prints the content type of the most current response.
+
+Syntax:
+
+  ct
+
+=cut
+
+sub run_ct {
+  my ($self) = @_;
+  if ($self->agent->content) {
+    eval { print $self->agent->ct, "\n"; };
+    if ($@) {
+      print "Could not get content-type : $@";
+    };
+    $self->add_history('print $agent->ct, "\n";');
+  } else {
+    print "No content available yet!\n";
+  }
+};
+
+=head2 referrer
+
+set the value of the Referer: header
+
+Syntax:
+
+  referer URL
+  referrer URL
+
+=cut
+
+sub run_referrer {
+  my ($self, $referrer) = @_;
+  if (defined $referrer) {
+    eval { $self->agent->add_header(Referer => $referrer); };
+    if ($@) {
+      print "Could not set referrer : $@";
+    };
+    $self->add_history( sprintf q{$agent->add_header('Referer', '%s');}, $referrer);
+  } else {
+    print "syntax: referer|referrer URL\n";
+  }
+};
+
+sub alias_referrer { qw(referer) };
+
+=head2 response
+
+display the last server response
+
+=cut
+
+sub run_response {
+  my ($self) = @_;
+  eval { print $self->agent->res->as_string };
+};
+
 sub shell {
   my $shell = WWW::Mechanize::Shell->new("shell");
 
@@ -1615,20 +1730,7 @@ Add C<head> as a command ?
 
 =item *
 
-Add C<referer> and C<referrer> as commands to set the C<Referer> (sic) header
-
-=item *
-
-Add C<ct> as a convenience command instead of C<eval $self-E<gt>agent-E<gt>ct>
-
-=item *
-
 Optionally silence the HTML::Parser / HTML::Forms warnings about invalid HTML.
-
-=item *
-
-Support setting of multiple values for checkboxes and selection lists (WWW::Mechanize::Ticky
-does this for checkboxes. Steal that code.)
 
 =back
 

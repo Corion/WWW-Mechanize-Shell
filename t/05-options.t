@@ -10,6 +10,8 @@ BEGIN {
     watchfiles
     cookiefile
     dumprequests
+    dumpresponses
+    verbose
     warnings
   );
 };

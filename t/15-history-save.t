@@ -30,7 +30,7 @@ use File::Temp qw( tempfile );
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
 
@@ -54,7 +54,7 @@ is($file, $script, "Written history is the same as history()");
 
 unlink $name
   or warn "Couldn't remove tempfile $name : $!";
-  
+
 ($fh,$name) = tempfile();
 close $fh;
 
@@ -70,4 +70,20 @@ is($file, $script, "Written script is the same as script()");
 
 unlink $name
   or warn "Couldn't remove tempfile $name : $!";
-  
+
+($fh,$name) = tempfile();
+close $fh;
+
+$s->agent->{content} = "<html><body>test</body></html>";
+$s->cmd(sprintf 'content "%s"', $name);
+my $content = $s->agent->content . "\n";
+ok(-f $name, "Script file exists");
+open F, "< $name"
+  or die "Couldn't open tempfile $name : $!";
+$file = do { local $/; <F> };
+close F;
+is($file, $content, 'Written content is the same as $agent->content');
+
+unlink $name
+  or warn "Couldn't remove tempfile $name : $!";
+

@@ -48,12 +48,15 @@ BEGIN {
       'get plain' => 'get http://www.google.com/',
       'open' => 'open foo',
       'reload' => 'reload',
+      'referer' => 'referer ""',
+      'referrer' => 'referrer ""',
       'save' => 'save /.../',
       'submit' => 'submit',
       'value' => 'value key value',
       'ua' => 'ua foo/1.0',
       'tick' => 'tick key value',
       'tick_all' => 'tick key',
+      'timeout' => 'timeout 60',
       'untick' => 'untick key value',
       'untick_all' => 'untick key',
   );
@@ -81,7 +84,8 @@ $mock_result->set_always( code => 200 );
 
 my $mock_form = Test::MockObject->new;
 $mock_form->mock( value => sub {} )
-          ->set_list( inputs => ());
+          ->set_list( inputs => ())
+          ->set_list( find_input => ());
 
 my $mock_uri = Test::MockObject->new;
 $mock_uri->set_always( abs => 'http://example.com/' )
@@ -94,6 +98,7 @@ $mock_agent->set_true($_)
 $mock_agent->set_false($_)
   for qw( form forms );
 $mock_agent->set_always( res => $mock_result )
+           ->set_always( add_header => 1 )
            ->set_always( submit => $mock_result )
            ->set_always( click => $mock_result )
            ->set_always( reload => $mock_result )
@@ -104,6 +109,7 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( uri => $mock_uri )
            ->set_always( request => $mock_result )
            ->set_always( tick => 1 )
+           ->set_always( timeout => 1 )
            ->set_always( untick => 1 )
            ;
 

@@ -47,11 +47,19 @@ BEGIN {
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
       'open' => 'open foo',
+      'reload' => 'reload',
+      'referrer' => 'referrer ""',
+      'referer' => 'referer ""',
       'save' => 'save 0',
       'save re' => 'save /.../',
       'submit' => 'submit',
+      'tick' => 'tick key value',
+      'tick_all' => 'tick key',
+      'timeout' => 'timeout 60',
       'value' => 'value key value',
       'ua' => 'ua foo/1.1',
+      'untick' => 'untick key value',
+      'untick_all' => 'untick key',
   );
 
   eval {
@@ -63,15 +71,6 @@ BEGIN {
 
 use Test::More tests => scalar (keys %tests)*2 +1;
 SKIP: {
-#skip "Can't load Term::ReadKey without a terminal", scalar (keys %tests)*2 +1
-#  unless -t STDIN;
-#eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
-#if ($@) {
-#  no warnings 'redefine';
-#  *Term::ReadKey::GetTerminalSize = sub {80,24};
-#  diag "Term::ReadKey seems to want a terminal";
-#};
-
 use_ok('WWW::Mechanize::Shell');
 
 eval {
@@ -86,7 +85,8 @@ $mock_result->set_always( code => 200 );
 
 my $mock_form = Test::MockObject->new;
 $mock_form->mock( value => sub {} )
-          ->set_list( inputs => ());
+          ->set_list( inputs => ())
+          ->set_list( find_input => ());
 
 my $mock_agent = Test::MockObject->new;
 $mock_agent->set_true($_)
@@ -99,6 +99,7 @@ $mock_uri->set_always( abs => 'http://example.com/' )
 $mock_uri->fake_module( 'URI::URL', new => sub {$mock_uri} );
 
 $mock_agent->set_always( res => $mock_result )
+           ->set_always( add_header => 1 )
            ->set_always( submit => $mock_result )
            ->set_always( click => $mock_result )
            ->set_always( reload => $mock_result )
@@ -106,6 +107,9 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( follow => 1 )
            ->set_always( links => [['foo','foo link','foo_link'],['foo2','foo2 link','foo2_link']])
            ->set_always( agent => 'foo/1.0' )
+           ->set_always( tick => 1 )
+           ->set_always( timeout => 1 )
+           ->set_always( untick => 1 )
            ->set_always( uri => $mock_uri );
 
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef, watchfiles => undef );

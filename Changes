@@ -8,6 +8,14 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - If more than one value is passed to the "value" command, the parameters
     are concatenated with spaces
   - added test that all released files are in Unix text format
+  - added "dumpresponses" option
+  - added "verbose" option that prints the commands while sourcing a file (Prakash Kailasa)
+  - "content" now can save the content to a file (Prakash Kailasa)
+  - added "ct" command to print the Context-Type header (Prakash Kailasa)
+  - added "referer" and "referrer" command to change the Referer header (Prakash Kailasa)
+  - added "timeout" command to set the LWP::UserAgent timeout (Prakash Kailasa)
+  - added "response" command to display the complete response (request by Mark Stosberg)
+  - updated tests to accomodate for the new commands
 
 0.26
   - added RE support to autofill
