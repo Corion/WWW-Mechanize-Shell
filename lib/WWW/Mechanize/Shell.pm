@@ -404,38 +404,39 @@ sub run_save {
   };
   
   my @links = ();
-  $self->add_history( q{my @links;} );    
+  my @all_links = $self->agent->links;
+  $self->add_history( q{my @links;} );
   
   if ($user_link =~ m!^/(.*)/$!) {
     my $re = $1;
     my $count = -1;
-    my @possible_links = @{$self->agent->links()};
-    @links = map { $count++; $_->[1] =~ /$re/ ? $count : () } @possible_links;
+    @links = map { $count++; (($_->[0] =~ /$re/)||($_->[1] =~ /$re/)) ? $count : () } @all_links;
     if (@links == 0) {
       print "No match.\n";
     };
-    $self->add_history( sprintf q{@links = map { /%s/ } } @{$agent->links()};}, $re);    
+    $self->add_history( sprintf q{@links = map { /%s/ } $agent->links();}, $re);    
   } else {
     $self->add_history( sprintf q{@links = '%s'}, $user_link);    
   };
 
   if (@links) {
-    $self->add_history( q{for my $link (@links) { $agent->mirror($link); } });
-    for $link (@links) {
+    $self->add_history( <<'CODE' );
+  my @all_links = $agent->links();
+  for my $link (@links) { 
+    my $target = $all_links[$link]->[0];
+    $target =~ s!^(.*/)([^/]+)$!$1!;
+    $agent->mirror($link,$target); 
+  }
+CODE
+    for my $link (@links) { 
+      my $target = $all_links[$link]->[0];
+      $target =~ s!^(.*/)([^/]+)$!$1!;
       eval {
-        $self->agent->follow($link);
-        $self->add_history( sprintf qq{\$agent->follow('%s');}, $user_link);
-        $self->agent->form(1);
-        if ($self->option('autosync')) {
-          $self->sync_browser;
-        } else {
-          #print $self->agent->{res}->as_string;
-          print "(",$self->agent->{res}->code,")\n";
-        };
+        $self->agent->mirror($all_links[$link]->[0],$target); 
       };
       warn $@ if $@;
     };
-  };
+  }
 };
 
 

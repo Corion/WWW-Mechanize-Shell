@@ -43,6 +43,7 @@ BEGIN {
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
       'open' => 'open',
+      'save' => 'save foo',
       'submit' => 'submit',
       'table' => 'table',
       'table params' => 'table foo bar',

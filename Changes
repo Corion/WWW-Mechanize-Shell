@@ -8,6 +8,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - added "ua" command to easily change the user agent string
   - added documentation for some more methods
   - added understanding of "#" as a comment
+  - added a "save" command to save links into files
 
 0.18
   - No functional changes to v0.17
