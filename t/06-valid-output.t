@@ -39,12 +39,13 @@ BEGIN {
       'back' => 'back',
       'click' => 'click',
       'content' => 'content',
-      #'fillout' => 'fillout',
+      'fillout' => 'fillout',
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
       'open' => 'open',
       'submit' => 'submit',
       'table' => 'table',
+      'table params' => 'table foo bar',
       'value' => 'value key value',
   );
 };
@@ -74,7 +75,8 @@ my $mock_result = Test::MockObject->new;
 $mock_result->set_always( code => 200 );
 
 my $mock_form = Test::MockObject->new;
-$mock_form->mock( value => sub {} );
+$mock_form->mock( value => sub {} )
+          ->set_list( inputs => ());
 
 my $mock_agent = Test::MockObject->new;
 $mock_agent->set_true($_)
