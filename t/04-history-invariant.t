@@ -45,10 +45,13 @@ BEGIN {
       parse
       quit
       restart
+      script
       set
       source
       tables
+      versions
   );
+  push @history_invariant, "#","      #", "# a comment", "  # another comment";
 
   @history_add = qw(
       autofill
@@ -60,6 +63,7 @@ BEGIN {
       open
       submit
       table
+      ua
       value
   );
 };
@@ -82,7 +86,7 @@ use_ok('WWW::Mechanize::Shell');
 # Silence all warnings
 $SIG{__WARN__} = sub {};
 
-my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef );
+my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 $s->agent->{content} = '';
 
 my @history;

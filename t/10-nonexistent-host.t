@@ -16,7 +16,7 @@ if ($@) {
 
 use_ok('WWW::Mechanize::Shell');
 
-my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef );
+my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 
 $s->cmd('get nonexistent.host');
 like($@,'/^Can\'t locate object method "host"/',"The 'get' command does not crash the shell");

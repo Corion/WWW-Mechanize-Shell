@@ -1,8 +1,8 @@
 use strict;
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 SKIP: {
-  skip "Can't load Term::ReadKey without a terminal", 18
+  skip "Can't load Term::ReadKey without a terminal", 19
     unless -t STDIN;
   eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
   if ($@) {
@@ -14,16 +14,17 @@ SKIP: {
   use_ok("WWW::Mechanize::Shell");
 
   my $s = do {
-    WWW::Mechanize::Shell->new("shell",rcfile => undef);
+    WWW::Mechanize::Shell->new("shell",rcfile => undef, warnings => undef);
   };
   isa_ok($s,"WWW::Mechanize::Shell");
 
   # Now check our published API :
-  for my $meth (qw( source_file cmdloop agent option restart_shell option)) {
+  for my $meth (qw( source_file cmdloop agent option restart_shell option cmd )) {
     can_ok($s,$meth);
   };
 
   # Check that we can set known options
+  # See also t/05-options.t
   my $oldvalue = $s->option('autosync');
   $s->option('autosync',"foo");
   is($s->option('autosync'),"foo","Setting an option works");
@@ -49,8 +50,7 @@ SKIP: {
     };
     my $test_filename = '/does/not/need/to/exist';
     my $s = do {
-      local $SIG{__WARN__} = sub {};
-      WWW::Mechanize::Shell->new("shell",rcfile => $test_filename);
+      WWW::Mechanize::Shell->new("shell",rcfile => $test_filename, warnings => undef);
     };
     isa_ok($s,"WWW::Mechanize::Shell");
     ok($called,"Passing an .rc file tries to load it");
@@ -65,17 +65,13 @@ SKIP: {
       $called++;
     };
     my $s = do {
-      local $SIG{__WARN__} = sub {};
-      WWW::Mechanize::Shell->new("shell",rcfile => undef);
+      WWW::Mechanize::Shell->new("shell",rcfile => undef, warnings => undef);
     };
     isa_ok($s,"WWW::Mechanize::Shell");
     diag "Tried to load '$filename'" unless is($called,0,"Passing in no .rc file tries not to load it");
   };
 
-  $s = do {
-    local $SIG{__WARN__} = sub {};
-    WWW::Mechanize::Shell->new("shell",rcfile => undef, cookiefile => 'test.cookiefile');
-  };
+  $s = WWW::Mechanize::Shell->new("shell",rcfile => undef, cookiefile => 'test.cookiefile', warnings => undef);
   isa_ok($s,"WWW::Mechanize::Shell");
   is($s->option('cookiefile'),'test.cookiefile',"Passing in a cookiefile filename works");
 };

@@ -1,5 +1,14 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.19
+  - Added t/00a*.t to check for a Term::Shell bug to the MANIFEST
+  - renamed the "history" command to "script"
+  - the new "history" command now outputs the "relevant" shell commands
+  - added "versions" command to print out the versions of the installed modules
+  - added "ua" command to easily change the user agent string
+  - added documentation for some more methods
+  - added understanding of "#" as a comment
+
 0.18
   - No functional changes to v0.17
   - Discovered that and documented how file uploads work

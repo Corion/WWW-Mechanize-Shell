@@ -15,7 +15,7 @@ if ($@) {
 
 use_ok('WWW::Mechanize::Shell');
 
-my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef );
+my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 
 # We don't want to annoy the user :
 $s->cmd('set useole 0');

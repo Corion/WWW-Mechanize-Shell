@@ -8,13 +8,13 @@ use vars qw( @options );
 
 BEGIN {
   @options = qw(
-    autosync     
-    autorestart  
-    watchfiles   
-    cookiefile   
-    dumprequests 
-    useole       
-    browsercmd   
+    autosync
+    autorestart
+    watchfiles
+    cookiefile
+    dumprequests
+    useole
+    browsercmd
     warnings
   );
 };
@@ -33,8 +33,8 @@ SKIP: {
 
   use_ok('WWW::Mechanize::Shell');
 
-  my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef );
-  
+  my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
+
   for my $option (@options) {
     my $oldval = $s->option($option);
     my $oldval2 = $s->option($option,"newvalue");

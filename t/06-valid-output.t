@@ -91,7 +91,7 @@ $mock_agent->set_always( res => $mock_result )
 # Silence all warnings
 my $s = do {
   local $SIG{__WARN__} = sub {};
-  WWW::Mechanize::Shell->new( 'test', rcfile => undef );
+  WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 };
 $s->{agent} = $mock_agent;
 
