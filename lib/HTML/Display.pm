@@ -86,7 +86,15 @@ add a new class or replace a class (or the rule), modify C<%os_default> :
 =cut
 
 %os_default = (
-  "HTML::Display::Win32::IE" 	=> sub { my $have_ole; eval 'use Win32::OLE; $have_ole = 1;'; $have_ole and $^O =~ qr/mswin32/i },
+  "HTML::Display::Win32::IE"    => sub { 
+  																	 my $have_ole; 
+  																	 eval {
+  																		 require Win32::OLE; 
+  																		 Win32::OLE->import(); 
+  																		 $have_ole = 1;
+  																	 }; 
+  																	 $have_ole and $^O =~ qr/mswin32/i 
+  																 },
   "HTML::Display::Debian" 		=> sub { -x "/bin/x-www-browser" },
   "HTML::Display::OSX"				=> sub { $^O =~ qr/darwin/i },
 );
@@ -121,8 +129,8 @@ sub new {
   $best_class ||= "HTML::Display::Dump";
 
   { no strict 'refs';
-    #undef $@;
-    eval "require $best_class"
+    undef $@;
+    eval "use $best_class;"
       unless defined *{"${best_class}::display_html"}{CODE};
     croak "While trying to load $best_class: $@" if $@;
   };
