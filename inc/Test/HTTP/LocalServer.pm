@@ -49,15 +49,15 @@ sub spawn {
   push @{$self->{delete}},$logfile;
   $self->{logfile} = $logfile;
   my $web_page = delete $args{file};
-  if (defined $web_page) {
-    $web_page = qq{"$web_page"}
-  } else {
-    $web_page = "";
-  };
+  #if (defined $web_page) {
+  #  $web_page = qq{$web_page}
+  #} else {
+  #  $web_page = "";
+  #};
 
   my $server_file = File::Spec->catfile( $FindBin::Bin,File::Spec->updir,'inc','Test','HTTP','log-server' );
 
-  open my $server, qq'$^X $server_file "$web_page" "$logfile" |'
+  open my $server, qq'"$^X" "$server_file" "$web_page" "$logfile" |'
     or die "Couldn't spawn fake server $server_file : $!";
   my $url = <$server>;
   chomp $url;
