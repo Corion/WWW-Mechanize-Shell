@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 =head1 NAME
 
@@ -915,6 +915,9 @@ of the following lines in your .mechanizerc :
 
   # for galeon
   set browsercmd "galeon -n %s"
+  
+  # for opera (thanks to Tina Mueller)
+  set browsercmd "opera -newwindow %s"
 
   # for Win32, using Phoenix instead of IE
   set useole 0
