@@ -39,7 +39,11 @@ tie *STDERR, 'Catch', '_STDERR_' or die $!;
 
 BEGIN {
   %tests = (
-    autofill => { requests => 2, lines => [ 'get %s', 'autofill query Fixed foo', 'fillout', 'submit' ], location => '%sformsubmit'},
+    autofill => { requests => 2, lines => [ 'get %s', 
+                                            'autofill query Fixed foo', 
+                                            'autofill cat Keep',
+                                            'fillout', 
+                                            'submit' ], location => '%sformsubmit'},
     back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => '%s' },
     comment => { requests => 1, lines => [ '# a comment','get %s','# another comment' ], location => '%s' },
     eval => { requests => 1, lines => [ 'eval "Hello World"', 'get %s','eval "Goodbye World"' ], location => '%s' },
@@ -49,6 +53,7 @@ BEGIN {
   					'eval sub ::custom_today { "20030511" };',
   					'autofill session Callback ::custom_today',
   					'autofill query Keep',
+            'autofill cat Keep',
   					'get %s',
   					'fillout',
   					'eval $self->agent->current_form->value("session")',
@@ -58,6 +63,7 @@ BEGIN {
     eval_multiline => { requests => 2,
     									lines => [ 'get %s',
     							 							 'autofill query Keep',
+											           'autofill cat Keep',
     														 'fillout',
     														 'submit',
     														 'eval "Hello World ",
@@ -67,25 +73,38 @@ BEGIN {
     form => { requests => 2, lines => [ 'get %s','form 1','submit' ], location => '%sformsubmit' },
     formfiller_chars => { requests => 2,
     									lines => [ 'eval srand 0',
+											           'autofill cat Keep',
     														 'autofill query Random::Chars size 5 set alpha', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_date => { requests => 2,
-    									lines => [ 'eval srand 0', 'autofill query Random::Date string %%Y%%m%%d', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'eval srand 0',
+											           'autofill cat Keep',
+    														 'autofill query Random::Date string %%Y%%m%%d', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_default => { requests => 2,
-    									lines => [ 'autofill query Default foo', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'autofill query Default foo', 
+											           'autofill cat Keep',
+					    									 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_fixed => { requests => 2,
-    									lines => [ 'autofill query Fixed foo', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'autofill query Fixed foo', 
+											           'autofill cat Keep',
+    														 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_keep => { requests => 2,
-    									lines => [ 'autofill query Keep foo', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'autofill query Keep foo', 
+											           'autofill cat Keep',
+    														 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_random => { requests => 2,
-    									lines => [ 'autofill query Random foo', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'autofill query Random foo', 
+											           'autofill cat Keep',
+    														 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     formfiller_word => { requests => 2,
-    									lines => [ 'eval srand 0', 'autofill query Random::Word size 1', 'get %s', 'fillout','submit','content' ],
+    									lines => [ 'eval srand 0', 
+											           'autofill cat Keep',
+    														 'autofill query Random::Word size 1', 'get %s', 'fillout','submit','content' ],
     									location => '%sformsubmit' },
     get => { requests => 1, lines => [ 'get %s' ], location => '%s' },
     get_content => { requests => 1, lines => [ 'get %s', 'content' ], location => '%s' },
@@ -102,6 +121,7 @@ BEGIN {
     interactive_script_creation => { requests => 2,
     									lines => [ 'eval @::list=qw(foo bar xxx)',
     														 'eval no warnings "once"; *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub { my $value=shift @::list; push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ]; $value }',
+											           'autofill cat Keep',
     														 'get %s',
     														 'fillout',
     														 'submit',
@@ -200,20 +220,20 @@ for my $name (sort keys %tests) {
 
   my ($compile) = `$^X -c "$tempname" 2>&1`;
   chomp $compile;
-  unless (is($compile,"$tempname syntax OK","$name compiles")) {
-    $script_server->stop;
-    diag $script;
-    ok(0, "Script $name didn't compile" );
-    ok(0, "Script $name didn't compile" );
-  } else {
+  SKIP: {
+    unless (is($compile,"$tempname syntax OK","$name compiles")) {
+      $script_server->stop;
+      diag $script;
+      skip "Script $name didn't compile", 2;
+    };
     my ($output);
     my $command = qq($^X -Ilib "$tempname" 2>&1);
     $output = `$command`;
     is( $output, $code_output, "Output of $name is identical" )
       or diag "Script:\n$script";
-		my $script_requests = $script_server->get_output;
-	  $code_requests =~ s!\b$code_port\b!$script_port!smg;
-		is($code_requests,$script_requests,"$name produces identical queries");
+    my $script_requests = $script_server->get_output;
+    $code_requests =~ s!\b$code_port\b!$script_port!smg;
+    is($code_requests,$script_requests,"$name produces identical queries");
   };
   unlink $tempname
     or diag "Couldn't remove tempfile '$name' : $!";
