@@ -74,7 +74,6 @@ require Test::HTTP::LocalServer; # from inc
 # We want to be safe from non-resolving local host names
 delete $ENV{HTTP_PROXY};
 
-
 my $actual_requests;
 {
   no warnings 'redefine';
@@ -95,6 +94,7 @@ for my $name (sort keys %tests) {
   my $requests = $tests{$name}->{requests};
 
   my $server = Test::HTTP::LocalServer->spawn( html => $HTML );
+	my $code_port = $server->port;
 
   my $result_location = sprintf $tests{$name}->{location}, $server->url;
 	my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
@@ -109,7 +109,6 @@ for my $name (sort keys %tests) {
 	is($_STDERR_,undef,"Shell produced no error output for $name");
 	is($actual_requests,$requests,"$requests requests were made for $name");
 	my $code_requests = $server->get_output;
-	my $code_port = $server->port;
 
   my $script_server = Test::HTTP::LocalServer->spawn(html => $HTML);
 	my $script_port = $script_server->port;
