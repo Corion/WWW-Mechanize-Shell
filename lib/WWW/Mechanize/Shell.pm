@@ -175,7 +175,7 @@ sub init {
   if (exists $args{rcfile}) {
     $sourcefile = delete $args{rcfile};
   } else {
-    my $userhome = $^O =~ /win32/i ? $ENV{'USERPROFILE'} || $ENV{'HOME'} : `cd ~; pwd`;
+    my $userhome = $^O =~ /win32/i ? $ENV{'USERPROFILE'} || $ENV{'HOME'} : ((getpwuid($<))[7]);
     $sourcefile = "$userhome/.mechanizerc";
   };
   $self->option('cookiefile', $args{cookiefile}) if (exists $args{cookiefile});
