@@ -10,6 +10,7 @@ lib/WWW/Mechanize/Shell.pm
 t/00-use.t
 t/01-fallback-Win32-OLE.t
 t/02-fallback-Pod-Constant.t
+t/02-fallback-HTML-TableExtract.t
 t/03-documentation.t
 t/04-history-invariant.t
 t/99-pod.t
