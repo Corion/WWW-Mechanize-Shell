@@ -666,6 +666,7 @@ sub run_value {
   my ($self,$key,$value) = @_;
 
   eval {
+    local $^W;
     $self->agent->current_form->value($key,$value);
     # Hmm - neither $key nor $value may contain backslashes nor single quotes ...
     $self->add_history( sprintf qq{\$agent->current_form->value('%s', '%s');}, $key, $value);

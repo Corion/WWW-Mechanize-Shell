@@ -18,6 +18,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - fixed many bugs in the generated scripts
   - many documentation fixes
   - Term::ReadLine now gets disabled for the tests
+  - silenced HTML::Form warning for readonly fields
 
 0.18
   - No functional changes to v0.17
