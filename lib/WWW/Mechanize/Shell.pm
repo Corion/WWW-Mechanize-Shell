@@ -12,7 +12,7 @@ use Hook::LexWrap;
 use HTML::Display qw();
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.23';
+$VERSION = '0.24';
 @EXPORT = qw( &shell );
 
 =head1 NAME

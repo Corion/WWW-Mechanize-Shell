@@ -1,5 +1,6 @@
 package HTML::Display::Common;
-use base 'HTML::Display::TempFile';
+#use base 'HTML::Display::TempFile';
+use URI::URL;
 
 =head1 NAME
 
@@ -129,10 +130,54 @@ sub display {
     $args{html} = <FILE>;
   };
 
-  $args{html} =~ s!(</head>)!<base href="$args{location}" />$1!i
-    unless ($args{html} =~ /<BASE/i);
+  # trim to directory create BASE HREF
+  # We are carefull to not trim if we just have http://domain.com
+  #$location =~ s%(?<!/)/[^/]*$%/%;
+  my $location = URI::URL->new( $args{location} );
+  my $path = $location->path;
+  $path =~ s%(?<!/)/[^/]*$%/%;
+  $location = sprintf "%s://%s%s", $location->scheme, $location->authority , $path;
 
-  $self->display_html($args{html});
+  require HTML::TokeParser::Simple;
+  my $p = HTML::TokeParser::Simple->new(\$args{html}) || die 'could not create HTML::TokeParser::Simple object';  
+  my ($has_head,$has_base);
+  while (my $token = $p->get_token) {
+		if ( $token->is_start_tag('head') ) {
+			$has_head++;
+		}	elsif ( $token->is_start_tag('base')) {
+		  $has_base++;
+		  last;
+		};
+	};
+  
+  # restart parsing
+  $p = HTML::TokeParser::Simple->new(\$args{html}) || die 'could not create HTML::TokeParser::Simple object';
+  my $new_html;
+  while (my $token = $p->get_token) {
+    if ( $token->is_start_tag('html') and not $has_head) {
+      $new_html .= $token->as_is . qq{<head><base href="$location" /></head>};
+    } elsif ( $token->is_start_tag('head') and not $has_base) {
+      # handle an empty <head /> :
+      if ($token->as_is =~ m!^<\s*head\s*/>$!i) {
+				$new_html .= qq{<head><base href="$location" /></head>}
+      } else {
+        $new_html .= $token->as_is . qq{<base href="$location" />};
+      };
+    } elsif ( $token->is_start_tag('base') ) {
+			# If they already have a <base href>, give up
+			if ($token->return_attr->{href}) {
+				$new_html = $args{html};
+				last;
+			} else {
+			  $token->set_attr('href',$location);
+				$new_html .= $token->as_is;
+			};			
+		}	else {
+			$new_html .= $token->as_is;
+		}
+	};
+
+  $self->display_html($new_html);
 };
 
 1;

@@ -123,7 +123,7 @@ sub new {
 
   { no strict 'refs';
     eval "require $best_class"
-      unless defined *{"${best_class}::new"}{CODE};
+      unless defined *{"${best_class}::display_html"}{CODE};
   };
   croak $@ if $@;
   #warn "Using $best_class\n";

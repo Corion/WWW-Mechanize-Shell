@@ -1,5 +1,12 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.24
+  - Added $VERSION to all HTML::Display modules
+  - patched handing of BASE tags, so that more cases are caught.
+    This adds HTML::TokeParser::Simple as a prerequisite
+  - fixed loading of classes in HTML::Display. Classes are only required
+    if there is no method "display_html" in that namespace already.
+
 0.23
   - "submit" didn't reload the browser HTML. Thanks to Slaven Rezic.
   - t/14* now skips instead of fails tests that can't succeed.
@@ -18,13 +25,13 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - "restart" in a -e oneliner dosen't crash the shell (it also dosen't restart though)
   - factored out the HTML display into a module of its own (HTML::Display),
     distributed with this. This breaks existing setups, as the "browsercmd"
-    and "useole" option disappeared. You can configure the used browser 
+    and "useole" option disappeared. You can configure the used browser
     class by setting the environment variable PERL_HTML_DISPLAY_CLASS
     or PERL_HTML_DISPLAY_COMMAND, either in your environment or in your mechanizerc.
-    
+
     If this feature causes too much grief, I will reimplement the browsercmd
     stuff again in a later release (but possibly different).
-    
+
     Please also tell me whether HTML::Display would be worth a release on its own!
 
 0.22

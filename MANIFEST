@@ -25,6 +25,7 @@ lib/HTML/Display/Win32/IE.pm
 lib/HTML/Display/Win32/OLE.pm
 lib/WWW/Mechanize/Shell.pm
 t/00-use.t
+t/00-HTML-Display-use.t
 t/00a-Term-Shell-catch-smry.t
 t/01-fallback-Win32-OLE.t
 t/02-fallback-HTML-TableExtract.t
