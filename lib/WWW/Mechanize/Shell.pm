@@ -72,7 +72,6 @@ your current browsers cookies.
   *WWW::Mechanize::redirect_ok = sub { print "\nRedirecting to ",$_[1]->uri; $_[0]->{uri} = $_[1]->uri; 1 };
 }
 
-package WWW::Mechanize::Shell;
 # TODO:
 # * Log facility, log all stuff to a file
 # * History persistence (see log facility)
@@ -276,7 +275,7 @@ sub catch_run {
   if ($command =~ /^\s*#/) {
     # Hey, it's a comment.
   } else {
-    $self->SUPER::catch_run->(@_);
+    print $self->msg_unknown_cmd($command);
   };
 };
 
@@ -812,6 +811,61 @@ sub run_fillout {
   };
   warn $@ if $@;
   $self->add_history('$formfiller->fill_form($agent->current_form);');
+};
+
+=head2 C<auth [authority realm] user password>
+
+Set basic authentication credentials.
+
+If you get back a 401, you can simply supply the matching
+user and password, as the authority and realm are already
+known :
+
+	>get http://www.example.com
+	Retrieving http://www.example.com(401)
+	http://www.example.com>auth corion secret
+	http://www.example.com>get http://www.example.com
+	Retrieving http://www.example.com(200)
+	http://www.example.com>
+
+If you know the authority and the realm in advance, you can
+presupply the credentials, for example at the start of the script :
+
+	>auth www.example.com:80 secure_realm corion secret
+	>get http://www.example.com
+	Retrieving http://www.example.com(200)
+	http://www.example.com>
+
+=cut
+
+sub run_auth {
+    my ($self) = shift;
+    my ($authority, $realm, $user, $password);
+    if (scalar @_ == 2) {
+      unless ($self->agent->res) {
+        print "Can't guess authentification elements without a request.";
+        print "Use the four parameter version instead.";
+        return;
+      };
+
+      ($user,$password) = @_;
+      if ($self->agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) {
+        $realm = $2
+      } else {
+        $self->warn_user();
+        $realm = "";
+      };
+      $authority = $self->agent->req->uri->authority();
+
+      $self->add_history(          q{($agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) or die "Couldn't find realm";},
+        						   q{my $realm = $2;},
+                                   q{my $authority = $agent->req->uri->authority();},
+                          sprintf( q{$agent->credentials($authority,$realm,'%s','%s');}, $user,$password ));
+    } else {
+      ($authority, $realm, $user, $password) = @_;
+      $self->add_history( sprintf q{$self->agent->credentials('%s','%s','%s','%s')}, $authority,$realm,$user,$password);
+    };
+    $self->agent->credentials($authority,$realm,$user,$password);
 };
 
 =head2 table

@@ -17,6 +17,7 @@ t/04-history-invariant.t
 t/05-options.t
 t/06-valid-output.t
 t/07-history-items.t
+t/08-unknown-command.t
 t/10-nonexistent-host.t
 t/11-browse-without-request.t
 t/98-bin.t
