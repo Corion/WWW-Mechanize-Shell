@@ -266,28 +266,18 @@ sub sync_browser {
   #  unless ($html =~ /<BASE/i);
 };
 
-=for old_version
-  my $browser;
-  $browser = $self->browser;
-  if ($browser) {
-    # We can push the HTML into a IE browser window
-    my $document = $browser->{Document};
-    $document->open("text/html","replace");
-    $document->write($html);
-  } else {
-    # We need to use a temp file for communication
-    require File::Temp;
-    my($tempfh, $tempfile) = File::Temp::tempfile(undef, UNLINK => 1);
-    print $tempfh $html;
-    my $cmdline = sprintf($self->option('browsercmd'), $tempfile);
-    system( $cmdline ) == 0
-      or warn "Couldn't launch '$cmdline' : $?";
-  };
-};
-
 sub prompt_str { ($_[0]->agent->uri || "") . ">" };
 
 sub request_dumper { print $_[1]->as_string if $_[0]->option("dumprequests"); };
+
+sub re_or_string {
+  my ($self,$arg) = @_;
+  if ($arg =~ m!^/(.*)/([imsx]?)$!) {
+    my ($re,$mode) = ($1,$2);
+    $arg = eval "qr/$re/$mode";
+  };
+  $arg;
+};
 
 =head2 C<$shell-E<gt>history>
 
@@ -515,10 +505,12 @@ sub run_save {
   my @all_links = $self->agent->links;
   push @history, q{my @links;} . "\n";
   push @history, q{my @all_links = $agent->links();} . "\n";
+  
+  $user_link = $self->re_or_string($user_link);
 
-  if ($user_link =~ m!^/(.*)/$!) {
-    my $re = qr($1);
+  if (ref $user_link) {
     my $count = -1;
+    my $re = $user_link;
     @links = map { $count++; (($_->[0] =~ /$re/)||($_->[1] =~ /$re/)) ? $count : () } @all_links;
     if (@links == 0) {
       print "No match for /$re/.\n";
@@ -784,14 +776,15 @@ Syntax:
 
 sub run_open {
   my ($self,$user_link) = @_;
+  $user_link = $self->re_or_string($user_link);
   my $link = $user_link;
-  my $user_link_expr = qq{'$user_link'};
+  my $user_link_expr = ref $link ? qq{qr/$link/} : qq{'$link'};
   unless (defined $link) {
     print "No link given\n";
     return
   };
-  if ($link =~ m!^/(.*)/$!) {
-    my $re = $1;
+  if (ref $link) {
+    my $re = $link;
     my $count = -1;
     my @possible_links = @{$self->agent->links()};
     my @links = map { $count++; $_->[1] =~ /$re/ ? $count : () } @possible_links;
@@ -808,9 +801,6 @@ sub run_open {
         print "Can't follow javascript link $1\n";
         undef $link;
       };
-      # Quote all unescaped slashes
-      $re =~ s!([^\\])/([^\\]|$)!$1\\/$2!g;
-      $user_link_expr = sprintf 'qr/%s/', $re;
     };
   };
 
@@ -1194,10 +1184,10 @@ sub run_autofill {
     if ($class eq 'Ask');
   if ($class) {
     my $name_vis;
-    if ($name =~ m!^/(.*)/$!) {
-      #warn "autofill RE detected";
-      $name_vis = qq{qr$name};
-      $name = qr{$1};
+    $name = $self->re_or_string($name);
+    if (ref $name) {
+      $name_vis = qq{qr/$name/};
+      warn "autofill RE detected $name";
     } else {
       $name_vis = qq{"$name"};
     };
@@ -1529,6 +1519,11 @@ Add C<ct> as a convenience command instead of C<eval $self-E<gt>agent-E<gt>ct>
 =item *
 
 Optionally silence the HTML::Parser / HTML::Forms warnings about invalid HTML.
+
+=item *
+
+Support setting of multiple values for checkboxes and selection lists (WWW::Mechanize::Ticker
+does this for checkboxes. Steal that code.)
 
 =back
 
