@@ -85,6 +85,7 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( click => $mock_result )
            ->set_always( reload => $mock_result )
            ->set_always( current_form => $mock_form )
+           ->set_always( form_name => 'test form name' )
            ->set_always( follow => 1 )
            ->set_list( links => WWW::Mechanize::Link->new('foo','foo link','foo_link',""),
                                 WWW::Mechanize::Link->new('foo2','foo2 link','foo2_link',""))
