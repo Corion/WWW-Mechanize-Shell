@@ -1724,7 +1724,8 @@ available through C<perldoc WWW::Mechanize::Shell>
 =head1 BUGS
 
 Bug reports are very welcome - please use the RT interface at
-https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Shell . Please
+https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Shell or send a
+descriptive mail to bug-WWW-Mechanize-Shell@rt.cpan.org . Please
 try to include as much (relevant) information as possible - a test script
 that replicates the undesired behaviour is welcome every time!
 

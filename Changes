@@ -3,6 +3,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
 0.28 
   - Add $PAGER support for multiline output
   - "referer" command now prints the old referer if no new value is given
+  - added RT bug email address to documentation
 
 0.27
   - now needs WWW::Mechanize 0.47
