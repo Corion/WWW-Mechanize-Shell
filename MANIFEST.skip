@@ -7,3 +7,4 @@ WWW-Mechanize-Shell-*/
 CVS/
 pm_to_blib
 cvstest
+Makefile

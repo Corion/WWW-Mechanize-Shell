@@ -1,7 +1,6 @@
 Changes
 MANIFEST			This list of files
 MANIFEST.skip
-Makefile
 Makefile.PL
 README
 bin/banking.postbank.de.mech
