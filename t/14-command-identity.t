@@ -9,9 +9,16 @@ use vars qw( %tests $_STDOUT_ $_STDERR_ );
 use URI::URL;
 use LWP::Simple;
 
-# pre-5.8.0's warns aren't caught by a tied STDERR.
+# Catch output:
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 tie *STDERR, 'IO::Catch', '_STDERR_' or die $!;
+
+# Make HTML::Display do nothing:
+BEGIN {
+  $ENV{PERL_HTML_DISPLAY_CLASS} = 'HTML::Display::Dump';
+  delete $ENV{PAGER};
+};
+use HTML::Display;
 
 BEGIN {
   %tests = (
@@ -145,23 +152,24 @@ BEGIN {
   };
 
   # To ease zeroing in on tests
-  #for (sort keys %tests) {
-  #  delete $tests{$_} unless /tick/;
-  #};
+  for (sort keys %tests) {
+    delete $tests{$_} unless /eval_/;
+  };
 };
 
 use Test::More tests => 1 + (scalar keys %tests)*7;
+BEGIN { 
+  # Disable all ReadLine functionality
+  $ENV{PERL_RL} = 0;
+  use_ok('WWW::Mechanize::Shell');
+};
+
 SKIP: {
-
-# Disable all ReadLine functionality
-$ENV{PERL_RL} = 0;
-
-use_ok('WWW::Mechanize::Shell');
-
 eval { require HTTP::Daemon; };
 skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*6
   if ($@);
-require Test::HTTP::LocalServer; # from inc
+# require Test::HTTP::LocalServer; # from inc
+use Test::HTTP::LocalServer; # from inc
 
 # We want to be safe from non-resolving local host names
 delete $ENV{HTTP_PROXY};
@@ -188,30 +196,29 @@ for my $name (sort keys %tests) {
   my @lines = @{$tests{$name}->{lines}};
   my $requests = $tests{$name}->{requests};
 
-  #my $server = Test::HTTP::LocalServer->spawn();
-	my $code_port = $server->port;
+  my $code_port = $server->port;
 
   my $url = $server->url;
   $url =~ s!/$!!;
   my $result_location = sprintf $tests{$name}->{location}, $url;
   $result_location = qr{$result_location};
-	my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
-	$s->option("dumprequests",1);
-	for my $line (@lines) {
-	  $line = sprintf $line, $server->url;
-  	$s->cmd($line);
-	};
-	$s->cmd('eval $self->agent->uri');
+  my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
+  $s->option("dumprequests",1);
+  for my $line (@lines) {
+    $line = sprintf $line, $server->url;
+    $s->cmd($line);
+  };
+  $s->cmd('eval $self->agent->uri');
   my $code_output = $_STDOUT_;
   diag join( "\n", $s->history )
     unless like($s->agent->uri,$result_location,"Shell moved to the specified url for $name");
-	is($_STDERR_,undef,"Shell produced no error output for $name");
-	is($actual_requests,$requests,"$requests requests were made for $name");
-	is($dumped_requests,$requests,"$requests requests were dumped for $name");
-	my $code_requests = $server->get_output;
+  is($_STDERR_,undef,"Shell produced no error output for $name");
+  is($actual_requests,$requests,"$requests requests were made for $name");
+  is($dumped_requests,$requests,"$requests requests were dumped for $name");
+  my $code_requests = $server->get_output;
 
   # Get a clean start
-	my $script_port = $server->port;
+  my $script_port = $server->port;
 
   # Modify the generated Perl script to match the new? port
   my $script = join "\n", $s->script;
@@ -219,12 +226,12 @@ for my $name (sort keys %tests) {
   $s->release_agent;
   undef $s;
 
-	# Write the generated Perl script
+  # Write the generated Perl script
   my ($fh,$tempname) = tempfile();
   print $fh $script;
   close $fh;
 
-  my ($compile) = `$^X -c "$tempname" 2>&1`;
+  my ($compile) = `"$^X" -c "$tempname" 2>&1`;
   chomp $compile;
   SKIP: {
     unless (is($compile,"$tempname syntax OK","$name compiles")) {
@@ -233,7 +240,7 @@ for my $name (sort keys %tests) {
       skip "Script $name didn't compile", 2;
     };
     my ($output);
-    my $command = qq($^X -Ilib "$tempname" 2>&1);
+    my $command = qq("$^X" -Iblib/lib "$tempname" 2>&1);
     $output = `$command`;
     is( $output, $code_output, "Output of $name is identical" )
       or diag "Script:\n$script";

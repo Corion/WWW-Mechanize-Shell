@@ -34,12 +34,14 @@ BEGIN {
 };
 
 use Test::More tests => 1 + (scalar keys %tests)*6;
+BEGIN {
+  delete $ENV{PAGER};
+  $ENV{PERL_RL} = 0;
+  use_ok('WWW::Mechanize::Shell');
+};
 SKIP: {
 
 # Disable all ReadLine functionality
-$ENV{PERL_RL} = 0;
-
-use_ok('WWW::Mechanize::Shell');
 my $HTML = do { local $/; <DATA> };
 
 eval { require HTTP::Daemon; };

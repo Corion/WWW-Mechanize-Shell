@@ -273,6 +273,7 @@ sub precmd {
 sub browser {
   my ($self) = @_;
   $self->{browser} ||= HTML::Display->new();
+  warn "Have browser: " . $self->{browser};
   $self->{browser};
 };
 
