@@ -669,7 +669,7 @@ sub run_value {
     local $^W;
     $self->agent->current_form->value($key,$value);
     # Hmm - neither $key nor $value may contain backslashes nor single quotes ...
-    $self->add_history( sprintf qq{\$agent->current_form->value('%s', '%s');}, $key, $value);
+    $self->add_history( sprintf q{{ local $^W; $agent->current_form->value('%s', '%s'); };}, $key, $value);
   };
   warn $@ if $@;
 };
