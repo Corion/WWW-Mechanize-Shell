@@ -47,6 +47,7 @@ BEGIN {
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
       'open' => 'open foo',
+      'reload' => 'reload',
       'save' => 'save /.../',
       'submit' => 'submit',
       'value' => 'value key value',
@@ -63,14 +64,6 @@ BEGIN {
 
 use Test::More tests => scalar (keys %tests) +1;
 SKIP: {
-#skip "Can't load Term::ReadKey without a terminal", scalar (keys %tests) +1
-#  unless -t STDIN;
-#eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
-#if ($@) {
-#  no warnings 'redefine';
-#  *Term::ReadKey::GetTerminalSize = sub {80,24};
-#  diag "Term::ReadKey seems to want a terminal";
-#};
 
 eval {
   require Test::MockObject;

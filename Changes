@@ -1,5 +1,9 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.22
+  - Added new command "reload", which repeats the last request
+    (intended for testing/modifying server side code)
+
 0.21
   - Fixed error in one-liner usage
   - Fixed embarassing errors in 'forms' and 'save' commands

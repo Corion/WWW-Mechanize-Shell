@@ -27,6 +27,7 @@ sub BINMODE {}
 
 package main;
 use strict;
+use lib 'inc';
 use File::Temp qw( tempfile );
 use vars qw( %tests $_STDOUT_ $_STDERR_ );
 use URI::URL;
@@ -87,9 +88,9 @@ BEGIN {
     				'submit'
     ], location => '%sformsubmit' },
     interactive_script_creation => { requests => 2,
-    									lines => [ 'eval @::list=qw(foo bar xxx)', 
-    														 'eval no warnings "once"; *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub { my $value=shift @::list; push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ]; $value }', 
-    														 'get %s', 
+    									lines => [ 'eval @::list=qw(foo bar xxx)',
+    														 'eval no warnings "once"; *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub { my $value=shift @::list; push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ]; $value }',
+    														 'get %s',
     														 'fillout',
     														 'submit',
     														 'content' ],
@@ -102,6 +103,8 @@ BEGIN {
     open_re5 => { requests => 2, lines => [ 'get %s','open "/Link /$/"','content' ], location => '%sslash_end' },
     open_re6 => { requests => 2, lines => [ 'get %s','open "/^/Link$/"','content' ], location => '%sslash_front' },
     open_re7 => { requests => 2, lines => [ 'get %s','open "/^/Link in slashes//"','content' ], location => '%sslash_both' },
+    reload => { requests => 2, lines => [ 'get %s','reload','content' ], location => '%s' },
+    reload_2 => { requests => 3, lines => [ 'get %s','open "/Link \/foo/"','reload','content' ], location => '%sfoo' },
     ua_get => { requests => 1, lines => [ 'ua foo/1.1', 'get %s' ], location => '%s' },
     ua_get_content => { requests => 1, lines => [ 'ua foo/1.1', 'get %s', 'content' ], location => '%s' },
   );
@@ -111,51 +114,15 @@ BEGIN {
     $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ], location => '%s' };
     $tests{get_table_params} = { requests => 1, lines => [ 'get %s','table Col2 Col1' ], location => '%s' };
   };
-  
+
   # To ease zeroing in on tests
   #for (sort keys %tests) {
-  #  delete $tests{$_} unless /^i|^eval_sub/;
+  #  delete $tests{$_} unless /^r/;
   #};
 };
 
 use Test::More tests => 1 + (scalar keys %tests)*6;
 SKIP: {
-
-# start a fake webserver, fork, and connect to ourselves
-{
-  package Test::HTTP::LocalServer;
-  use LWP::Simple;
-
-  sub spawn {
-    my ($class,%args) = @_;
-    my $self = { %args };
-    bless $self,$class;
-
-    open my $server, qq'"$^X" $FindBin::Bin/log-server|'
-      or die "Couldn't spawn fake server : $!";
-    sleep 1; # give the child some time
-    my $url = <$server>;
-    chomp $url;
-
-    $self->{_fh} = $server;
-    $self->{_server_url} = $url;
-
-    $self;
-  };
-
-  sub port { URI::URL->new($_[0]->url)->port };
-  sub url { $_[0]->{_server_url} };
-  sub stop { get( $_[0]->{_server_url} . "quit_server" )};
-
-  sub get_output {
-    my ($self) = @_;
-    $self->stop;
-    my $fh = $self->{_fh};
-    my $result = join "\n", <$fh>;
-    $self->{_fh}->close;
-    $result;
-  };
-};
 
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
@@ -165,6 +132,7 @@ use_ok('WWW::Mechanize::Shell');
 eval { require HTTP::Daemon; };
 skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*5
   if ($@);
+require Test::HTTP::LocalServer; # from inc
 
 # We want to be safe from non-resolving local host names
 delete $ENV{HTTP_PROXY};

@@ -10,7 +10,7 @@ use FindBin;
 use URI::URL;
 
 use vars qw( $VERSION @EXPORT );
-$VERSION = '0.21';
+$VERSION = '0.22';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -840,6 +840,26 @@ sub run_back {
   warn $@ if $@;
 };
 
+=head2 reload
+
+Repeat the last request, thus reloading the current page.
+
+Note that also POST requests are blindly repeated, as this command
+is mostly intended to be used when testing server side code.
+
+=cut
+
+sub run_reload {
+  my ($self) = @_;
+  eval {
+    $self->agent->_do_request;
+    $self->add_history('$agent->_do_request();');
+    $self->sync_browser
+      if ($self->option('autosync'));
+  };
+  warn $@ if $@;
+};
+
 =head2 browse
 
 Open the web browser with the current page
@@ -950,7 +970,7 @@ sub run_fillout {
     @interactive_values = @{$self->{answers}};
   };
   warn $@ if $@;
-  $self->add_history( join( "\n", 
+  $self->add_history( join( "\n",
                       map { sprintf( q[$formfiller->add_filler( '%s' => Fixed => '%s' );], @$_ ) } @interactive_values) . '$formfiller->fill_form($agent->current_form);');
 };
 
@@ -1382,7 +1402,7 @@ This method can also be used to retrieve data from shell scripts :
   eval sub &::custom_today { chomp `date` };
   autofill date Callback WWW::Mechanize::Shell::custom_today
   fillout
-  
+
 As the namespace is different between the shell and the generated
 script, make sure you always fully qualify your subroutine names,
 either in your own namespace or in the main namespace.
