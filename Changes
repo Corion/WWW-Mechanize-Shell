@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.18
+  - No functional changes to v0.17
+  - Discovered that and documented how file uploads work
+  - Added BUGS section to documentation
+
 0.17
   - Fixed a doc bug where "exit" referred to the (nonexistent) "quit" topic (thanks Mark)
   - Made a test checking the version of Term::Shell and the help summary bug

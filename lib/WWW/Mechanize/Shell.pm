@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use HTTP::Cookies;
 
 use vars qw( $VERSION );
-$VERSION = '0.17';
+$VERSION = '0.18';
 
 =head1 NAME
 
@@ -72,7 +72,7 @@ your current browsers cookies.
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
   use vars qw( $VERSION );
-  $VERSION = '0.13';
+  $VERSION = '0.18';
 
   sub new {
     my ($class,$name,$shell) = @_;
@@ -911,6 +911,12 @@ __END__
   # now you have a program that gives you a csv file of
   # that table.
 
+=head2 Uploading a file
+
+  get http://aliens:xxxxx/
+  value f path/to/file
+  click "upload"
+
 =head1 DISPLAYING HTML
 
 WWW::Mechanize::Shell can display the HTML of the current page
@@ -984,18 +990,31 @@ Remove the three lines
 in C<sub run_help> and replace them by
 
       my $smry = $o->summary($h);
+      
+The shell works without this patch and the online help is still
+available through C<perldoc WWW::Mechanize::Shell>
 
-=head1 TODO
+=head1 BUGS
 
 =over 4
 
 =item *
 
-Add method (to C<WWW::Mechanize> ?) to specify binary (file) uploads
+The shell currently detects when you want to follow a JavaScript link and tells you
+that this is not supported. It would be nicer if there was some callback mechanism
+to (automatically?) extract URLs from JavaScript-infected links.
 
 =item *
 
-Add command to specify a file value to a form
+The embedded test C<t/embedded-WWW-Mechanize-Shell.t> currently dies under Perl 5.8
+and Solaris after successfully running all tests. I can't test this myself so I don't
+know where the reason for that lies - any hints are welcome !
+
+=back
+
+=head1 TODO
+
+=over 4
 
 =item *
 
