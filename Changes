@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW::Mechanize::Shell.
 
+0.11 20030318
+  - Updated the tests so they skip when there is no terminal available
+    (as is the case when the tests are run from cron)
+  - Fixed the inline tests so the synopsis shows again
+
 0.10 20030312
   - Added the "table" command to display/dump HTML tables using HTML::TableExtract
   - Added "table" history
