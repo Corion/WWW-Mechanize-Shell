@@ -38,14 +38,17 @@ WWW::Mechanize::Shell - An interactive shell for WWW::Mechanize
 =for example_testing
   BEGIN {
     require WWW::Mechanize::Shell;
+    $ENV{PERL_RL} = 0;
+    #$ENV{PERL_RL_USE_TRK} = 0;
+    $ENV{COLUMNS} = '80';
+    $ENV{LINES} = '24';
+  };
+  BEGIN {
     no warnings 'once';
-    *WWW::Mechanize::Shell::cmdloop = sub {};
-    eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
-    if ($@) {
-      diag "Term::ReadKey seems to want a terminal";
-      *Term::ReadKey::GetTerminalSize = sub {80,24};
-    };
     no warnings 'redefine';
+    require Term::ReadKey;
+    *WWW::Mechanize::Shell::cmdloop = sub {};
+    *Term::ReadKey::GetTerminalSize = sub {80,24};
     *WWW::Mechanize::Shell::display_user_warning = sub {};
   };
   isa_ok( $shell, "WWW::Mechanize::Shell" );
@@ -274,7 +277,7 @@ sub prompt_str { ($_[0]->agent->uri || "") . ">" };
 
 Returns the (relevant) shell history, that is, all commands
 that were not solely for the information of the user. The
-lines are returned as a list. 
+lines are returned as a list.
 
   print join "\n", $shell->history;
 
@@ -299,7 +302,7 @@ a one-by-one correspondence to the lines in the history.
 sub script {
   my ($self,$prefix) = @_;
   $prefix ||= "";
-  
+
   my @result = sprintf <<'HEADER', $^X;
 #%s -w
 use strict;
@@ -1122,7 +1125,7 @@ Examples:
 
   # Say hello
   eval "Hello World"
-  
+
   # And take a look at the current content type
   eval $self->agent->ct
 

@@ -63,15 +63,15 @@ BEGIN {
 
 use Test::More tests => 1 + (scalar keys %tests)*5;
 SKIP: {
-skip "Can't load Term::ReadKey without a terminal", 1 +(scalar keys %tests)*5
-  unless -t STDIN;
+#skip "Can't load Term::ReadKey without a terminal", 1 +(scalar keys %tests)*5
+#  unless -t STDIN;
 
-eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
-if ($@) {
-  no warnings 'redefine';
-  *Term::ReadKey::GetTerminalSize = sub {80,24};
-  diag "Term::ReadKey seems to want a terminal";
-};
+#eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
+#if ($@) {
+#  no warnings 'redefine';
+#  *Term::ReadKey::GetTerminalSize = sub {80,24};
+#  diag "Term::ReadKey seems to want a terminal";
+#};
 
 # start a fake webserver, fork, and connect to ourselves
 {
@@ -108,6 +108,9 @@ if ($@) {
     $result;
   };
 };
+
+# Disable all ReadLine functionality
+$ENV{PERL_RL} = 0;
 
 use_ok('WWW::Mechanize::Shell');
 

@@ -32,17 +32,19 @@ use vars qw( $_STDOUT_ $_STDERR_ );
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
 
+# Disable all ReadLine functionality
+$ENV{PERL_RL} = 0;
+
 use Test::More tests => 7;
 SKIP: {
-skip "Can't load Term::ReadKey without a terminal", 7
-  unless -t STDIN;
-
-eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
-if ($@) {
-  no warnings 'redefine';
-  *Term::ReadKey::GetTerminalSize = sub {80,24};
-  diag "Term::ReadKey seems to want a terminal";
-};
+#skip "Can't load Term::ReadKey without a terminal", 7
+#  unless -t STDIN;
+#eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
+#if ($@) {
+#  no warnings 'redefine';
+#  *Term::ReadKey::GetTerminalSize = sub {80,24};
+#  diag "Term::ReadKey seems to want a terminal";
+#};
 
 use_ok('WWW::Mechanize::Shell');
 

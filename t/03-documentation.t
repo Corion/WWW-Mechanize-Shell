@@ -12,24 +12,25 @@ BEGIN {
 
 use Test::More tests => scalar @methods*3 +2;
 
-SKIP: {
-  skip "Can't load Term::ReadKey without a terminal", 2 + scalar @methods*3
-    unless -t STDIN;
+# Disable all ReadLine functionality
+$ENV{PERL_RL} = 0;
 
-  eval {
-    require Pod::Constants;
-  };
+SKIP: {
+  #skip "Can't load Term::ReadKey without a terminal", 2 + scalar @methods*3
+  #  unless -t STDIN;
+  #eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
+  #if ($@) {
+  #  no warnings 'redefine';
+  #  *Term::ReadKey::GetTerminalSize = sub {80,24};
+  #  diag "Term::ReadKey seems to want a terminal";
+  #};
+
+  eval { require Pod::Constants;};
   skip "Need Pod::Constants to test the documentation", 2 + scalar @methods*3
     if $@;
 
   use_ok("WWW::Mechanize::Shell");
 
-  eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize(); };
-  if ($@) {
-    no warnings 'redefine';
-    *Term::ReadKey::GetTerminalSize = sub {80,24};
-    diag "Term::ReadKey seems to want a terminal";
-  };
 
   my $shell = WWW::Mechanize::Shell->new("shell", rcfile => undef, warnings => undef );
   isa_ok($shell,"WWW::Mechanize::Shell");

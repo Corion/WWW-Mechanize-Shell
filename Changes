@@ -17,6 +17,7 @@ Revision history for Perl extension WWW::Mechanize::Shell.
   - added full end-to-end testing for many commands and their generated scripts
   - fixed many bugs in the generated scripts
   - many documentation fixes
+  - Term::ReadLine now gets disabled for the tests
 
 0.18
   - No functional changes to v0.17

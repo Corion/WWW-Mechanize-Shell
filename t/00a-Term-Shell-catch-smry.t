@@ -11,20 +11,23 @@ use Test::More tests => 1;
   sub PRINT {};
 };
 
+# Disable all ReadLine functionality
+$ENV{PERL_RL} = 0;
+
 SKIP: {
   #skip "Can't load Term::ReadKey without a terminal", 1
   #  unless -t STDIN;
-  eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
-  if ($@) {
-    diag "Term::ReadKey seems to want a terminal";
-    no warnings 'redefine';
-    *Term::ReadKey::GetTerminalSize = sub {80,24};
-  };
+  #eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
+  #if ($@) {
+  #  diag "Term::ReadKey seems to want a terminal";
+  #  no warnings 'redefine';
+  #  *Term::ReadKey::GetTerminalSize = sub {80,24};
+  #};
 
   # Now check that the Term::Shell summary calls catch_smry
-  
+
   require Term::Shell;
-  use vars qw( $called );  
+  use vars qw( $called );
   {
     package Term::Shell::Test;
     use base 'Term::Shell';
@@ -33,12 +36,12 @@ SKIP: {
   };
   my $s = { handlers => { foo => { run => sub {}}} };
   bless $s, 'Term::Shell::Test';
-  
+
   { local *STDOUT;
     tie *STDOUT, 'Catch';
     $s->run_help();
   };
-  
+
   if (not is($called,1,"Term::Shell::Test::catch_smry gets called for unknown methods")) {
     diag "Term::Shell did not call a custom catch_smry handler";
     diag "This is most likely because your version of Term::Shell";

@@ -1,15 +1,18 @@
 use strict;
 use Test::More tests => 19;
 
+# Disable all ReadLine functionality
+$ENV{PERL_RL} = 0;
+
 SKIP: {
-  skip "Can't load Term::ReadKey without a terminal", 19
-    unless -t STDIN;
-  eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
-  if ($@) {
-    diag "Term::ReadKey seems to want a terminal";
-    no warnings 'redefine';
-    *Term::ReadKey::GetTerminalSize = sub {80,24};
-  };
+#  skip "Can't load Term::ReadKey without a terminal", 19
+#    unless -t STDIN;
+#  eval { require Term::ReadKey; Term::ReadKey::GetTerminalSize() };
+#  if ($@) {
+#    diag "Term::ReadKey seems to want a terminal";
+#    no warnings 'redefine';
+#    *Term::ReadKey::GetTerminalSize = sub {80,24};
+#  };
 
   use_ok("WWW::Mechanize::Shell");
 
