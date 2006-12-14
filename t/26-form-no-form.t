@@ -20,7 +20,7 @@ my @warnings;
 use_ok('WWW::Mechanize::Shell');
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 
-{ no warnings 'once';
+{ no warnings qw'redefine once';
 *WWW::Mechanize::Shell::status = sub {};
 };
 

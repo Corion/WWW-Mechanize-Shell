@@ -19,7 +19,7 @@ BEGIN {
     interactive_script_creation => { requests => 2,
     									lines => [ 'eval @::list=qw(1 2 3 4 5 6 7 8 9 10 foo NY 11 DE 13 V 15 16 2038-01-01)',
     														 'eval
-    														    no warnings "once";
+    														    no warnings qw"once redefine";
     														    *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub {
     														      #warn "Filled out ",$_[1]->name;
     														      my $value=shift @::list || "empty";

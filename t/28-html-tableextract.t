@@ -25,7 +25,7 @@ SKIP: {
     } elsif (! $have_tableextract) {
         skip "Unknown error loading HTML::TableExtract, skipping tests", 1;
     } else {
-        no warnings 'redefine';
+        no warnings qw'redefine once';
         local *WWW::Mechanize::Shell::status = sub {};
         my @output;
         local *WWW::Mechanize::Shell::print_paged = sub {

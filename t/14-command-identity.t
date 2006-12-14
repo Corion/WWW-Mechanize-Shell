@@ -116,7 +116,7 @@ BEGIN {
     ], location => qr'^%s/formsubmit\?session=2&query=foo&cat=cat_foo&cat=cat_bar' },
     interactive_script_creation => { requests => 2,
     									lines => [ 'eval @::list=qw(foo bar xxx)',
-    														 'eval no warnings "once"; *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub { my $value=shift @::list; push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ]; $value }',
+    														 'eval no warnings qw"redefine once"; *WWW::Mechanize::FormFiller::Value::Ask::ask_value = sub { my $value=shift @::list; push @{$_[0]->{shell}->{answers}}, [ $_[1]->name, $value ]; $value }',
 											           'autofill cat Keep',
     														 'get %s',
     														 'fillout',
@@ -184,7 +184,7 @@ delete $ENV{HTTP_PROXY};
 
 use vars qw( $actual_requests $dumped_requests );
 {
-  no warnings 'redefine';
+  no warnings qw'redefine once';
   my $old_request = *WWW::Mechanize::_make_request{CODE};
   *WWW::Mechanize::_make_request = sub {
     $actual_requests++;
