@@ -8,7 +8,7 @@ WriteMakefile(
 		       'URI::URL' => 0.00,
 		       'Test::Harness' => 2.30,
                        'LWP' => 5.69,
-                       'WWW::Mechanize' => 0.63,
+                       'WWW::Mechanize' => 1.20,
                        'WWW::Mechanize::FormFiller' => 0.05,
                        'Hook::LexWrap' => 0.20,
                        'HTML::TokeParser::Simple' => 2.0,
@@ -32,7 +32,7 @@ BEGIN {
 
 # Autocreate the synopsis test from the pod of every module
 # (if we have Test::Inline)
-{
+if ($have_test_inline) { eval q{
     package MY;
     use strict;
     sub top_targets {
@@ -70,7 +70,7 @@ cover:
 \t/usr/bin/cover cover_db -report html
 EOF
 		}
-}
+}};
 
 # To make Test::Prereq happy
 1;

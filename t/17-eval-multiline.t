@@ -20,10 +20,13 @@ use_ok('WWW::Mechanize::Shell');
 sub command_ok {
   my ($command,$expected,$name) = @_;
   my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
+  $s->agent->get("file:t/17-eval-multiline.t");
   eval { $s->cmd($command) };
-  is($@,"","$name does not crash");
+  is($@,"","$name does not crash")
+      or diag "Crash on '$command'";
   is($_STDERR_,undef,"$name produces no warnings");
-  is($_STDOUT_,$expected,"$name produces the desired output");
+  is($_STDOUT_,$expected,"$name produces the desired output")
+      or diag "Command: '$command'";
   undef $_STDOUT_;
   undef $_STDERR_;
 };
@@ -31,4 +34,4 @@ sub command_ok {
 command_ok('eval "Hello",
  " World"', "Hello World\n","Multiline eval");
 command_ok('eval "Hello from ",
- $self->agent->uri || ""', "Hello from \n","Multiline eval substitution");
+ $self->agent->uri || ""', "Hello from file:t/17-eval-multiline.t\n","Multiline eval substitution");

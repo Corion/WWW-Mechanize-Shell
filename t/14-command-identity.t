@@ -157,9 +157,12 @@ BEGIN {
   };
 
   # To ease zeroing in on tests
-  #for (sort keys %tests) {
-  #  delete $tests{$_} unless /save/;
-  #};
+  if (@ARGV) {
+      my $re = join "|", @ARGV;
+      for (sort keys %tests) {
+           delete $tests{$_} unless /$re/o;
+        };
+    };
 };
 
 use Test::More tests => 1 + (scalar keys %tests)*7;
@@ -182,8 +185,8 @@ delete $ENV{HTTP_PROXY};
 use vars qw( $actual_requests $dumped_requests );
 {
   no warnings 'redefine';
-  my $old_request = *WWW::Mechanize::request{CODE};
-  *WWW::Mechanize::request = sub {
+  my $old_request = *WWW::Mechanize::_make_request{CODE};
+  *WWW::Mechanize::_make_request = sub {
     $actual_requests++;
     goto &$old_request;
   };

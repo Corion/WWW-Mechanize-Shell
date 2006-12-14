@@ -24,9 +24,8 @@ my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef )
 *WWW::Mechanize::Shell::status = sub {};
 };
 
-$s->agent->{content} = "<html><body>No form here</body></html>\n";
 $s->agent->{base} = 'http://www.google.com/';
-$s->agent->_parse_html();
+$s->agent->update_html("<html><body>No form here</body></html>\n");
 
 eval {
   $s->cmd("form foo");

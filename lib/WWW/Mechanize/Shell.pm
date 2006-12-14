@@ -12,9 +12,10 @@ use URI::URL;
 use Hook::LexWrap;
 use HTML::Display qw();
 use HTML::TokeParser::Simple;
+use B::Deparse;
 
-use vars qw( $VERSION @EXPORT );
-$VERSION = '0.37';
+use vars qw( $VERSION @EXPORT %munge_map );
+$VERSION = '0.38';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -108,15 +109,17 @@ sub init {
   };
   # Install the request dumper :
   $self->{request_wrapper} = wrap *LWP::UserAgent::request,
-                               pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); },
-                               post => sub {
-                                 #warn scalar @_, " arguments";
-                                 #warn $_ for @_;
-                                 $self->response_dumper($_[-1]) if $self->option("dumpresponses");
-                               };
+      pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); },
+      post => sub {
+                    $self->response_dumper($_[-1]) if $self->option("dumpresponses");
+                  };
 
   $self->{redirect_ok_wrapper} = wrap 'WWW::Mechanize::redirect_ok',
-  																post => sub { return unless $_[1]; $self->status( "\nRedirecting to ".$_[1]->uri."\n" ); $_[-1] };
+    post => sub {
+        return unless $_[1];
+        $self->status( "\nRedirecting to ".$_[1]->uri."\n" ); 
+        $_[-1] 
+    };
 
   # Load the proxy settings from the environment
   $self->agent->env_proxy();
@@ -626,13 +629,13 @@ manual editing of the produced script.
 sub run_content {
   my ($self, $filename) = @_;
   $self->display($filename, $self->agent->content);
-if ($filename) {
-  $self->add_history( sprintf '{ my $filename = q{%s};
-	local *F;
+  if ($filename) {
+    $self->add_history( sprintf '{ my $filename = q{%s};
+  local *F;
   open F, "> $filename" or die "$filename: $!";
-	binmode F;
-	print F $agent->content,"\n";
-	close F
+  binmode F;
+  print F $agent->content,"\n";
+  close F
 };', $filename );
   } else {
     $self->add_history('print $agent->content,"\n";');
@@ -1072,16 +1075,15 @@ is mostly intended to be used when testing server side code.
 =cut
 
 sub run_reload {
-  my ($self) = @_;
-  eval {
-    #$self->agent->request($self->agent->{req});
-    #$self->add_history('$agent->request($agent->{req});');
-    $self->agent->reload();
-    $self->add_history('$agent->reload;');
-    $self->sync_browser
-      if ($self->option('autosync'));
-  };
-  warn $@ if $@;
+    my ($self) = @_;
+    eval {
+        $self->agent->reload();
+        $self->add_history('$agent->reload;');
+        $self->sync_browser
+          if ($self->option('autosync'));
+    };
+    $self->display_user_warning($@)
+        if $@;
 };
 
 =head2 browse
@@ -1257,23 +1259,28 @@ sub run_auth {
       };
 
       ($user,$password) = @_;
-      if ($self->agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) {
-        $realm = $2
-      } else {
-        #$self->warn_user();
-        $realm = "";
+      my $code = sub {
+          if ($self->agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) {
+            $realm = $2
+          } else {
+            #$self->warn_user();
+            $realm = "";
+          };
+          $authority = $self->agent->{req}->uri->authority();
+          $self->agent->credentials($authority,$realm,$user => $password);
       };
-      $authority = $self->agent->{req}->uri->authority();
+      $code->();
+      my $body = $self->munge_code($code);
 
-      $self->add_history(          q{($agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) or die "Couldn't find realm";},
-        						               q{my $realm = $2;},
-                                   q{my $authority = $agent->{req}->uri->authority();},
-                          sprintf( q{$agent->credentials($authority,$realm,'%s' => '%s');}, $user,$password ));
+      $self->add_history(
+          sprintf( q{my ($user,$password) = ('%s','%s')}, $user, $password),
+          $body,
+      );
     } else {
       ($authority, $realm, $user, $password) = @_;
       $self->add_history( sprintf q{$agent->credentials('%s','%s','%s','%s');}, $authority,$realm,$user,$password);
+      $self->agent->credentials($authority,$realm,$user => $password);
     };
-    $self->agent->credentials($authority,$realm,$user => $password);
 };
 
 =head2 table
@@ -1301,32 +1308,30 @@ sub run_table {
 
   eval {
     require HTML::TableExtract;
+    die "I need a HTML::TableExtract version of 2 or greater. I found '$HTML::TableExtract::VERSION'"
+        if $HTML::TableExtract::VERSION < 2;
 
-    my $table = HTML::TableExtract->new( headers => [ @columns ] );
-    (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
-    $table->parse($content);
-    my @lines;
-    push @lines, join(", ", @columns),"\n";
-    for my $ts ($table->table_states) {
-      for my $row ($ts->rows) {
-        push @lines, join(", ", @$row), "\n";
-      };
+    my $code = sub {
+        my $table = HTML::TableExtract->new( headers => [ @columns ] );
+        (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
+        $table->parse($content);
+        my @lines;
+        push @lines, join(", ", @columns),"\n";
+        for my $ts ($table->table_states) {
+          for my $row ($ts->rows) {
+            push @lines, ">".join(", ", @$row)."<\n";
+          };
+        };
+        $self->print_paged(@lines);
     };
-    $self->print_paged(@lines);
-
-    $self->add_history( sprintf( 'my @columns = ( %s );'."\n", join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns ))),
-                        <<'PRINTTABLE' );
-require HTML::TableExtract;
-my $table = HTML::TableExtract->new( headers => [ @columns ]);
-(my $content = $agent->content) =~ s/\&nbsp;?//g;
-$table->parse($content);
-print join(", ", @columns),"\n";
-for my $ts ($table->table_states) {
-  for my $row ($ts->rows) {
-    print join(", ", @$row), "\n";
-  };
-};
-PRINTTABLE
+    $code->();
+    my $body = $self->munge_code($code);
+    
+    $self->add_history( 
+        "require HTML::TableExtract;\n",
+        sprintf( 'my @columns = ( %s );'."\n", join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns ))),
+        $body
+    );
   };
   $self->display_user_warning( "Couldn't load HTML::TableExtract: $@" )
     if ($@);
@@ -1357,6 +1362,8 @@ sub run_tables {
 
   eval {
     require HTML::TableExtract;
+    die "I need a HTML::TableExtract version of 2 or greater. I found '$HTML::TableExtract::VERSION'"
+        if $HTML::TableExtract::VERSION < 2;
 
     my $table = HTML::TableExtract->new( subtables => 1 );
     (my $content = $self->agent->content) =~ s/\&nbsp;?//g;
@@ -1472,14 +1479,26 @@ Examples:
 =cut
 
 sub run_eval {
-  my ($self) = @_;
+  my ($self,@rest) = @_;
   my $code = $self->line;
-  $code =~ /^eval\s+(.*)$/sm and do {
-    my $code = $1;
-    my $script_code = $code;
-    $script_code =~ s/\$self->agent\b/\$agent/g;
-    $self->add_history( sprintf q{ print( do { %s },"\n" );}, $script_code);
-    print eval $code,"\n";
+  if ($code !~ /^eval\s+(.*)$/sm) {
+      #warn "Don't know what to do with '$code'";
+      $self->display_user_warning("Don't know what to make of '$code'");
+  } else {
+    my $str = $1;
+    my $code = qq{ do { $str } };
+    my @res = eval $code;
+    if (my $err = $@) {
+        #warn "Don't know what to do with '$str' ($err)";
+        $self->display_user_warning($err);
+        return
+    };
+    print join "", @res,"\n";
+    
+    
+    my $script_code = $self->munge_code(qq{print $code, "\\n";});
+    #warn "Script: $script_code<<";
+    $self->add_history( $script_code );
   };
 };
 
@@ -1632,6 +1651,41 @@ sub shell {
   } else {
     $shell->cmdloop;
   };
+};
+
+=head2 C<< $shell->munge_code( CODE ) >>
+
+Munges a coderef to become code fit for
+output independent of WWW::Mechanize::Shell.
+
+=cut
+
+%munge_map = (
+        '^{' => '',
+        '}$' => '',
+        '\$self->print_paged' => 'print ',
+        '\$self->agent'       => '$agent',
+        '\s*package ' . __PACKAGE__ . ';' => '',
+);
+
+sub munge_code {
+    my ($self, $code) = @_;
+    my $body;
+    
+    if (ref $code) {
+        # Munge code
+        my $d = B::Deparse->new('-sC');
+        $d->ambient_pragmas(strict => 'all', warnings => 'all');
+        $body = $d->coderef2text($code);
+    } else {
+        $body = $code
+    }
+    
+    while (my ($key,$val) = each %munge_map) {
+        $body =~ s/$key/$val/gs;
+    };
+    
+    $body
 };
 
 {

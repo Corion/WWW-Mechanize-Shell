@@ -49,6 +49,8 @@ BEGIN {
 
   eval {
     require HTML::TableExtract;
+    $HTML::TableExtract::VERSION >= 2
+        or die "Need HTML::TableExtract version >= 2";
     $tests{table} = 'table';
     $tests{'table params'} = 'table foo bar';
   };
@@ -114,7 +116,6 @@ sub compiles_ok {
   my ($command,$testname) = @_;
   $testname ||= $command;
   @history = ();
-  # $s->cmd('links');
   $s->cmd($command);
   local $, = "\n";
   my ($fh,$name) = tempfile();
@@ -129,7 +130,6 @@ sub compiles_ok {
   unlink $name
     or diag "Couldn't remove tempfile '$name' : $!";
 };
-
 
 foreach my $name (sort keys %tests) {
   compiles_ok( $tests{$name},$name );

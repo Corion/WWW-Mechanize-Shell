@@ -4,6 +4,22 @@ Todo:
   + Think about HTML::FillInForm for displaying changed form values interactively
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
+  + Use Scalar::Util::weaken if available
+
+0.38 200612xx
+  - Bumped module version
+  - Added a test for HTML::TableExtract functionality
+    which went untested so far
+  - Fixed HTML::TableExtract functionality
+        This functionality now requires 
+        HTML::TableExtract 2.0 or higher, sorry
+  - This release now needs WWW::Mechanize 1.20, for the update_html
+    method which is used in the tests. Sorry.
+  - Reworked code generation and code execution
+  - ! Think about plugins for other extractions:
+      * Template::Extract
+      * XML::XPath extractions
+  - Think about using a different shell framework provider
 
 0.37
   - Fixed bug that created invalid code for the C<auth> command
