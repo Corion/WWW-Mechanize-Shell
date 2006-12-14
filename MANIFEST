@@ -56,6 +56,7 @@ t/25-save-file-nolink.t
 t/26-form-no-form.t
 t/27-form_number.t
 t/27-index.html
+t/28-html-tableextract.t
 t/401-server
 t/98-bin.t
 t/99-pod.t
