@@ -32,7 +32,7 @@ BEGIN {
 
 # Autocreate the synopsis test from the pod of every module
 # (if we have Test::Inline)
-if ($have_test_inline) { eval q{
+if (0) { eval q{
     package MY;
     use strict;
     sub top_targets {
