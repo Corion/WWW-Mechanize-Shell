@@ -15,7 +15,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.38';
+$VERSION = '0.39';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -304,7 +304,14 @@ sub sync_browser {
   $browser->display( html => $html, location => $location );
 };
 
-sub prompt_str { ($_[0]->agent->uri || "") . ">" };
+sub prompt_str {
+    my $self = shift;
+    if ($self->agent->response) {
+        return ($_[0]->agent->uri || "") . ">"
+    } else {
+        return "(no url)>"
+    };
+};
 
 sub request_dumper { print $_[1]->as_string };
 sub response_dumper { print $_[1]->as_string };

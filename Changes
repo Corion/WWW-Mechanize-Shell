@@ -6,6 +6,10 @@ Todo:
     shells own JS blocking (badly, I guess)
   + Use Scalar::Util::weaken if available
 
+0.39
+  - Bumped module version
+  - Fix for RT 22121 - shell does not start
+
 0.38 200612xx
   - Bumped module version
   - Added a test for HTML::TableExtract functionality
