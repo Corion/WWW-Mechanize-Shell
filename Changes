@@ -6,6 +6,11 @@ Todo:
     shells own JS blocking (badly, I guess)
   + Use Scalar::Util::weaken if available
 
+0.40 20070117
+  - Fixed showstopper bug in prompt method that was hidden
+    by all tests disabling interactive prompts
+    Thanks to all reporters
+
 0.39
   - Bumped module version
   - Fix for RT 22121 - shell does not start
