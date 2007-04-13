@@ -26,7 +26,7 @@ BEGIN {
       'form' => 'form test',
       'get @' => 'get http://admin@www.google.com/',
       'get plain' => 'get http://www.google.com/',
-      'open' => 'open foo',
+      'open' => 'open "foo link"',
       'reload' => 'reload',
       'referer' => 'referer ""',
       'referrer' => 'referrer ""',
@@ -86,7 +86,7 @@ $mock_agent->set_always( res => $mock_result )
            ->set_always( reload => $mock_result )
            ->set_always( current_form => $mock_form )
            ->set_always( form_name => 'test form name' )
-           ->set_always( follow => 1 )
+           ->set_always( follow_link => 1 )
            ->set_list( links => WWW::Mechanize::Link->new('foo','foo link','foo_link',""),
                                 WWW::Mechanize::Link->new('foo2','foo2 link','foo2_link',""))
            ->set_always( agent => 'mocked/1.0')

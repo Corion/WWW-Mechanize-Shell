@@ -6,6 +6,11 @@ Todo:
     shells own JS blocking (badly, I guess)
   + Use Scalar::Util::weaken if available
 
+0.41 20070414
+  - Codeacrobat release
+  - Restore compatibility with WWW::Mechanize 1.22
+    Thanks to Jörg Meltzer who sent in the patch
+
 0.40 20070117
   - Fixed showstopper bug in prompt method that was hidden
     by all tests disabling interactive prompts

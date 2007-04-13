@@ -15,7 +15,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.40';
+$VERSION = '0.41';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -511,7 +511,10 @@ sub run_restart {
   $self->restart_shell;
 };
 
-sub activate_first_form { $_[0]->agent->form(1) if $_[0]->agent->forms and scalar @{$_[0]->agent->forms}; };
+sub activate_first_form {
+    $_[0]->agent->form_number(1)
+        if $_[0]->agent->forms and scalar @{$_[0]->agent->forms};
+};
 
 =head2 get
 
@@ -540,7 +543,7 @@ sub run_get {
 
   $self->activate_first_form;
   $self->sync_browser if $self->option('autosync');
-  $self->add_history( sprintf q{$agent->get('%s');}."\n".q{  $agent->form(1) if $agent->forms and scalar @{$agent->forms};}, $url);
+  $self->add_history( sprintf q{$agent->get('%s');}."\n".q{ $agent->form_number(1) if $agent->forms and scalar @{$agent->forms};}, $url);
 };
 
 =head2 save
@@ -1012,11 +1015,14 @@ sub run_open {
     print "No link given\n";
     return
   };
-  if (ref $link) {
-    my $re = $link;
+
+  if ($link =~ /\D/) { # looks like a name/re
+    my $re = $link if ref $link;
     my $count = -1;
     my @possible_links = $self->agent->links();
-    my @links = map { $count++; $_->text =~ /$re/ ? $count : () } @possible_links;
+    my @links = defined $re 
+        ? map { $count++; $_->text =~ /$re/ ? $count : () } @possible_links
+        : map { $count++; $_->text eq $link ? $count : () } @possible_links;
     if (@links > 1) {
       $self->print_pairs([ @links ],[ map {$possible_links[$_]->[1]} @links ]);
       undef $link;
@@ -1035,8 +1041,18 @@ sub run_open {
 
   if (defined $link) {
     eval {
-      $self->agent->follow($link);
-      $self->add_history( sprintf qq{\$agent->follow(%s);}, $user_link_expr);
+      $self->agent->follow_link('n' => $link +1);
+      my ( $hist_option, $hist_value ) =
+          $user_link =~ /^\d+$/
+              ? ('n', $user_link + 1 )
+              : ref $user_link
+          ? ( 'text_regex', $user_link_expr )
+          : ( 'text'      , $user_link_expr );
+      $self->add_history(
+          sprintf qq{\$agent->follow_link('%s' => %s);},
+          $hist_option,
+          $hist_value
+      );
       $self->activate_first_form;
       if ($self->option('autosync')) {
         $self->sync_browser;

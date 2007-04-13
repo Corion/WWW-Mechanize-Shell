@@ -124,7 +124,7 @@ BEGIN {
     														 'content' ],
     									location => qr'^%s/formsubmit\?session=foo&query=bar&cat=cat_foo&cat=cat_bar$' },
     open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ], location => qr'^%s/test$' },
-    open_re => { requests => 2, lines => [ 'get %s','open "foo1"','content' ], location => qr'^%s/foo1.save_log_server_test.tmp$' },
+    open_re => { requests => 2, lines => [ 'get %s','open "Link foo1.save_log_server_test.tmp"','content' ], location => qr'^%s/foo1.save_log_server_test.tmp$' },
     open_re2 => { requests => 2, lines => [ 'get %s','open "/foo1/"','content' ], location => qr'^%s/foo1.save_log_server_test.tmp$' },
     open_re3 => { requests => 2, lines => [ 'get %s','open "/Link /foo/"','content' ], location => qr'^%s/foo$' },
     open_re4 => { requests => 2, lines => [ 'get %s','open "/Link \/foo/"','content' ], location => qr'^%s/foo$' },
@@ -165,7 +165,7 @@ BEGIN {
     };
 };
 
-use Test::More tests => 1 + (scalar keys %tests)*7;
+use Test::More tests => 1 + (scalar keys %tests)*8;
 BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
@@ -173,8 +173,9 @@ BEGIN {
 };
 
 SKIP: {
+diag "Loading HTTP::Daemon";
 eval { require HTTP::Daemon; };
-skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*6
+skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*8
   if ($@);
 # require Test::HTTP::LocalServer; # from inc
 use Test::HTTP::LocalServer; # from inc
@@ -195,7 +196,9 @@ use vars qw( $actual_requests $dumped_requests );
   *WWW::Mechanize::Shell::request_dumper = sub { $dumped_requests++ };
 };
 
+diag "Spawning local test server";
 my $server = Test::HTTP::LocalServer->spawn();
+diag sprintf "on port %s", $server->port;
 for my $name (sort keys %tests) {
   $_STDOUT_ = '';
   undef $_STDERR_;
@@ -212,10 +215,16 @@ for my $name (sort keys %tests) {
   $result_location = qr{$result_location};
   my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
   $s->option("dumprequests",1);
-  for my $line (@lines) {
-    $line = sprintf $line, $server->url;
-    $s->cmd($line);
+  my @commands;
+  eval {
+      for my $line (@lines) {
+        $line = sprintf $line, $server->url;
+        push @commands, $line;
+        $s->cmd($line);
+      };
   };
+  is $@, '', "Commands ran without dieing"
+      or do { diag for @commands };
   $s->cmd('eval $self->agent->uri');
   my $code_output = $_STDOUT_;
   diag join( "\n", $s->history )
