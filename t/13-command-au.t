@@ -22,13 +22,14 @@ skip "HTTP::Daemon required to test basic authentication",7
   if ($@);
 
 # We want to be safe from non-resolving local host names
-delete $ENV{HTTP_PROXY};
+delete @ENV{qw(HTTP_PROXY http_proxy)};
 
 # Now start a fake webserver, fork, and connect to ourselves
 open SERVER, qq'"$^X" "$FindBin::Bin/401-server" |'
   or die "Couldn't spawn fake server : $!";
 sleep 1; # give the child some time
 my $url = <SERVER>;
+chomp $url;
 die unless $url =~ m!^http://([^/]+)/!;
 my $host = $1;
 

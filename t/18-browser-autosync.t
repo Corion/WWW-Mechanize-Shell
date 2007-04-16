@@ -33,7 +33,7 @@ BEGIN {
     if ($@);
   use lib 'inc';
   require Test::HTTP::LocalServer; # from inc
-  delete $ENV{HTTP_PROXY};
+  delete @ENV{qw(HTTP_PROXY http_proxy)};
 };
 
 my $browser_synced;

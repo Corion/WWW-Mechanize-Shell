@@ -12,6 +12,7 @@ use Test::More tests => 5;
 
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
+delete @ENV{qw(HTTP_PROXY http_proxy)};
 
 use_ok('WWW::Mechanize::Shell');
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );

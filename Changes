@@ -5,6 +5,13 @@ Todo:
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
   + Use Scalar::Util::weaken if available
+  + Spin off HTML::Display into its own distribution
+
+0.42 200704..
+  - Test fixes only, no need to upgrade
+  - Patches submitted by MAREKR (RT #26397) and somebody else whose
+    name I cannot find, sorry.
+  - Delete some more proxy settings for the test runs
 
 0.41 20070414
   - Codeacrobat release

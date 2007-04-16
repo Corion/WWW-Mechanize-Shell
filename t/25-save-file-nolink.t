@@ -12,6 +12,7 @@ use Test::More tests => 6;
 
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
+delete @ENV{qw(HTTP_PROXY http_proxy)};
 delete $ENV{PAGER}
   if $ENV{PAGER};
 $ENV{PERL_HTML_DISPLAY_CLASS}="HTML::Display::Dump";

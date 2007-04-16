@@ -51,7 +51,7 @@ skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*6
 require Test::HTTP::LocalServer; # from inc
 
 # We want to be safe from non-resolving local host names
-delete $ENV{HTTP_PROXY};
+delete @ENV{qw(HTTP_PROXY http_proxy)};
 
 my $actual_requests;
 {
