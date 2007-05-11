@@ -7,6 +7,10 @@ Todo:
   + Use Scalar::Util::weaken if available
   + Spin off HTML::Display into its own distribution
 
+0.43 20070511
+  - fix failures on 5.6.2 with a B::Deparse version that doesn't
+    support ->ambient_pragmas() - they get ignored there now.
+
 0.42 200704..
   - Test fixes only, no need to upgrade
   - Patches submitted by MAREKR (RT #26397) and somebody else whose

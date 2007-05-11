@@ -15,7 +15,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.42';
+$VERSION = '0.43';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1698,7 +1698,9 @@ sub munge_code {
     if (ref $code) {
         # Munge code
         my $d = B::Deparse->new('-sC');
-        $d->ambient_pragmas(strict => 'all', warnings => 'all');
+	if ($d->can('ambient_pragmas')) {
+            $d->ambient_pragmas(strict => 'all', warnings => 'all');
+	};
         $body = $d->coderef2text($code);
     } else {
         $body = $code
