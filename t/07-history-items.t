@@ -102,7 +102,7 @@ my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef, 
 $s->{agent} = $mock_agent;
 
 my @history;
-{ no warnings 'redefine';
+{ no warnings 'redefine','once';
   *WWW::Mechanize::Shell::add_history = sub {
     my $shell = shift;
     push @history, $shell->line;

@@ -13,13 +13,13 @@ my ($fh,$temp) = tempfile();
 print {$fh} "quit\n";
 close $fh;
 
-my $res = system($perl, "-Iblib/lib", "-MWWW::Mechanize::Shell", "-eshell", $temp);
+my $res = system($perl, "-Iblib/lib", "-MWWW::Mechanize::Shell", "-eshell(warnings=>undef)", $temp);
 is $res,0,"Shell launch works";
 is $?, 0, "No error on exit";
 unlink $temp
     or diag "Couldn't remove '$temp': $!";
 
 use_ok "WWW::Mechanize::Shell";
-my $s = WWW::Mechanize::Shell->new();
+my $s = WWW::Mechanize::Shell->new("shell",warnings=>undef);
 my $prompt = eval { $s->prompt_str };
 is $@, '', "prompt_str() doesn't die for empty WWW::Mechanize";

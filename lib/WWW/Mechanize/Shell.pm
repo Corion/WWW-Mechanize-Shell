@@ -15,7 +15,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.43';
+$VERSION = '0.44';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -328,7 +328,7 @@ sub re_or_string {
 
 =head2 C<< $shell->link_text LINK >>
 
-Returns a meaningfull text from a WWW::Mechanize::Link object. This is (in order of
+Returns a meaningful text from a WWW::Mechanize::Link object. This is (in order of
 precedence) :
 
     $link->text
@@ -650,6 +650,80 @@ sub run_content {
   } else {
     $self->add_history('print $agent->content,"\n";');
   };
+};
+
+=head2 title
+
+Display the current page title as found
+in the C<< <TITLE> >> tag.
+
+=cut
+
+sub run_title {
+    my ($self) = @_;
+    my $title = $self->agent->title;
+    if (! defined $title) {
+        $title = "<missing title>"
+    } elsif ($title eq '') {
+        $title = "<empty title>"
+    };
+    print "$title\n";
+};
+
+=head2 headers [12345]*
+
+Prints all C<< <H1> >> through C<< <H5> >> strings found in the content,
+indented accordingly.  With an argument, prints only those
+levels; e.g., C<headers 145> prints H1,H4,H5 strings only. 
+
+=cut
+
+sub run_headers {
+    my ($self,$headers) = @_;
+    $headers ||= "12345";
+
+    my $content = $self->agent->content;
+
+    # Convert the $headers argument to a RE matching
+    # the header tags:
+    my $wanted = join "|", map { "H$_" } split //, $headers;
+    $wanted = qr/^$wanted$/i;
+    #warn $wanted;
+
+    my $p = HTML::TokeParser::Simple->new( \$content );
+    while ( my $token = $p->get_token ) {
+        # This prints all text in an HTML doc (i.e., it strips the HTML)
+	if ($token->is_start_tag($wanted)) {
+	    my $tag = $token->get_tag;
+
+	    # Indent with two spaces per level
+	    my $indent;
+	    $indent = $1
+	        if ($tag =~ /(\d)/);
+	    $indent ||= 1;
+	    $indent--;
+	    $indent *= 2;
+
+	    # advance and print the first text tag we encounter
+	    while ($token and not $token->is_text and not $token->is_end_tag($wanted)) {
+	        $token = $p->get_token
+	    };
+	    my $text = "<no text>";
+	    if ($token and $token->is_text) {
+	        $text = $token->as_is;
+		if ($text !~ /\S/) {
+		    $text = "<empty tag>";
+		};
+	    };
+
+	    # Clean up whitespace
+	    $text =~ s/^\s+//g;
+	    $text =~ s/\s+$//g;
+	    $text =~ s/\s+/ /g;
+
+	    printf "%s:%${indent}s%s\n", $tag, "", $text;
+	};
+    }
 };
 
 =head2 ua
@@ -1666,16 +1740,6 @@ sub run_response {
   eval { $self->print_paged( $self->agent->res->as_string )};
 };
 
-sub shell {
-  my $shell = WWW::Mechanize::Shell->new("shell");
-
-  if (@ARGV) {
-    $shell->source_file( @ARGV );
-  } else {
-    $shell->cmdloop;
-  };
-};
-
 =head2 C<< $shell->munge_code( CODE ) >>
 
 Munges a coderef to become code fit for
@@ -1711,6 +1775,31 @@ sub munge_code {
     };
     
     $body
+};
+
+=head2 C<< shell >>
+
+This subroutine is exported by default as a convenience method
+so that the following oneliner invocation works:
+
+    perl -MWWW::Mechanize::Shell -eshell
+
+You can pass constructor arguments to this
+routine as well. Any scripts given in C<< @ARGV >>
+will be run. If C<< @ARGV >> is empty,
+an interactive loop will be started.
+
+=cut
+
+sub shell {
+  my @args = ("shell",@_);
+  my $shell = WWW::Mechanize::Shell->new(@args);
+
+  if (@ARGV) {
+    $shell->source_file( @ARGV );
+  } else {
+    $shell->cmdloop;
+  };
 };
 
 {

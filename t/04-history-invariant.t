@@ -32,7 +32,10 @@ BEGIN {
       versions
       ct
       response
+      title
+      headers
   );
+  push @history_invariant, "headers 1","headers 12","headers 2","headers 12345";
   push @history_invariant, "#","      #", "# a comment", "  # another comment";
 
   @history_add = qw(
@@ -77,7 +80,7 @@ sub disable {
   *{"$namespace\::$subname"} = sub { return };
 };
 
-{ no warnings 'redefine';
+{ no warnings 'redefine','once';
   *WWW::Mechanize::Shell::add_history = sub {
     shift;
     push @history, join "", @_;

@@ -57,6 +57,7 @@ t/26-form-no-form.t
 t/27-form_number.t
 t/27-index.html
 t/28-html-tableextract.t
+t/28-cmd-title.t
 t/29-launch-shell.t
 t/401-server
 t/98-bin.t

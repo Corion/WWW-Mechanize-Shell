@@ -81,9 +81,10 @@ ok(defined *main::shell{CODE},"'shell' gets exported");
 };
 
 {
-  no warnings 'redefine';
+  no warnings 'redefine','once';
   my $called;
   local *WWW::Mechanize::Shell::cmdloop = sub { $called++ };
-  shell();
+  # Need to suppress status warnings here
+  shell(warnings => undef);
   is($called,1,"Shell function works");
 };

@@ -12,7 +12,7 @@ use_ok('WWW::Mechanize::Shell');
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 
 my $called;
-{ no warnings 'redefine';
+{ no warnings 'redefine','once';
   *WWW::Mechanize::Shell::status = sub {};
 };
 

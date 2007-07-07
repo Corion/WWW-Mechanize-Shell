@@ -25,7 +25,7 @@ All code ripped from pod2test by M. Schwern
 
 use vars qw($VERSION);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 sub TIEHANDLE {
     my($class, $var) = @_;
@@ -39,6 +39,15 @@ sub PRINT  {
     ${'main::'.$self->{var}} = ""
       unless defined ${'main::'.$self->{var}};
     ${'main::'.$self->{var}} .= join '', @_;
+}
+
+sub PRINTF {
+    no strict 'refs';
+    my($self) = shift;
+    my $tmpl = shift;
+    ${'main::'.$self->{var}} = ""
+      unless defined ${'main::'.$self->{var}};
+    ${'main::'.$self->{var}} .= sprintf $tmpl, @_;
 }
 
 sub OPEN  {}    # XXX Hackery in case the user redirects

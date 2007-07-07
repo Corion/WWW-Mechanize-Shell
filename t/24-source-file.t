@@ -22,7 +22,7 @@ my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef )
 # Now test
 my $server = Test::HTTP::LocalServer->spawn();
 
-{ no warnings 'redefine';
+{ no warnings 'redefine','once';
   local *WWW::Mechanize::Shell::status = sub {};
 
   $s->cmd( sprintf 'get "%s"', $server->url);
@@ -32,7 +32,7 @@ my $server = Test::HTTP::LocalServer->spawn();
   is($_STDERR_,undef,"No warnings");
 };
 
-{ no warnings 'redefine';
+{ no warnings 'redefine','once';
   my $warned;
   local *WWW::Mechanize::Shell::display_user_warning = sub { $warned++ };
 

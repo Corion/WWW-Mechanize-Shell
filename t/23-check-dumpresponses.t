@@ -20,7 +20,7 @@ my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef )
 # Now test
 my $server = Test::HTTP::LocalServer->spawn();
 
-{ no warnings 'redefine';
+{ no warnings 'redefine','once';
   local *WWW::Mechanize::Shell::status = sub {};
 
   #$s->cmd("set dumprequests 1");

@@ -9,7 +9,7 @@ $ENV{COLUMNS} = 80;
 $ENV{LINES} = 24;
 
 TODO: {
-  local $TODO = "Term::Shell::catch_smry is buggy";
+  #local $TODO = "Term::Shell::catch_smry is buggy";
 
   # Now check that the Term::Shell summary calls catch_smry
 
