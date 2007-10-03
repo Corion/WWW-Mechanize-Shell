@@ -49,19 +49,4 @@ t/99-pod.t
 t/99-todo.t
 t/99-unix-text.t
 t/99-manifest.t
-t/embedded-HTML-Display-Common.t
-t/embedded-HTML-Display-Debian.t
-t/embedded-HTML-Display-Dump.t
-t/embedded-HTML-Display-Galeon.t
-t/embedded-HTML-Display-Mozilla.t
-t/embedded-HTML-Display-OSX-Camino.t
-t/embedded-HTML-Display-OSX-Safari.t
-t/embedded-HTML-Display-OSX.t
-t/embedded-HTML-Display-Opera.t
-t/embedded-HTML-Display-Phoenix.t
-t/embedded-HTML-Display-TempFile.t
-t/embedded-HTML-Display-Win32-IE.t
-t/embedded-HTML-Display-Win32-OLE.t
-t/embedded-HTML-Display-Win32.t
-t/embedded-HTML-Display.t
 META.yml                                 Module meta-data (added by MakeMaker)
