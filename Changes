@@ -10,6 +10,10 @@ Todo:
     display stuff via CSS selectors or XPath selectors. Steal
     from Web::Scraper.
 
+0.46 20071003
+  + Bump version because of borked CPAN upload, retrying
+  * No need to upgrade
+
 0.45 20071003
   * No library code changes, no need to upgrade
   - Removed HTML::Display from the distribution
