@@ -3,6 +3,7 @@ MANIFEST			This list of files
 MANIFEST.skip
 README
 Makefile.PL
+lib/WWW/Mechanize/Shell.pm
 bin/banking.postbank.de.mech
 bin/hotmail.signup.mech
 bin/wwwshell.pl

@@ -672,8 +672,6 @@ sub run_title {
 
 =head2 headers
 
-=head2 headers [12345]*
-
 Prints all C<< <H1> >> through C<< <H5> >> strings found in the content,
 indented accordingly.  With an argument, prints only those
 levels; e.g., C<headers 145> prints H1,H4,H5 strings only. 
