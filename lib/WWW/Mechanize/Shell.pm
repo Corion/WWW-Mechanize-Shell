@@ -15,7 +15,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.44';
+$VERSION = '0.45';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -669,6 +669,8 @@ sub run_title {
     };
     print "$title\n";
 };
+
+=head2 headers
 
 =head2 headers [12345]*
 

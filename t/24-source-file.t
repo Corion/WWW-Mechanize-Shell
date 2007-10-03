@@ -16,6 +16,8 @@ delete $ENV{PAGER}
   if $ENV{PAGER};
 $ENV{PERL_HTML_DISPLAY_CLASS}="HTML::Display::Dump";
 
+delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
+
 use_ok('WWW::Mechanize::Shell');
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 

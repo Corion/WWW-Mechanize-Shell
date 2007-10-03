@@ -9,7 +9,7 @@ BEGIN{
   use_ok("WWW::Mechanize::Shell");
 };
 
-delete @ENV{qw(HTTP_PROXY http_proxy)};
+delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
 
 my $output= `$^X -Ilib -MWWW::Mechanize::Shell -e "WWW::Mechanize::Shell->new('t',rcfile=>undef,warnings=>undef)->cmd('restart');print'OK'" 2>&1`;
 chomp $output;

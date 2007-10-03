@@ -22,7 +22,7 @@ skip "HTTP::Daemon required to test basic authentication",7
   if ($@);
 
 # We want to be safe from non-resolving local host names
-delete @ENV{qw(HTTP_PROXY http_proxy)};
+delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
 
 # Now start a fake webserver, fork, and connect to ourselves
 open SERVER, qq'"$^X" "$FindBin::Bin/401-server" |'

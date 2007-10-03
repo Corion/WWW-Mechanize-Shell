@@ -11,6 +11,7 @@ WriteMakefile(
                        'WWW::Mechanize' => 1.20,
                        'WWW::Mechanize::FormFiller' => 0.05,
                        'Hook::LexWrap' => 0.20,
+		       'HTML::Display' => 0,
                        'HTML::TokeParser::Simple' => 2.0,
                       }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

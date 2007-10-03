@@ -26,6 +26,12 @@ Valid arguments are :
 
 All served HTML will have the first %s replaced by the current location.
 
+The following entries will be removed from C<%ENV>:
+
+    HTTP_PROXY
+    http_proxy
+    CGI_HTTP_PROXY
+
 =cut
 
 sub spawn {
@@ -35,6 +41,8 @@ sub spawn {
 
   local $ENV{TEST_HTTP_VERBOSE} = 1
     if (delete $args{debug});
+
+  delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
 
   $self->{delete} = [];
   if (my $html = delete $args{html}) {
@@ -138,7 +146,7 @@ None by default.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2003 Max Maischein
+Copyright (C) 2003-2007 Max Maischein
 
 =head1 AUTHOR
 

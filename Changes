@@ -10,6 +10,14 @@ Todo:
     display stuff via CSS selectors or XPath selectors. Steal
     from Web::Scraper.
 
+0.45 20071003
+  * No library code changes, no need to upgrade
+  - Removed HTML::Display from the distribution
+    as that now lives its own life on CPAN
+  - Fix failing tests if HTTP_PROXY was set. This fixes
+    Debian bug #444634, http://bugs.debian.org/444634
+    and CPAN RT #29455, thanks to Niko Tyni
+
 0.44 20070707
 
   + Added C<title> and C<headers> commands that print out
