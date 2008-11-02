@@ -17,6 +17,8 @@ Todo:
   + WWW::Mechanize 1.34+ breaks Basic authentication with LWP 5.815+
     so all auth tests are skipped until Andy Lester and Gisle Aas
     work out who has to fix their stuff.
+  . Hook::LexWrap is subject to bug [perl #46217], this might
+    cause problems if you're running Perl 5.10.0. All tests pass.
 
 0.46 20071003
   + Bump version because of borked CPAN upload, retrying

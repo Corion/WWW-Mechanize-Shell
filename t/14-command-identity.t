@@ -170,9 +170,9 @@ BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
   require LWP::UserAgent;
-  my $old = \&LWP::UserAgent::request;
-  print STDERR $old;
-  *LWP::UserAgent::request = sub {print STDERR "LWP::UserAgent::request\n"; goto &$old };
+  #my $old = \&LWP::UserAgent::request;
+  #print STDERR $old;
+  #*LWP::UserAgent::request = sub {print STDERR "LWP::UserAgent::request\n"; goto &$old };
   use_ok('WWW::Mechanize::Shell');
 };
 
@@ -199,10 +199,10 @@ use vars qw( $actual_requests $dumped_requests );
   *WWW::Mechanize::Shell::status = sub {};
   *WWW::Mechanize::Shell::request_dumper = sub { $dumped_requests++; return 1 };
 
-  *Hook::LexWrap::Cleanup::DESTROY = sub {
-      print STDERR "Disabling hook.\n";
-      $_[0]->();
-  };
+  #*Hook::LexWrap::Cleanup::DESTROY = sub {
+      #print STDERR "Disabling hook.\n";
+      #$_[0]->();
+  #};
 };
 
 diag "Spawning local test server";
@@ -256,7 +256,7 @@ for my $name (sort keys %tests) {
   # Modify the generated Perl script to match the new? port
   my $script = join "\n", $s->script;
   s!\b$code_port\b!$script_port!smg for ($script, $code_output);
-  print STDERR "Releasing hook";
+  #print STDERR "Releasing hook";
   undef $s->{request_wrapper};
   {
     local *WWW::Mechanize::Shell::request_dumper = sub { die };

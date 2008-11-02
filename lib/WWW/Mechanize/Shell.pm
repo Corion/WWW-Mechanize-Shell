@@ -15,7 +15,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.46';
+$VERSION = '0.47';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -2060,7 +2060,7 @@ invocation of the shell like with CPAN :
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002,2003 Max Maischein
+Copyright (C) 2002,2008 Max Maischein
 
 =head1 AUTHOR
 
