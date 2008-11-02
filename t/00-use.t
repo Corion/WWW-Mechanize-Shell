@@ -8,6 +8,11 @@ $ENV{LINES} = 24;
 
 use_ok("WWW::Mechanize::Shell");
 
+diag "Running under $]";
+for (qw(WWW::Mechanize LWP::UserAgent)) {
+    diag "Using '$_' version " . $_->VERSION;
+};
+
 my $s = do {
   WWW::Mechanize::Shell->new("shell",rcfile => undef, warnings => undef);
 };

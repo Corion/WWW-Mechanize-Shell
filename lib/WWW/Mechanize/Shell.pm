@@ -108,7 +108,8 @@ sub init {
 		verbose => 0,
   };
   # Install the request dumper :
-  $self->{request_wrapper} = wrap *LWP::UserAgent::request,
+  $self->{request_wrapper} = wrap 'LWP::UserAgent::request',
+      #pre => sub { printf STDERR "Dumping? %s\n",$self->option("dumprequests"); $self->request_dumper($_[1]) if $self->option("dumprequests"); },
       pre => sub { $self->request_dumper($_[1]) if $self->option("dumprequests"); },
       post => sub {
                     $self->response_dumper($_[-1]) if $self->option("dumpresponses");
@@ -163,7 +164,10 @@ circular reference. This method does this.
 
 sub release_agent {
   my ($self) = @_;
+  use Data::Dumper;
+  warn Dumper $self;
   undef $self->{request_wrapper};
+  undef $self->{redirect_ok_wrapper};
   $self->{agent} = undef;
 };
 
@@ -1350,12 +1354,14 @@ sub run_auth {
     my ($authority, $realm, $user, $password);
     if (scalar @_ == 2) {
       unless ($self->agent->res) {
-        print "Can't guess authentification elements without a request.";
+        print "Can't guess authentification elements without a request or a realm.";
         print "Use the four parameter version instead.";
         return;
       };
 
       ($user,$password) = @_;
+      $password = "" if not defined $password;
+
       my $code = sub {
           if ($self->agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) {
             $realm = $2

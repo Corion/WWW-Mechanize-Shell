@@ -9,6 +9,14 @@ Todo:
   + Think how to add other (Xpath) extractions to conveniently
     display stuff via CSS selectors or XPath selectors. Steal
     from Web::Scraper.
+  + There is a memory leak between ::FormFiller and ::Shell
+
+0.47 200811xx
+  + Fix tests to work with libwww 5.815+ which automatically retries
+    with empty user/password
+  + WWW::Mechanize 1.34+ breaks Basic authentication with LWP 5.815+
+    so all auth tests are skipped until Andy Lester and Gisle Aas
+    work out who has to fix their stuff.
 
 0.46 20071003
   + Bump version because of borked CPAN upload, retrying

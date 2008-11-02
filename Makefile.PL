@@ -19,59 +19,5 @@ WriteMakefile(
        AUTHOR     => 'Max Maischein <corion@cpan.org>') : ()),
 );
 
-use vars qw($have_test_inline);
-BEGIN {
-  eval { require Test::Inline;
-         $have_test_inline = $Test::Inline::VERSION ge '0.15_001'; };
-  undef $@;
-  if ($have_test_inline) {
-    print "Good - you have a patched Test::Inline\n";
-  } else {
-    print "Test::Inline 0.15_001 is nice for testing the examples, but not necessary\n"
-  };
-};
-
-# Autocreate the synopsis test from the pod of every module
-# (if we have Test::Inline)
-if (0) { eval q{
-    package MY;
-    use strict;
-    sub top_targets {
-
-        my($self) = @_;
-        my $out = "POD2TEST_EXE = pod2test\n";
-
-        $out .= $self->SUPER::top_targets(@_);
-        return $out unless $main::have_test_inline;
-
-        $out =~ s/^(pure_all\b.*)/$1 testifypods/m;
-
-        $out .= "\n\ntestifypods : \n";
-
-        foreach my $pod (keys %{$self->{MAN1PODS}},
-                         keys %{$self->{MAN3PODS}})
-        {
-            (my $test = $pod) =~ s/\.(pm|pod)$//;
-            $test =~ s|/|-|g;
-            $test =~ s/^lib\W//;
-            $test =~ s/\W/-/;
-            $test = "embedded-$test.t";
-            $out .= "\t$self->{NOECHO}\$(POD2TEST_EXE) ".
-                    "$pod t/$test\n";
-        }
-
-        return $out;
-    }
-
-		sub postamble {
-    	return <<EOF
-cover:
-\trm -rf cover_db
-\tHARNESS_PERL_SWITCHES=-MDevel::Cover=-coverage,statement,branch,-silent,1,-select,^blib/lib,+inc,Win32,-summary,0 \$(MAKE) test || true
-\t/usr/bin/cover cover_db -report html
-EOF
-		}
-}};
-
 # To make Test::Prereq happy
 1;
