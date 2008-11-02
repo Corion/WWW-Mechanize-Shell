@@ -11,3 +11,5 @@ cvstest
 Makefile
 cover_db/
 blibdirs.ts
+perlbug.rep
+t/hook*

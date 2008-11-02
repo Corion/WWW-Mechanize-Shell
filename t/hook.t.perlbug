@@ -1,0 +1,61 @@
+package main;
+use strict;
+
+=head1 DESCRIPTION
+
+This test program shows a difference in behaviour
+between 5.8.8 and 5.10. Under 5.8.8, the dynamic
+wrapping of methods works and the wrapper always
+gets called.
+
+Under 5.10, the wrapper only gets called once.
+If you remove the ->SUPER:: call at the end
+of the test, it works under 5.10. Unfortunately,
+removing elements from a class hierarchy is not
+always possible.
+
+To be resolved in 5.10.1
+
+=cut
+
+use Test::More tests => 4;
+use vars qw( %called );
+
+for my $name (1..2) {
+  %called = ();
+  my @lines = (1,2);
+  my $requests = scalar @lines;
+
+  # Install the request dumper :
+  my $unwind;
+  { no warnings 'redefine';
+    my $old_request = \&Dummy::UserAgent::request;
+    *Dummy::UserAgent::request = sub {
+        goto &$old_request if $unwind;
+        $called{wrapper}++;
+        $old_request->(@_);
+    };
+  };
+  my $agent = Dummy::Mechanize->new();
+
+  for my $line (@lines) {
+      $agent->get($line);
+  };
+  is($called{wrapper},$requests,"$requests calls were made to the wrapper for round $name");
+  is($called{total},$requests,"$requests calls were made in total for round $name");
+
+  # Release the hook
+  $unwind++;
+};
+
+sub Dummy::UserAgent::new { bless {}, shift };
+sub Dummy::UserAgent::request { $main::called{total}++ };
+
+package Dummy::Mechanize;
+use strict;
+use vars '@ISA';
+BEGIN { @ISA = 'Dummy::UserAgent' };
+sub get { my $s = shift; $s->request(@_) };
+
+# If you comment out this line, all is well:
+sub request { my $s = shift; $s->SUPER::request(@_) };
