@@ -13,6 +13,8 @@ BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
 
+  # Also disable the paged output of Term::Shell
+
   @history_invariant = qw(
       browse
       cookies
@@ -59,6 +61,9 @@ BEGIN {
       timeout
   );
 };
+
+# For testing the "versions" command
+sub WWW::Mechanize::Shell::print_pairs {};
 
 use Test::More tests => scalar @history_invariant +1;
 SKIP: {

@@ -15,7 +15,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.47';
+$VERSION = '0.48';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1326,23 +1326,12 @@ Set basic authentication credentials.
 
 Syntax:
 
-  auth [authority realm] user password
-
-If you get back a 401, you can simply supply the matching
-user and password, as the authority and realm are already
-known :
-
-	>get http://www.example.com
-	Retrieving http://www.example.com(401)
-	http://www.example.com>auth corion secret
-	http://www.example.com>get http://www.example.com
-	Retrieving http://www.example.com(200)
-	http://www.example.com>
+  auth user password
 
 If you know the authority and the realm in advance, you can
 presupply the credentials, for example at the start of the script :
 
-	>auth www.example.com:80 secure_realm corion secret
+	>auth corion secret
 	>get http://www.example.com
 	Retrieving http://www.example.com(200)
 	http://www.example.com>
@@ -1351,38 +1340,23 @@ presupply the credentials, for example at the start of the script :
 
 sub run_auth {
     my ($self) = shift;
-    my ($authority, $realm, $user, $password);
+    my ($user, $password);
     if (scalar @_ == 2) {
-      unless ($self->agent->res) {
-        print "Can't guess authentification elements without a request or a realm.";
-        print "Use the four parameter version instead.";
-        return;
-      };
-
       ($user,$password) = @_;
       $password = "" if not defined $password;
 
       my $code = sub {
-          if ($self->agent->res->www_authenticate =~ /\brealm=(['"]?)(.*)\1/) {
-            $realm = $2
-          } else {
-            #$self->warn_user();
-            $realm = "";
-          };
-          $authority = $self->agent->{req}->uri->authority();
-          $self->agent->credentials($authority,$realm,$user => $password);
+          $self->agent->credentials($user => $password);
       };
       $code->();
       my $body = $self->munge_code($code);
 
       $self->add_history(
-          sprintf( q{my ($user,$password) = ('%s','%s')}, $user, $password),
+          sprintf( q{my ($user,$password) = ('%s','%s');}, $user, $password),
           $body,
       );
     } else {
-      ($authority, $realm, $user, $password) = @_;
-      $self->add_history( sprintf q{$agent->credentials('%s','%s','%s','%s');}, $authority,$realm,$user,$password);
-      $self->agent->credentials($authority,$realm,$user => $password);
+        $self->display_user_warning("Authentication only supports the two-argument form");
     };
 };
 

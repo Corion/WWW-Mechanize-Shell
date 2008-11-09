@@ -11,7 +11,13 @@ Todo:
     from Web::Scraper.
   + There is a memory leak between ::FormFiller and ::Shell
 
-0.47 200811xx
+0.48 20081109
+  + More test fixes for incompatibilities between LWP and Mechanize 1.34+
+  + Removed way to set up authentication for more than one site
+  . WWW::Mechanize monkeypatches LWP::UserAgent and thus you can only ever
+    have one set of user/password in your script.
+
+0.47 20081102
   + Fix tests to work with libwww 5.815+ which automatically retries
     with empty user/password
   + WWW::Mechanize 1.34+ breaks Basic authentication with LWP 5.815+

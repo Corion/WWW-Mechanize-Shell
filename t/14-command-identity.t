@@ -28,7 +28,7 @@ BEGIN {
                                             'autofill cat Keep',
                                             'fillout',
                                             'submit' ], location => qr'^%s/formsubmit\?session=1&query=foo&cat=cat_foo&cat=cat_bar$'},
-    auth => { requests => 1, lines => [ 'auth localhost:80 realm user password', 'get %s' ], location => qr'^%s/$' },
+    auth => { requests => 1, lines => [ 'auth user password', 'get %s' ], location => qr'^%s/$' },
     back => { requests => 2, lines => [ 'get %s','open 0','back' ], location => qr'^%s/$' },
     content_save => { requests => 1, lines => [ 'get %s','content tmp.content','eval unlink "tmp.content"'], location => qr'^%s/$' },
     comment => { requests => 1, lines => [ '# a comment','get %s','# another comment' ], location => qr'^%s/$' },
