@@ -12,7 +12,7 @@ tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
 
-use Test::More tests => 7;
+use Test::More tests => 6;
 SKIP: {
 
 use_ok('WWW::Mechanize::Shell');
@@ -81,15 +81,29 @@ $s->cmd( "auth foo bar" );
 # If it didn't return our expected credentials, we're a victim of
 # WWW::Mechanize's monkeypatch :-(
 my @credentials = $s->agent->get_basic_credentials();
+
 if ($credentials[0] ne 'foo') {
     SKIP: { 
         skip "WWW::Mechanize $WWW::Mechanize::VERSION has buggy implementation/override of ->credentials", 1;
     };
 } else {
-    $s->cmd( "get $url" );
-    diag $s->agent->res->message
-      unless is($s->agent->res->code, 200, "Request with credentials gives 200");
-    is($s->agent->content, "user = 'foo' pass = 'bar'", "Credentials are good");
+    diag "Credentials are @credentials";
+    use Data::Dumper;
+    my $a = $s->agent;
+    @credentials = $a->get_basic_credentials();
+    diag "Credentials are @credentials";
+
+    my @real_credentials = LWP::UserAgent::credentials($a,$host,'testing realm');
+    SKIP: {
+        if ($real_credentials[0] ne $credentials[0]) {
+            skip "WWW::Mechanize credentials() patch breaks LWP::UserAgent credentials()", 1;
+        } else {
+            $s->cmd( "get $url" );
+            diag $s->agent->res->message
+                unless is($s->agent->res->code, 200, "Request with credentials gives 200");
+            is($s->agent->content, "user = 'foo' pass = 'bar'", "Credentials are good");
+        };
+    };
 };
 
 diag "Shutting down test server at $url";
