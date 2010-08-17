@@ -5,10 +5,12 @@ blib
 WWW-Mechanize-Shell-*
 WWW-Mechanize-Shell-*/
 CVS/
+.git/
+MANIFEST.bak
 pm_to_blib
 pm_to_blib.ts
 cvstest
-Makefile
+Makefile$
 cover_db/
 blibdirs.ts
 perlbug.rep

@@ -1,15 +1,17 @@
-Changes
-MANIFEST			This list of files
-MANIFEST.skip
-README
-Makefile.PL
-lib/WWW/Mechanize/Shell.pm
+.gitignore
 bin/banking.postbank.de.mech
 bin/hotmail.signup.mech
 bin/wwwshell.pl
+Changes
+inc/IO/Catch.pm
 inc/Test/HTTP/LocalServer.pm
 inc/Test/HTTP/log-server
-inc/IO/Catch.pm
+lib/WWW/Mechanize/Shell.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.skip
+META.yml			Module meta-data (added by MakeMaker)
+README
 t/00-use.t
 t/00a-Term-Shell-catch-smry.t
 t/01-fallback-Win32-OLE.t
@@ -41,13 +43,17 @@ t/25-save-file-nolink.t
 t/26-form-no-form.t
 t/27-form_number.t
 t/27-index.html
-t/28-html-tableextract.t
+t/28-cmd-headers.t
 t/28-cmd-title.t
+t/28-html-tableextract.t
 t/29-launch-shell.t
 t/401-server
 t/98-bin.t
+t/99-changes.t
+t/99-examples.t
+t/99-manifest.t
 t/99-pod.t
 t/99-todo.t
 t/99-unix-text.t
-t/99-manifest.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/99-versions.t
+t/source.mech
