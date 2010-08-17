@@ -258,11 +258,11 @@ for my $name (sort keys %tests) {
   s!\b$code_port\b!$script_port!smg for ($script, $code_output);
   #print STDERR "Releasing hook";
   undef $s->{request_wrapper};
-  {
-    local *WWW::Mechanize::Shell::request_dumper = sub { die };
-    use HTTP::Request::Common;
-    $s->agent->request(GET 'http://google.de/');
-  };
+  #{
+  #  local *WWW::Mechanize::Shell::request_dumper = sub { die };
+  #  use HTTP::Request::Common;
+  #  $s->agent->request(GET 'http://google.de/');
+  #};
   $s->release_agent;
   undef $s;
 
