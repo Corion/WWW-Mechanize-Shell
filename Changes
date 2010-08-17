@@ -5,11 +5,12 @@ Todo:
   + Check how the new WWW::Mechanize JavaScript handling interacts with the
     shells own JS blocking (badly, I guess)
   + Use Scalar::Util::weaken if available
-  + Spin off HTML::Display into its own distribution
   + Think how to add other (Xpath) extractions to conveniently
     display stuff via CSS selectors or XPath selectors. Steal
     from Web::Scraper.
   + There is a memory leak between ::FormFiller and ::Shell
+
+0.49 to be released
 
 0.48 20081109
   + More test fixes for incompatibilities between LWP and Mechanize 1.34+
