@@ -15,7 +15,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.48';
+$VERSION = '0.49';
 @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -2034,7 +2034,7 @@ invocation of the shell like with CPAN :
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002,2008 Max Maischein
+Copyright (C) 2002,2010 Max Maischein
 
 =head1 AUTHOR
 
@@ -2044,6 +2044,6 @@ Please contact me if you find bugs or otherwise improve the module. More tests a
 
 =head1 SEE ALSO
 
-L<WWW::Mechanize>,L<WWW::Mechanize::FormFiller>
+L<WWW::Mechanize>,L<WWW::Mechanize::FormFiller>,L<WWW::Mechanize::Firefox>
 
 =cut
