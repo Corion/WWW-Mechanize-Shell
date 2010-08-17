@@ -318,7 +318,13 @@ sub prompt_str {
 };
 
 sub request_dumper { print $_[1]->as_string };
-sub response_dumper { print $_[1]->as_string };
+sub response_dumper {
+  if (ref $_[1] eq 'ARRAY') {
+    print $_[1]->[0]->as_string;
+  } else {
+    print $_[1]->as_string;
+  }
+};
 
 sub re_or_string {
   my ($self,$arg) = @_;
@@ -1961,7 +1967,7 @@ load their proxies from the environment.
 =head1 ONLINE HELP
 
 The online help feature is currently a bit broken in C<Term::Shell>,
-but a fix is in the works. Until then, you can reenable the
+but a fix is in the works. Until then, you can re-enable the
 dynamic online help by patching C<Term::Shell> :
 
 Remove the three lines
