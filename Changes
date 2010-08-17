@@ -80,7 +80,7 @@ Todo:
   - Bumped module version
   - Fix for RT 22121 - shell does not start
 
-0.38 200612xx
+0.38 20061214
   - Bumped module version
   - Added a test for HTML::TableExtract functionality
     which went untested so far
