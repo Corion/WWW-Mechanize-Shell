@@ -2036,6 +2036,16 @@ invocation of the shell like with CPAN :
 
   perl -MWWW::Mechanize::Shell -e"shell"
 
+=head1 REPOSITORY
+
+The public repository of this module is 
+L<http://github.com/Corion/WWW-Mechanize-Shell>.
+
+=head1 SUPPORT
+
+The public support forum of this module is
+L<http://perlmonks.org/>.
+
 =head1 COPYRIGHT AND LICENSE
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
