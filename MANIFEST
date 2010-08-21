@@ -24,7 +24,6 @@ t/06-valid-output.t
 t/07-history-items.t
 t/08-unknown-command.t
 t/09-invalid-filename.t
-t/10-nonexistent-host.t
 t/11-browse-without-request.t
 t/12-comments.t
 t/13-command-au.t

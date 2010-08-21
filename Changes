@@ -11,6 +11,12 @@ Todo:
   + There is a memory leak between ::FormFiller and ::Shell
   + Ditch Hook::LexWrap now that LWP::UserAgent has progress callbacks
 
+0.50 20100821
+  . Remove test file that was just testing LWP functionality and that
+    failed for some weird setups where nonexistent hosts still
+    result in a successful HTTP request.
+  . Added links to repositories
+
 0.49 20100817
   + Apply [rt.cpan.org #59246] , 
     thanks to Ansgar Burchardt
