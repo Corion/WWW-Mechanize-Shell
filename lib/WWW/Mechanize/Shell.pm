@@ -5,6 +5,7 @@ use Carp;
 use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
 use HTTP::Cookies;
+use parent qw( Term::Shell );
 use base qw( Term::Shell Exporter );
 use FindBin;
 use File::Temp qw(tempfile);
