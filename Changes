@@ -10,6 +10,8 @@ Todo:
     from Web::Scraper.
   + There is a memory leak between ::FormFiller and ::Shell
   + Ditch Hook::LexWrap now that LWP::UserAgent has progress callbacks
+  + Add set-cookie and delete-cookie commands
+  + Add (optional) HTTP::Cookies::Find support
 
 0.50 20100821
   . Remove test file that was just testing LWP functionality and that
