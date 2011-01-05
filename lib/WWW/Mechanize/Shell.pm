@@ -6,7 +6,7 @@ use WWW::Mechanize;
 use WWW::Mechanize::FormFiller;
 use HTTP::Cookies;
 use parent qw( Term::Shell );
-use base qw( Term::Shell Exporter );
+use Exporter 'import';
 use FindBin;
 use File::Temp qw(tempfile);
 use URI::URL;
@@ -16,7 +16,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.50';
+$VERSION = '0.51';
 @EXPORT = qw( &shell );
 
 =head1 NAME
