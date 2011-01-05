@@ -36,7 +36,7 @@ my $server = Test::HTTP::LocalServer->spawn();
   $_STDERR_ = undef;
   
   $s->cmd("save /does-not-exist/");
-  is($_STDOUT_,"No match for /(?-xism:does-not-exist)/.\n","save RE error message");
+  like($_STDOUT_,'/No match for \/\(\?(-xism|^):does-not-exist\)\/.\n/',"save RE error message");
   is($_STDERR_,undef,"No warnings");
 };
 
