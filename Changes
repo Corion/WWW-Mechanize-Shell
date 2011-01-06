@@ -13,6 +13,9 @@ Todo:
   + Add set-cookie and delete-cookie commands
   + Add (optional) HTTP::Cookies::Find support
 
+0.52 20110106
+  . Fix stupid thinko in test (only affects tests on 5.13+)
+
 0.51 20110105
   . Make a test more robust against 5.14
   . Streamlined Exporter.pm usage
