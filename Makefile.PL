@@ -18,6 +18,11 @@ WriteMakefile(
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'lib/WWW/Mechanize/Shell.pm', # retrieve abstract from module
        AUTHOR     => 'Max Maischein <corion@cpan.org>') : ()),
+    META_MERGE => {
+      resources => {
+        repository =>  'https://github.com/Corion/WWW-Mechanize-Shell',
+      },
+    },
 );
 
 # To make Test::Prereq happy
