@@ -1,0 +1,55 @@
+{
+   "abstract" : "An interactive shell for WWW::Mechanize",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Mechanize-Shell",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Display" : "0",
+            "HTML::TokeParser::Simple" : "2",
+            "Hook::LexWrap" : "0.2",
+            "LWP" : "5.69",
+            "Term::Shell" : "0.02",
+            "Test::Harness" : "2.3",
+            "URI::URL" : "0",
+            "WWW::Mechanize" : "1.2",
+            "WWW::Mechanize::FormFiller" : "0.05",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/Corion/WWW-Mechanize-Shell"
+      }
+   },
+   "version" : "0.53"
+}

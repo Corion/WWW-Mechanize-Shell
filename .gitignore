@@ -8,5 +8,5 @@ WWW-Mechanize-Shell-*
 WWW-Mechanize-Shell-*/
 .releaserc
 .lwpcookies
-META.yml
 CVS
+MYMETA.*

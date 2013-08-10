@@ -13,6 +13,9 @@ Todo:
   + Add set-cookie and delete-cookie commands
   + Add (optional) HTTP::Cookies::Find support
 
+0.53 20130810
+  . Add links to repository, contributed by D. Steinbrunner
+
 0.52 20110106
   . Fix stupid thinko in test (only affects tests on 5.13+)
 
