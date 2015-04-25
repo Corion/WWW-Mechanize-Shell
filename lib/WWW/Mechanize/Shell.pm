@@ -16,7 +16,7 @@ use HTML::TokeParser::Simple;
 use B::Deparse;
 
 use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.53';
+$VERSION = '0.54';
 @EXPORT = qw( &shell );
 
 =head1 NAME

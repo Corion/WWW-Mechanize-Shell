@@ -13,6 +13,11 @@ Todo:
   + Add set-cookie and delete-cookie commands
   + Add (optional) HTTP::Cookies::Find support
 
+0.54 20150426
+  . Fix test suite against new sprintf() warnings in 5.21+
+  . Fix test suite against calling CGI::param in list context
+    Both analyzed and contributed by Slaven Rezic
+
 0.53 20130810
   . Add links to repository, contributed by D. Steinbrunner
 
