@@ -234,6 +234,7 @@ for my $name (sort keys %tests) {
   my @commands;
   eval {
       for my $line (@lines) {
+        no warnings;
         $line = sprintf $line, $server->url;
         push @commands, $line;
         $s->cmd($line);

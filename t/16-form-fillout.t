@@ -78,6 +78,7 @@ for my $name (sort keys %tests) {
   my $result_location = sprintf $tests{$name}->{location}, $server->url;
 	my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 	for my $line (@lines) {
+          no warnings;
 	  $line = sprintf $line, $server->url;
   	$s->cmd($line);
 	};
