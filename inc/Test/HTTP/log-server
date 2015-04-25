@@ -61,7 +61,7 @@ SERVERLOOP: {
           my ($query,$session,%cat);
           $query = defined $q->param('query') ? $q->param('query') : "(empty)";
           $session = defined $q->param('session') ? $q->param('session') : 1;
-          %cat = map { $_ => 1 } (defined $q->param('cat') ? $q->param('cat') : qw( cat_foo cat_bar ));
+          %cat = map { $_ => 1 } (defined $q->param('cat') ? scalar $q->param('cat') : qw( cat_foo cat_bar ));
           my @categories = map { $cat{$_} ? "checked" : "" } qw( cat_foo cat_bar cat_baz );
           $res = HTTP::Response->new(200, "OK", undef, sprintf($body,$location,$session,$query,@categories));
           $res->content_type('text/html');
