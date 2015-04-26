@@ -55,7 +55,8 @@ sub sync_ok {
   $browser_synced = 0;
 
   for my $cmd (@commands) {
-	  $cmd = sprintf $cmd, $server->url;
+    no warnings;
+    $cmd = sprintf $cmd, $server->url;
     $s->cmd($cmd);
   };
   is($browser_synced,$count,"'$name' synchronizes $count times")
