@@ -6,7 +6,7 @@ $ENV{PERL_RL} = 0;
 $ENV{COLUMNS} = 80;
 $ENV{LINES} = 24;
 
-use_ok("WWW::Mechanize::Shell");
+use_ok("WWW::Mechanize::Shell") or BAIL_OUT('Does not compile correctly');
 
 diag "Running under $]";
 for (qw(WWW::Mechanize LWP::UserAgent)) {
