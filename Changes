@@ -13,6 +13,10 @@ Todo:
   + Add set-cookie and delete-cookie commands
   + Add (optional) HTTP::Cookies::Find support
 
+0.56 to be released
+  + Send uncompressed output to the browser
+    (contributed by weltonrodrigo)
+
 0.55 20150426
   . Fix one more test against new sprintf() warnings in 5.21+
 

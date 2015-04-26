@@ -292,7 +292,7 @@ sub sync_browser {
   return unless $self->agent->res;
 
   # Prepare the HTML for local display :
-  my $unclean = $self->agent->res->content;
+  my $unclean = $self->agent->content;
   my $html = '';
 
   # ugly fix:
