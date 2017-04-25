@@ -277,10 +277,14 @@ for my $name (sort keys %tests) {
     my ($output);
     my $command = qq("$^X" -Iblib/lib "$tempname" 2>&1);
     $output = `$command`;
+    $output =~ s!^Cookie:.*$!Cookie: <removed>!smg; # cookies get re-ordered, sometimes
+    $code_output =~ s!^Cookie:.*$!Cookie: <removed>!smg; # cookies get re-ordered, sometimes
     is( $output, $code_output, "Output of $name is identical" )
       or diag "Script:\n$script";
     my $script_requests = $server->get_log;
     $code_requests =~ s!\b$code_port\b!$script_port!smg;
+    $code_requests =~ s!^Cookie:.*$!Cookie: <removed>!smg; # cookies get re-ordered, sometimes
+    $script_requests =~ s!^Cookie:.*$!Cookie: <removed>!smg; # cookies get re-ordered, sometimes
     is($code_requests,$script_requests,"$name produces identical queries")
       or diag $script;
   };
