@@ -3,12 +3,13 @@ abstract: 'An interactive shell for WWW::Mechanize'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -18,16 +19,18 @@ no_index:
     - t
     - inc
 requires:
-  HTML::Display: 0
-  HTML::TokeParser::Simple: 2
-  Hook::LexWrap: 0.2
-  LWP: 5.69
-  Term::Shell: 0.02
-  Test::Harness: 2.3
-  URI::URL: 0
-  WWW::Mechanize: 1.2
-  WWW::Mechanize::FormFiller: 0.05
-  parent: 0
+  HTML::Display: '0'
+  HTML::TokeParser::Simple: '2'
+  Hook::LexWrap: '0.2'
+  LWP: '5.69'
+  Term::Shell: '0.02'
+  Test::Harness: '2.3'
+  URI::URL: '0'
+  WWW::Mechanize: '1.2'
+  WWW::Mechanize::FormFiller: '0.05'
+  parent: '0'
+  perl: '5.006'
 resources:
-  repository: https://github.com/Corion/WWW-Mechanize-Shell
-version: 0.55
+  repository: git://github.com/Corion/WWW-Mechanize-Shell.git
+version: '0.55'
+x_static_install: 1

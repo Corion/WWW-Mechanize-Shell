@@ -3,10 +3,10 @@
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -41,15 +41,24 @@
             "URI::URL" : "0",
             "WWW::Mechanize" : "1.2",
             "WWW::Mechanize::FormFiller" : "0.05",
-            "parent" : "0"
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/Corion/WWW-Mechanize-Shell"
+         "type" : "git",
+         "url" : "git://github.com/Corion/WWW-Mechanize-Shell.git",
+         "web" : "https://github.com/Corion/WWW-Mechanize-Shell"
       }
    },
-   "version" : "0.55"
+   "version" : "0.55",
+   "x_static_install" : 1
 }
