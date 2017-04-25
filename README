@@ -1,45 +1,57 @@
-WWW/Mechanize/Shell
-================================
+NAME
 
-This is a small shell around WWW::Mechanize
-that allows interactive exploration of a web page. After
-you've found your way around the website, you can dump the
-session as Perl code to replay the session without
-the shell.
+WWW::Mechanize::Shell - An interactive shell for WWW::Mechanize
+
+DESCRIPTION
+
+This module implements a www-like shell above WWW::Mechanize
+and also has the capability to output crude Perl code that recreates
+the recorded session. Its main use is as an interactive starting point
+for automating a session through WWW::Mechanize.
+
+The cookie support is there, but no cookies are read from your existing
+browser sessions. See L<HTTP::Cookies> on how to implement reading/writing
+your current browsers cookies.
+
 
 INSTALLATION
 
-To install this module type the following:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DEPENDENCIES
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-This module requires these other modules and libraries:
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-  WWW::Mechanize
 
-  WWW::Mechanize::FormFiller
+REPOSITORY
 
-  Term::Shell
-  
-  Hook::LexWrap
+The public repository of this module is 
+L<http://github.com/Corion/WWW-Mechanize-Shell>.
 
-Nice to have are :
+SUPPORT
 
-  Win32::OLE - for automating IE
+The public support forum of this module is
+L<http://perlmonks.org/>.
 
-  Pod::Constants - for the online help
 
-  HTML::TableExtract - for extracting stuff out of tables
+AUTHOR
 
-  Test::Inline - for the tests
+Max Maischein, E<lt>corion@cpan.orgE<gt>
 
-COPYRIGHT AND LICENCE
+Please contact me if you find bugs or otherwise improve the module. More tests are also very welcome !
 
-You can use this shell under the same terms as Perl itself
 
-Copyright (C) 2002,2010 Max Maischein (corion@cpan.org)
+COPYRIGHT AND LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Copyright (C) 2002,2010 Max Maischein
