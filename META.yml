@@ -3,6 +3,7 @@ abstract: 'An interactive shell for WWW::Mechanize'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
+  CGI: '0'
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
@@ -12,7 +13,7 @@ generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: WWW-Mechanize-Shell
 no_index:
   directory:
@@ -32,5 +33,5 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/Corion/WWW-Mechanize-Shell.git
-version: '0.55'
+version: '0.56'
 x_static_install: 1

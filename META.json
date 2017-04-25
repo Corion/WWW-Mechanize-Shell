@@ -47,6 +47,7 @@
       },
       "test" : {
          "requires" : {
+            "CGI" : "0",
             "Test::More" : "0"
          }
       }
@@ -59,6 +60,6 @@
          "web" : "https://github.com/Corion/WWW-Mechanize-Shell"
       }
    },
-   "version" : "0.55",
+   "version" : "0.56",
    "x_static_install" : 1
 }
