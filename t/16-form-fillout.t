@@ -88,10 +88,10 @@ for my $name (sort keys %tests) {
     unless is($s->agent->uri,$result_location,"Shell moved to the specified url for $name");
 	is($_STDERR_,undef,"Shell produced no error output for $name");
 	is($actual_requests,$requests,"$requests requests were made for $name");
-	my $code_requests = $server->get_output;
+	my $code_requests = $server->get_log;
 
   my $script_server = Test::HTTP::LocalServer->spawn(html => $HTML);
-	my $script_port = $script_server->port;
+  my $script_port = $script_server->port;
 
   # Modify the generated Perl script to match the new? port
   my $script = join "\n", $s->script;
@@ -114,11 +114,16 @@ for my $name (sort keys %tests) {
     my ($output);
     my $command = qq($^X -Ilib "$tempname" 2>&1);
     $output = `$command`;
+    $output =~ s!^Cookie:.*$!Cookie: <removed>!smg; # cookies get re-ordered, sometimes
+    $code_output =~ s!^Cookie:.*$!Cookie: <removed>!smg; # cookies get re-ordered, sometimes
     is( $output, $code_output, "Output of $name is identical" )
       or diag "Script:\n$script";
-		my $script_requests = $script_server->get_output;
-	  $code_requests =~ s!\b$code_port\b!$script_port!smg;
-		is($code_requests,$script_requests,"$name produces identical queries");
+    my $script_requests = $script_server->get_log;
+    $code_requests =~ s!\b$code_port\b!$script_port!smg;
+    $code_requests =~ s!^Cookie:.*$!Cookie: <removed>!smg; # cookies get re-ordered, sometimes
+    $script_requests =~ s!^Cookie:.*$!Cookie: <removed>!smg; # cookies get re-ordered, sometimes
+    is($code_requests,$script_requests,"$name produces identical queries")
+      or diag $script;
   };
   unlink $tempname
     or diag "Couldn't remove tempfile '$name' : $!";

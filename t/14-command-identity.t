@@ -243,7 +243,7 @@ for my $name (sort keys %tests) {
   is($_STDERR_,undef,"Shell produced no error output for $name");
   is($actual_requests,$requests,"$requests requests were made for $name");
   is($dumped_requests,$requests,"$requests requests were dumped for $name");
-  my $code_requests = $server->get_output;
+  my $code_requests = $server->get_log;
 
   # Get a clean start
   my $script_port = $server->port;
@@ -270,7 +270,7 @@ for my $name (sort keys %tests) {
   chomp $compile;
   SKIP: {
     unless (is($compile,"$tempname syntax OK","$name compiles")) {
-      $server->get_output;
+      $server->get_log;
       diag $script;
       skip "Script $name didn't compile", 2;
     };
@@ -279,7 +279,7 @@ for my $name (sort keys %tests) {
     $output = `$command`;
     is( $output, $code_output, "Output of $name is identical" )
       or diag "Script:\n$script";
-    my $script_requests = $server->get_output;
+    my $script_requests = $server->get_log;
     $code_requests =~ s!\b$code_port\b!$script_port!smg;
     is($code_requests,$script_requests,"$name produces identical queries")
       or diag $script;
