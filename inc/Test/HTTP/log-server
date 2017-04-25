@@ -117,7 +117,7 @@ SERVERLOOP: {
             my @categories = map { $cat{$_} ? "checked" : "" } qw( cat_foo cat_bar cat_baz );
             my $headers = CGI::escapeHTML( $r->headers->as_string );
             
-            my $rbody = sprintf $body,$headers, $location,$session,$query,$botcheck_query,$query2,@categories;
+            my $rbody = sprintf $body,$headers, $location,$session,$query,@categories;
             $res = HTTP::Response->new(200, "OK", [
                   'Set-Cookie' => $q->cookie(-name => 'log-server-httponly',-value=>'supersecret', -discard => 1, -httponly=>1),
                   'Set-Cookie' => $q->cookie(-name => 'log-server',-value=>'shazam2', -discard=>1,),
@@ -198,9 +198,7 @@ __DATA__
   <form name='f' action="/formsubmit" method="GET">
     <input type="hidden" name="session" value="%s"/>
     <input type="text" name="query" value="%s"/>
-    <input type="text" name="botcheck_query" class="hidden" value="%s"/>
     <input type="image" name="submit_image" value="Go_img" id="submit_button_image" />
-    <input type="text" name="query2" value="%s"/>
     <input type="submit" name="submit" value="Go" id="submit_button" />
     <input type="checkbox" name="cat" value="cat_foo" %s />
     <input type="checkbox" name="cat" value="cat_bar" %s />
