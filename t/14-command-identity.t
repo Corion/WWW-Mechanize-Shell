@@ -209,8 +209,6 @@ diag "Spawning local test server";
 my $server = Test::HTTP::LocalServer->spawn();
 diag sprintf "on port %s", $server->port;
 
-require LWP::UserAgent;
-my $lwp_useragent_request = *LWP::UserAgent::request{CODE};
 for my $name (sort keys %tests) {
   $_STDOUT_ = '';
   undef $_STDERR_;
@@ -225,10 +223,6 @@ for my $name (sort keys %tests) {
   $url =~ s!/$!!;
   my $result_location = sprintf $tests{$name}->{location}, $url;
   $result_location = qr{$result_location};
-  {
-      no warnings 'redefine';
-      *LWP::UserAgent::request = $lwp_useragent_request;
-  };
   my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
   $s->option("dumprequests",1);
   my @commands;
