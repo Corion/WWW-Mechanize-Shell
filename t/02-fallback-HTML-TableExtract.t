@@ -42,5 +42,8 @@ SKIP: {
     };
   };
   is( $@, '', "No error without HTML::TableExtract");
-  like( $warned, qr'^HTML\W+TableExtract\.pm did not return a true value', "Missing HTML::TableExtract raises warning");
+  my $pass =    ($warned =~ qr'^HTML\W+TableExtract\.pm did not return a true value')
+             || ($warned =~ qr!^Can't locate HTML/TableExtract.pm in \@INC!);
+  ok $pass, "Missing HTML::TableExtract raises warning"
+      or diag "Caught warning '$warned'";
 };
