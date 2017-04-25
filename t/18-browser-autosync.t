@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use lib 'inc';
+use lib './inc';
 use IO::Catch;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
@@ -31,7 +31,7 @@ BEGIN {
   eval { require HTTP::Daemon; };
   skip "HTTP::Daemon required to test browser synchronisation",(scalar keys %tests)*6
     if ($@);
-  use lib 'inc';
+  use lib './inc';
   require Test::HTTP::LocalServer; # from inc
   delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
 };

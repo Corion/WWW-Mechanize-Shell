@@ -11,7 +11,7 @@ BEGIN{
 
 delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
 
-my $output= `$^X -Ilib -MWWW::Mechanize::Shell -e "WWW::Mechanize::Shell->new('t',rcfile=>undef,warnings=>undef)->cmd('restart');print'OK'" 2>&1`;
+my $output= `$^X -I./lib -MWWW::Mechanize::Shell -e "WWW::Mechanize::Shell->new('t',rcfile=>undef,warnings=>undef)->cmd('restart');print'OK'" 2>&1`;
 chomp $output;
 is($@, "","'restart' on -e dosen't crash");
 is($?, 0,"'restart' on -e dosen't crash");

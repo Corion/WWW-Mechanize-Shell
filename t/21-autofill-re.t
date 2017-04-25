@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use lib 'inc';
+use lib './inc';
 use File::Temp qw( tempfile );
 use IO::Catch;
 use vars qw($_STDOUT_ $_STDERR_);

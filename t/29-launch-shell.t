@@ -13,7 +13,7 @@ my ($fh,$temp) = tempfile();
 print {$fh} "quit\n";
 close $fh;
 
-my $res = system($perl, "-Iblib/lib", "-MWWW::Mechanize::Shell", "-eshell(warnings=>undef)", $temp);
+my $res = system($perl, "-I./blib/lib", "-MWWW::Mechanize::Shell", "-eshell(warnings=>undef)", $temp);
 is $res,0,"Shell launch works";
 is $?, 0, "No error on exit";
 unlink $temp

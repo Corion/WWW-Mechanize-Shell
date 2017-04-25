@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-use lib 'inc';
+use lib './inc';
 use IO::Catch;
 use Test::More ();
 

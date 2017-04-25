@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-use lib 'inc';
+use lib './inc';
 use IO::Catch;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
