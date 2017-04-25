@@ -58,10 +58,11 @@ my %module = (
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
+        'CGI.pm'     => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Filter-signatures-*' },
+    clean               => { FILES => 'WWW-Mechanize-Shell-*' },
 
     test            => { TESTS => join( ' ', @tests ) },
 );
