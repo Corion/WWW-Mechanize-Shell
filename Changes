@@ -13,9 +13,12 @@ Todo:
   + Add set-cookie and delete-cookie commands
   + Add (optional) HTTP::Cookies::Find support
 
-0.56 to be released
+0.56 20170425
   + Send uncompressed output to the browser
     (contributed by weltonrodrigo)
+  + Fix some warnings caused by links without a text
+  . Fix test suite due to newer version of Test::Without::Module
+  . Upgrade the test HTTP server to work in absence of CGI.pm
 
 0.55 20150426
   . Fix one more test against new sprintf() warnings in 5.21+
@@ -44,7 +47,7 @@ Todo:
   . Added links to repositories
 
 0.49 20100817
-  + Apply [rt.cpan.org #59246] , 
+  + Apply [rt.cpan.org #59246] ,
     thanks to Ansgar Burchardt
     This fixes another case where API changes in LWP weren't mirrored
     by this module.
@@ -117,7 +120,7 @@ Todo:
   - Added a test for HTML::TableExtract functionality
     which went untested so far
   - Fixed HTML::TableExtract functionality
-        This functionality now requires 
+        This functionality now requires
         HTML::TableExtract 2.0 or higher, sorry
   - This release now needs WWW::Mechanize 1.20, for the update_html
     method which is used in the tests. Sorry.
