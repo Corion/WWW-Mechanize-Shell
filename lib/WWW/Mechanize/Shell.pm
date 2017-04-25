@@ -590,12 +590,12 @@ sub run_save {
   if (ref $user_link) {
     my $count = -1;
     my $re = $user_link;
-    @links = map { $count++; (($_->text =~ /$re/)||($_->url =~ /$re/)) ? $count : () } @all_links;
+    @links = map { $count++; ((defined $_->text && $_->text =~ /$re/)||(defined $_->url && $_->url =~ /$re/)) ? $count : () } @all_links;
     if (@links == 0) {
       print "No match for /$re/.\n";
     };
     push @history, q{my $count = -1;} . "\n";
-    push @history, sprintf q{@links = map { $count++; (($_->text =~ qr(%s))||($_->url =~ qr(%s))) ? $count : () } @all_links;} . "\n", $re, $re;
+    push @history, sprintf q{@links = map { $count++; ((defined $_->text && $_->text =~ qr(%s))||(defined $_->url && $_->url =~ qr(%s))) ? $count : () } @all_links;} . "\n", $re, $re;
   } else {
     @links = $user_link;
     push @history, sprintf q{@links = '%s';} . "\n", $user_link;
@@ -1106,8 +1106,8 @@ sub run_open {
     my $count = -1;
     my @possible_links = $self->agent->links();
     my @links = defined $re 
-        ? map { $count++; $_->text =~ /$re/ ? $count : () } @possible_links
-        : map { $count++; $_->text eq $link ? $count : () } @possible_links;
+        ? map { $count++; my $t = $_->text; defined $t && $t =~ /$re/ ? $count : () } @possible_links
+        : map { $count++; my $t = $_->text; defined $t && $t eq $link ? $count : () } @possible_links;
     if (@links > 1) {
       $self->print_pairs([ @links ],[ map {$possible_links[$_]->[1]} @links ]);
       undef $link;
