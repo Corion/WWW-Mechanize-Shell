@@ -58,7 +58,7 @@ my %module = (
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
-        'CGI.pm'     => 0,
+        'CGI'        => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
