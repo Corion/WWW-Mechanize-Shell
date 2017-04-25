@@ -15,6 +15,7 @@ META.json
 META.yml			Module meta-data (added by MakeMaker)
 README
 README.mkdn
+t/00-load.t
 t/00-use.t
 t/00a-Term-Shell-catch-smry.t
 t/01-fallback-Win32-OLE.t

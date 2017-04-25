@@ -1,6 +1,7 @@
 \.lwpcookies$
 \.cvsignore$
 \.releaserc$
+\.travis.yml$
 blib
 WWW-Mechanize-Shell-*
 WWW-Mechanize-Shell-*/
