@@ -31,4 +31,3 @@ requires:
 resources:
   repository: https://github.com/Corion/WWW-Mechanize-Shell
 version: 0.55
-
