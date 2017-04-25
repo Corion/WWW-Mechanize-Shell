@@ -2040,7 +2040,7 @@ invocation of the shell like with CPAN :
 =head1 REPOSITORY
 
 The public repository of this module is 
-L<http://github.com/Corion/WWW-Mechanize-Shell>.
+L<https://github.com/Corion/WWW-Mechanize-Shell>.
 
 =head1 SUPPORT
 
@@ -2051,7 +2051,7 @@ L<http://perlmonks.org/>.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002,2010 Max Maischein
+Copyright (C) 2002-2017 Max Maischein
 
 =head1 AUTHOR
 

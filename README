@@ -35,7 +35,7 @@ Should you wish to install this module manually, the procedure is
 REPOSITORY
 
 The public repository of this module is 
-L<http://github.com/Corion/WWW-Mechanize-Shell>.
+L<https://github.com/Corion/WWW-Mechanize-Shell>.
 
 SUPPORT
 
@@ -54,4 +54,4 @@ COPYRIGHT AND LICENSE
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002,2010 Max Maischein
+Copyright (C) 2002-2017 Max Maischein

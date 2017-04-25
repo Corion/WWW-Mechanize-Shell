@@ -712,7 +712,7 @@ invocation of the shell like with CPAN :
 # REPOSITORY
 
 The public repository of this module is 
-[http://github.com/Corion/WWW-Mechanize-Shell](http://github.com/Corion/WWW-Mechanize-Shell).
+[https://github.com/Corion/WWW-Mechanize-Shell](https://github.com/Corion/WWW-Mechanize-Shell).
 
 # SUPPORT
 
@@ -723,7 +723,7 @@ The public support forum of this module is
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
-Copyright (C) 2002,2010 Max Maischein
+Copyright (C) 2002-2017 Max Maischein
 
 # AUTHOR
 
