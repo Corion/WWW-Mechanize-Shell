@@ -8,7 +8,7 @@ use Test::More tests => 1;
 my $module;
 
 BEGIN {
-   $module  = "Net::Fritz::Phonebook";
+   $module  = "WWW::Mechanize::Shell";
    require_ok( $module );
 }
 
