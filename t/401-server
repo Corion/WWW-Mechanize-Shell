@@ -5,8 +5,16 @@ use LWP::UserAgent;
 
 $|++;
 
-my $d = HTTP::Daemon->new or die;
-print $d->url, "\n";
+my $host = 'localhost';
+my $d = HTTP::Daemon->new(
+    LocalAddr => $host,
+) or die;
+
+# HTTP::Deamon doesn't return http://localhost:.../
+# for LocalAddr => 'localhost'. This causes the
+# tests to fail of many machines.
+( my $url = URI->new($d->url) )->host($host);
+print "$url\n";
 
 # How many requests do we expect?
 my ($ex_user,$ex_pass) = @ARGV;
