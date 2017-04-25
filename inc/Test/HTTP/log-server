@@ -68,7 +68,7 @@ SERVERLOOP: {
         $log .= "Request:\n" . $r->as_string . "\n";
         if ($location =~ m!^/redirect/(.*)$!) {
             $res = HTTP::Response->new(302);
-            $res->header('location', $d->url . $1);
+            $res->header('location', $url . $1);
         } elsif ($location =~ m!^/local/(.*)$!) {
             my $rbody= do { open my $fh, '<', $1; binmode $fh; local $/; <$fh> };
             $res = HTTP::Response->new(200, "OK", [
