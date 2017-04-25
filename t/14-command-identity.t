@@ -123,7 +123,7 @@ BEGIN {
     														 'submit',
     														 'content' ],
     									location => qr'^%s/formsubmit\?session=foo&query=bar&cat=cat_foo&cat=cat_bar$' },
-    open_parm => { requests => 2, lines => [ 'get %s','open 0','content' ], location => qr'^%s/test$' },
+    open_parm => { requests => 2, lines => [ 'get %s','open 1','content' ], location => qr'^%s/test$' },
     open_re => { requests => 2, lines => [ 'get %s','open "Link foo1.save_log_server_test.tmp"','content' ], location => qr'^%s/foo1.save_log_server_test.tmp$' },
     open_re2 => { requests => 2, lines => [ 'get %s','open "/foo1/"','content' ], location => qr'^%s/foo1.save_log_server_test.tmp$' },
     open_re3 => { requests => 2, lines => [ 'get %s','open "/Link /foo/"','content' ], location => qr'^%s/foo$' },
