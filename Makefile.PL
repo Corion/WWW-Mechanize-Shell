@@ -53,6 +53,7 @@ my %module = (
         'WWW::Mechanize' => 1.20,
         'WWW::Mechanize::FormFiller' => 0.05,
         'Hook::LexWrap' => 0.20,
+        'HTML::Cookies' => 0,
         'HTML::Display' => 0,
         'HTML::TokeParser::Simple' => 2.0,
     },
