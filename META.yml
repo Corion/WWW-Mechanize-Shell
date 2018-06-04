@@ -5,7 +5,7 @@ author:
 build_requires:
   CGI: '0'
   ExtUtils::MakeMaker: '0'
-  Test::HTTP::LocalServer: '0'
+  Test::HTTP::LocalServer: '0.63'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'

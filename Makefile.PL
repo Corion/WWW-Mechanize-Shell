@@ -60,7 +60,7 @@ my %module = (
     TEST_REQUIRES => {
         'Test::More'              => 0,
         'CGI'                     => 0,
-        'Test::HTTP::LocalServer' => 0,
+        'Test::HTTP::LocalServer' => '0.63', # earlier has some bugs in request handling
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
