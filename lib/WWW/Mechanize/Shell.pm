@@ -86,13 +86,35 @@ filename for the rcfile, the C<rcfile> parameter can be passed to the constructo
 
   rcfile => '.myapprc',
 
+=over 4
+
+=item B<agent>
+
+  my $shell = WWW::Mechanize::Shell->new(
+      agent => WWW::Mechanize::Chrome->new(),
+  );
+
+Pass in a premade custom user agent. This object must be compatible to
+L<WWW::Mechanize>. Use this feature from the command line as
+
+  perl -Ilib -MWWW::Mechanize::Chrome \
+             -MWWW::Mechanize::Shell \
+             -e"shell(agent => WWW::Mechanize::Chrome->new())"
+
+=back
+
 =cut
 
 sub init {
   my ($self) = @_;
   my ($name,%args) = @{$self->{API}{args}};
 
-  $self->{agent} = WWW::Mechanize->new();
+  $self->{agent} = $args{ agent };
+  if( ! $self->agent ) {
+      my $class = $args{ agent_class } || 'WWW::Mechanize';
+      my $args  = $args{ agent_args }  || [];
+      $self->{agent} = $class->new( @$args );
+  };
 
   $self->{formfiller} = WWW::Mechanize::FormFiller->new(default => [ Ask => $self ]);
 
@@ -124,7 +146,8 @@ sub init {
     };
 
   # Load the proxy settings from the environment
-  $self->agent->env_proxy();
+  $self->agent->env_proxy()
+      if $self->agent->can('env_proxy');
 
   # Read our .rc file :
   # I could use File::Homedir, but the docs claim it dosen't work on Win32. Maybe
@@ -1341,7 +1364,7 @@ sub run_fillout {
   };
   warn $@ if $@;
   $self->add_history( join( "\n",
-                      map { sprintf( q[$formfiller->add_filler( '%s' => Fixed => '%s' );], @$_ ) } @interactive_values) . '$formfiller->fill_form($agent->current_form);');
+                      map { sprintf( q[$formfiller->add_filler( '%s' => Fixed => '%s' );], $_->[0], defined $_->[1] ? $_->[1] : '' ) } @interactive_values) . '$formfiller->fill_form($agent->current_form);');
 };
 
 =head2 auth

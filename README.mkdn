@@ -48,6 +48,19 @@ filename for the rcfile, the `rcfile` parameter can be passed to the constructor
 
     rcfile => '.myapprc',
 
+- **agent**
+
+        my $shell = WWW::Mechanize::Shell->new(
+            agent => WWW::Mechanize::Chrome->new(),
+        );
+
+    Pass in a premade custom user agent. This object must be compatible to
+    [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize). Use this feature from the command line as
+
+        perl -Ilib -MWWW::Mechanize::Chrome \
+                   -MWWW::Mechanize::Shell \
+                   -e"shell(agent => WWW::Mechanize::Chrome->new())"
+
 ## `$shell->release_agent`
 
 Since the shell stores a reference back to itself within the
