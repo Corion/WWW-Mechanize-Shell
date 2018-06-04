@@ -787,6 +787,23 @@ sub run_links {
   };
 };
 
+=head2 images
+
+Display images on a page
+
+=cut
+
+sub run_images {
+    my ($self) = @_;
+
+    my @images = $self->agent->images;
+    my $count  = 0;
+
+    for my $image ( @images ) {
+        print sprintf("[%d] \"%s\" %s\n", $count++, $image->alt, $image->url);
+    }
+}
+
 =head2 parse
 
 Dump the output of HTML::TokeParser of the current content
