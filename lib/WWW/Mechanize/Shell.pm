@@ -15,9 +15,8 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 use B::Deparse;
 
-use vars qw( $VERSION @EXPORT %munge_map );
-$VERSION = '0.56';
-@EXPORT = qw( &shell );
+our $VERSION = '0.57';
+our @EXPORT = qw( &shell );
 
 =head1 NAME
 
@@ -1774,7 +1773,7 @@ output independent of WWW::Mechanize::Shell.
 
 =cut
 
-%munge_map = (
+our %munge_map = (
         '^{' => '',
         '}$' => '',
         '\$self->print_paged' => 'print ',
@@ -1830,12 +1829,12 @@ sub shell {
 };
 
 {
-  package WWW::Mechanize::FormFiller::Value::Ask;
+  package # hide from CPAN
+      WWW::Mechanize::FormFiller::Value::Ask;
   use WWW::Mechanize::FormFiller;
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
-  use vars qw( $VERSION );
-  $VERSION = '0.21';
+  our $VERSION = '0.57';
 
   sub new {
     my ($class,$name,$shell) = @_;
