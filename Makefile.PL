@@ -58,8 +58,9 @@ my %module = (
         'HTML::TokeParser::Simple' => 2.0,
     },
     TEST_REQUIRES => {
-        'Test::More' => 0,
-        'CGI'        => 0,
+        'Test::More'              => 0,
+        'CGI'                     => 0,
+        'Test::HTTP::LocalServer' => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
