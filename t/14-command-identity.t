@@ -260,7 +260,7 @@ for my $name (sort keys %tests) {
 
   my $url = $server->url;
   $url =~ s!/$!!;
-  my $result_location = sprintf $tests{$name}->{location}, $url;
+  my $result_location = sprintf $tests{$name}->{location}, quotemeta $url;
   $result_location = qr{$result_location};
   my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
   $s->option("dumprequests",1);
