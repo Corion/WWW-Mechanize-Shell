@@ -13,7 +13,10 @@ Todo:
   + Add set-cookie and delete-cookie commands
   + Add (optional) HTTP::Cookies::Find support
 
-0.57 20180604
+0.58 to be released
+  + Made the tests pass on IPv6 enabled systems
+    Uncovered by making Test::HTTP::LocalServer work on IPv6 enabled systems.
+
 0.57 2018-06-04
   + Add "images" command to list all images
   + Allow other user agent objects like WWW::Mechanize::Chrome
