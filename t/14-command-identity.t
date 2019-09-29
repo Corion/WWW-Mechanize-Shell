@@ -8,6 +8,7 @@ use File::Temp qw( tempfile );
 use vars qw( %tests $_STDOUT_ $_STDERR_ );
 use URI::URL;
 use LWP::Simple;
+use Test::HTTP::LocalServer;
 
 # Catch output:
 $SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
@@ -216,12 +217,6 @@ BEGIN {
 };
 
 SKIP: {
-diag "Loading HTTP::Daemon";
-eval { require HTTP::Daemon; };
-skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*8
-  if ($@);
-# require Test::HTTP::LocalServer; # from inc
-use Test::HTTP::LocalServer; # from inc
 
 # We want to be safe from non-resolving local host names
 delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
@@ -244,9 +239,8 @@ use vars qw( $actual_requests $dumped_requests );
   #};
 };
 
-diag "Spawning local test server";
 my $server = Test::HTTP::LocalServer->spawn();
-diag sprintf "on port %s", $server->port;
+diag "Spawned local test server at " . $server->url;
 
 for my $name (sort keys %tests) {
   $_STDOUT_ = '';

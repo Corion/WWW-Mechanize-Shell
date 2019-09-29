@@ -7,7 +7,8 @@ use IO::Catch;
 use File::Temp qw( tempfile );
 use vars qw( %tests $_STDOUT_ $_STDERR_ );
 use URI::URL;
-use LWP::Simple;
+#use LWP::Simple;
+use Test::HTTP::LocalServer;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 $SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
@@ -44,11 +45,6 @@ SKIP: {
 
 # Disable all ReadLine functionality
 my $HTML = do { local $/; <DATA> };
-
-eval { require HTTP::Daemon; };
-skip "HTTP::Daemon required to test script/code identity",(scalar keys %tests)*6
-  if ($@);
-require Test::HTTP::LocalServer; # from inc
 
 # We want to be safe from non-resolving local host names
 delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};

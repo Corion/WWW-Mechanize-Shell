@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
+use Test::HTTP::LocalServer;
 use lib './inc';
 use IO::Catch;
 
@@ -28,12 +29,6 @@ BEGIN {
   $ENV{PERL_RL} = 0;
   use_ok('WWW::Mechanize::Shell');
 
-  eval { require HTTP::Daemon; };
-  skip "HTTP::Daemon required to test browser synchronisation",(scalar keys %tests)*6
-    if ($@);
-  use lib './inc';
-  require Test::HTTP::LocalServer; # from inc
-  delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
 };
 
 my $browser_synced;
