@@ -48,7 +48,6 @@ t/28-cmd-headers.t
 t/28-cmd-title.t
 t/28-html-tableextract.t
 t/29-launch-shell.t
-t/401-server
 t/embedded-WWW-Mechanize-Shell.t
 t/source.mech
 xt/99-changes.t
