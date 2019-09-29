@@ -38,13 +38,14 @@ my $browser_synced;
   };
 };
 
+my $server = Test::HTTP::LocalServer->spawn();
+
 sub sync_ok {
   my %args = @_;
   my $name = $args{name};
   my $count = $args{count};
   my (@commands) = @{$args{commands}};
 
-  my $server = Test::HTTP::LocalServer->spawn();
   my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
   $s->option('autosync', 1);
   $browser_synced = 0;
@@ -56,11 +57,10 @@ sub sync_ok {
   };
   is($browser_synced,$count,"'$name' synchronizes $count times")
     or diag join "\n", @commands;
-  $server->stop;
 };
 
 for my $cmd (sort keys %tests) {
   sync_ok( name => $cmd, %{$tests{$cmd}} );
 };
 
-};
+$server->stop;
