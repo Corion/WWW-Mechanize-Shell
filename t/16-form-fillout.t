@@ -1,22 +1,21 @@
 #!/usr/bin/perl -w
 use strict;
 use FindBin;
-use lib './inc';
-use IO::Catch;
+use Test::More;
 
 use File::Temp qw( tempfile );
-use vars qw( %tests $_STDOUT_ $_STDERR_ );
+our ($_STDOUT_, $_STDERR_ );
 use URI::URL;
-#use LWP::Simple;
 use Test::HTTP::LocalServer;
+use lib './inc';
+use IO::Catch;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 $SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 tie *STDERR, 'IO::Catch', '_STDERR_' or die $!;
 
-BEGIN {
-  %tests = (
+our %tests = (
     interactive_script_creation => { requests => 2,
     									lines => [ 'eval @::list=qw(1 2 3 4 5 6 7 8 9 10 foo NY 11 DE 13 V 15 16 2038-01-01)',
     														 'eval
@@ -33,14 +32,13 @@ BEGIN {
     														 'content' ],
     									location => '%sgift_card/alphasite/www/cgi-bin/giftcard.cgi/checkout_process' },
   );
-};
 
-use Test::More tests => 1 + (scalar keys %tests)*6;
+plan tests => (scalar keys %tests)*6;
 BEGIN {
   delete $ENV{PAGER};
   $ENV{PERL_RL} = 0;
-  use_ok('WWW::Mechanize::Shell');
 };
+use WWW::Mechanize::Shell;
 SKIP: {
 
 # Disable all ReadLine functionality

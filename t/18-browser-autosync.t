@@ -1,16 +1,14 @@
 #!/usr/bin/perl -w
 use strict;
 use Test::HTTP::LocalServer;
+use Test::More;
 use lib './inc';
 use IO::Catch;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
-use vars qw( %tests );
-
-BEGIN {
-  %tests = (
+our %tests = (
       back => { count => 3, commands => ['get %s','click submit','back']},
       browse => { count => 2, commands => [ 'get %s', 'browse' ] },
       get => { count => 1, commands => ['get %s']} ,
@@ -18,10 +16,9 @@ BEGIN {
       submit => { count => 2, commands => ['get %s','submit']},
       click => { count => 2, commands => ['get %s','click submit']},
       reload => { count => 2, commands => ['get %s','reload'] },
-  )
-};
+  );
+plan tests => scalar (keys %tests);
 
-use Test::More tests => scalar (keys %tests);
 BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;

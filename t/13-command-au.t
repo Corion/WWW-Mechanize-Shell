@@ -4,7 +4,7 @@ use FindBin;
 
 use lib './inc';
 use IO::Catch;
-use vars qw( $_STDOUT_ $_STDERR_ );
+our ( $_STDOUT_, $_STDERR_ );
 use URI;
 use Test::HTTP::LocalServer;
 

@@ -1,14 +1,15 @@
 #!/usr/bin/perl -w
 use strict;
-use lib './inc';
 
 use FindBin;
-use IO::Catch;
 use File::Temp qw( tempfile );
-use vars qw( %tests $_STDOUT_ $_STDERR_ );
+our ($_STDOUT_, $_STDERR_ );
 use URI::URL;
-use LWP::Simple;
+#use LWP::Simple;
 use Test::HTTP::LocalServer;
+use Test::More;
+use lib './inc';
+use IO::Catch;
 
 # Catch output:
 $SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
@@ -22,8 +23,7 @@ BEGIN {
 };
 use HTML::Display;
 
-BEGIN {
-  %tests = (
+our %tests = (
     autofill => { requests => 2, lines => [ 'get %s',
                                             'autofill query Fixed foo',
                                             'autofill cat Keep',
@@ -190,6 +190,7 @@ BEGIN {
               location => qr'^%s/formsubmit$' },
   );
 
+BEGIN {
   eval {
     require HTML::TableExtract;
     $tests{get_table} = { requests => 1, lines => [ 'get %s','table' ], location => qr'^%s/$' };
@@ -205,23 +206,23 @@ BEGIN {
     };
 };
 
-use Test::More tests => 1 + (scalar keys %tests)*10;
+plan tests => (scalar keys %tests)*10;
 BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
-  require LWP::UserAgent;
+  #require LWP::UserAgent;
   #my $old = \&LWP::UserAgent::request;
   #print STDERR $old;
   #*LWP::UserAgent::request = sub {print STDERR "LWP::UserAgent::request\n"; goto &$old };
-  use_ok('WWW::Mechanize::Shell');
 };
+use WWW::Mechanize::Shell;
 
 SKIP: {
 
 # We want to be safe from non-resolving local host names
 delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
 
-use vars qw( $actual_requests $dumped_requests );
+our ($actual_requests, $dumped_requests );
 {
   no warnings qw'redefine once';
   my $old_request = *WWW::Mechanize::_make_request{CODE};
