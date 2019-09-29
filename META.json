@@ -52,8 +52,9 @@
             "CGI" : "0",
             "File::Temp" : "0",
             "HTTP::Daemon" : "0",
-            "Test::HTTP::LocalServer" : "0.63",
-            "Test::More" : "0"
+            "Test::HTTP::LocalServer" : "0.67",
+            "Test::More" : "0",
+            "URI" : "0"
          }
       }
    },

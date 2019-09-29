@@ -7,8 +7,9 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
   HTTP::Daemon: '0'
-  Test::HTTP::LocalServer: '0.63'
+  Test::HTTP::LocalServer: '0.67'
   Test::More: '0'
+  URI: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
