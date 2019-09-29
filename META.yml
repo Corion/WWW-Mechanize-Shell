@@ -5,12 +5,14 @@ author:
 build_requires:
   CGI: '0'
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  HTTP::Daemon: '0'
   Test::HTTP::LocalServer: '0.63'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,9 +33,11 @@ requires:
   URI::URL: '0'
   WWW::Mechanize: '1.2'
   WWW::Mechanize::FormFiller: '0.05'
+  WWW::Mechanize::Link: '1.2'
   parent: '0'
   perl: '5.006'
 resources:
+  license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/WWW-Mechanize-Shell.git
 version: '0.57'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,6 @@
 
-[![Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Shell.svg?branch=master)](https://github.com/Corion/WWW-Mechanize-Shell)
+[![Travis Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Shell.svg?branch=master)](https://travis-ci.org/Corion/WWW-Mechanize-Shell)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/WWW-Mechanize-Shell?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/WWW-Mechanize-Shell)
 
 # NAME
 
