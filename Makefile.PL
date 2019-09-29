@@ -35,11 +35,11 @@ my %module = (
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
-    
+
     MIN_PERL_VERSION => '5.006',
 
     LICENSE => 'perl',
-    
+
     PL_FILES            => {},
     BUILD_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
@@ -110,7 +110,7 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
     delete $params{AUTHOR} if $] < 5.005;
     delete $params{ABSTRACT_FROM} if $] < 5.005;
     delete $params{BINARY_LOCATION} if $] < 5.005;
-    
+
     WriteMakefile(%params);
 }
 
@@ -148,7 +148,7 @@ INSTALL
             pod_section($_[0], 'AUTHOR'),
             pod_section($_[0], 'LICENSE' ),
             pod_section($_[0], 'COPYRIGHT' ),
-    ;        
+    ;
         update_file( 'README', $readme );
     };
     # README.mkdn is the documentation that will be shown as the main
@@ -175,7 +175,7 @@ sub pod_section {
     open my $fh, '<', $filename
         or die "Couldn't read '$filename': $!";
 
-    my @section = 
+    my @section =
         grep { /^=head1\s+$section/.../^=/ } <$fh>;
     pop @section if @section and $section[-1] =~ /^=/;
     shift @section if $remove_heading;
@@ -187,7 +187,7 @@ sub pod_section {
         shift @section
             while $section[0] =~ /^\s*$/;
     };
-    
+
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
     return join "", @section;
 }

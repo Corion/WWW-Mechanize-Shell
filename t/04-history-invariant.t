@@ -90,7 +90,7 @@ sub disable {
     shift;
     push @history, join "", @_;
   };
-  
+
   *WWW::Mechanize::links = sub {()};
 };
 

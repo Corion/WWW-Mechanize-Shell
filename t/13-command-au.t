@@ -83,7 +83,7 @@ $s->cmd( "auth foo bar" );
 my @credentials = $s->agent->get_basic_credentials();
 
 if ($credentials[0] ne 'foo') {
-    SKIP: { 
+    SKIP: {
         skip "WWW::Mechanize $WWW::Mechanize::VERSION has buggy implementation/override of ->credentials", 1;
     };
 } else {

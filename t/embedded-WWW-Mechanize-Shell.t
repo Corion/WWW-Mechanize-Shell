@@ -131,7 +131,7 @@ SKIP: {
 };
 SKIP: {
     # A header testing whether we find all prerequisites :
-    
+
     # The original POD test
         undef $main::_STDOUT_;
     undef $main::_STDERR_;
