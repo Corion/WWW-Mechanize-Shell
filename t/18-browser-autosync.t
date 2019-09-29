@@ -21,15 +21,12 @@ BEGIN {
   )
 };
 
-use Test::More tests => scalar (keys %tests) +1;
-SKIP: {
-
+use Test::More tests => scalar (keys %tests);
 BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
-  use_ok('WWW::Mechanize::Shell');
-
 };
+use WWW::Mechanize::Shell;
 
 my $browser_synced;
 { no warnings 'redefine';
