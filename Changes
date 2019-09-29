@@ -14,6 +14,7 @@ Todo:
   + Add (optional) HTTP::Cookies::Find support
 
 0.57 20180604
+0.57 2018-06-04
   + Add "images" command to list all images
   + Allow other user agent objects like WWW::Mechanize::Chrome
     Use it from the command line as
@@ -21,40 +22,40 @@ Todo:
                    -MWWW::Mechanize::Shell \
                    -e"shell(agent => WWW::Mechanize::Chrome->new())"
 
-0.56 20170425
+0.56 2017-04-25
   + Send uncompressed output to the browser
     (contributed by weltonrodrigo)
   + Fix some warnings caused by links without a text
   . Fix test suite due to newer version of Test::Without::Module
   . Upgrade the test HTTP server to work in absence of CGI.pm
 
-0.55 20150426
+0.55 2015-04-26
   . Fix one more test against new sprintf() warnings in 5.21+
 
-0.54 20150426
+0.54 2015-04-26
   . Fix test suite against new sprintf() warnings in 5.21+
   . Fix test suite against calling CGI::param in list context
     Both analyzed and contributed by Slaven Rezic
 
-0.53 20130810
+0.53 2013-08-10
   . Add links to repository, contributed by D. Steinbrunner
 
-0.52 20110106
+0.52 2011-01-06
   . Fix stupid thinko in test (only affects tests on 5.13+)
 
-0.51 20110105
+0.51 2011-01-05
   . Make a test more robust against 5.14
   . Streamlined Exporter.pm usage
   . Rely on parent.pm instead of base.pm
   . No need to upgrade
 
-0.50 20100821
+0.50 2010-08-21
   . Remove test file that was just testing LWP functionality and that
     failed for some weird setups where nonexistent hosts still
     result in a successful HTTP request.
   . Added links to repositories
 
-0.49 20100817
+0.49 2010-08-17
   + Apply [rt.cpan.org #59246] ,
     thanks to Ansgar Burchardt
     This fixes another case where API changes in LWP weren't mirrored
@@ -62,13 +63,13 @@ Todo:
   + Fix t/14-command-identity.t to not make an external request anymore
     Addresses [rt.cpan.org #59883]
 
-0.48 20081109
+0.48 2008-11-09
   + More test fixes for incompatibilities between LWP and Mechanize 1.34+
   + Removed way to set up authentication for more than one site
   . WWW::Mechanize monkeypatches LWP::UserAgent and thus you can only ever
     have one set of user/password in your script.
 
-0.47 20081102
+0.47 2008-11-02
   + Fix tests to work with libwww 5.815+ which automatically retries
     with empty user/password
   + WWW::Mechanize 1.34+ breaks Basic authentication with LWP 5.815+
@@ -77,11 +78,11 @@ Todo:
   . Hook::LexWrap is subject to bug [perl #46217], this might
     cause problems if you're running Perl 5.10.0. All tests pass.
 
-0.46 20071003
+0.46 2007-10-03
   + Bump version because of borked CPAN upload, retrying
   * No need to upgrade
 
-0.45 20071003
+0.45 2007-10-03
   * No library code changes, no need to upgrade
   - Removed HTML::Display from the distribution
     as that now lives its own life on CPAN
@@ -89,7 +90,7 @@ Todo:
     Debian bug #444634, http://bugs.debian.org/444634
     and CPAN RT #29455, thanks to Niko Tyni
 
-0.44 20070707
+0.44 2007-07-07
 
   + Added C<title> and C<headers> commands that print out
     the title and headers of the page. Suggested by Ed Halley.
@@ -99,7 +100,7 @@ Todo:
   + Upgrade to Term::Shell v0.02 which now displays the help
     summary better.
 
-0.43 20070511
+0.43 2007-05-11
   - fix failures on 5.6.2 with a B::Deparse version that doesn't
     support ->ambient_pragmas() - they get ignored there now.
 
@@ -109,12 +110,12 @@ Todo:
     name I cannot find, sorry.
   - Delete some more proxy settings for the test runs
 
-0.41 20070414
+0.41 2007-04-14
   - Codeacrobat release
   - Restore compatibility with WWW::Mechanize 1.22
     Thanks to Jörg Meltzer who sent in the patch
 
-0.40 20070117
+0.40 2007-01-17
   - Fixed showstopper bug in prompt method that was hidden
     by all tests disabling interactive prompts
     Thanks to all reporters
@@ -123,7 +124,7 @@ Todo:
   - Bumped module version
   - Fix for RT 22121 - shell does not start
 
-0.38 20061214
+0.38 2006-12-14
   - Bumped module version
   - Added a test for HTML::TableExtract functionality
     which went untested so far
@@ -328,13 +329,13 @@ Todo:
   - Made a test checking the version of Term::Shell and the help summary bug
   - Fixed t/06*.t - it crashed when Test::MockObject wasn't installed
 
-0.16 20030429
+0.16 2003-04-29
   - Changed double quotes around parameters to single quotes
     to allow for urls like http://mark@foo.com (thanks Mark)
   - Added tests to check that created scripts at least compile
   - Made the form fillout more robust by wrapping it in an eval block
 
-0.14 20030414
+0.14 2003-04-14
   - Fixed a bad list bug introduced with my unix-browser patch to the options system. Slaven Rezics
     submitted patch had nothing to do with this, I only grabbed the idea from him but did botch
     the implementation myself.
@@ -345,7 +346,7 @@ Todo:
       The shell detects when you want to follow a javascript: link,
       and says that you can't do that.
 
-0.13 20030404
+0.13 2003-04-04
   - Slaven Rezic submitted a patch to enable synchronous HTML
     display under Unix ! Thanks go to Slaven !!
     All bugs/errors are my fault !
@@ -354,17 +355,17 @@ Todo:
   - added tests for those two crashes
   - moved example shell from examples/shell.pl to bin/wwwshell.pl
 
-0.12 20030320
+0.12 2003-03-20
   - Added a test to check for the behaviour if HTML::TableExtract is not present
   - silenced warnings in the tests
   - No changes to the main module except for the version number
 
-0.11 20030318
+0.11 2003-03-18
   - Updated the tests so they skip when there is no terminal available
     (as is the case when the tests are run from cron)
   - Fixed the inline tests so the synopsis shows again
 
-0.10 20030312
+0.10 2003-03-12
   - Added the "table" command to display/dump HTML tables using HTML::TableExtract
   - Added "table" history
   - Added tests for history
@@ -374,33 +375,33 @@ Todo:
   - Added documentation on proxy
   - Added table lister
 
-0.09 20030308
+0.09 2003-03-08
   - I should go back and use the web interface. It was made for people like me.
 
-0.08 20030308
+0.08 2003-03-08
   - third time's the charm
 
-0.07 20030308
+0.07 2003-03-08
   - And again, because I am stupid
 
-0.06 20030308
+0.06 2003-03-08
   - bumped version because I uploaded a partial file to CPAN ...
 
-0.05 20030307
+0.05 2003-03-07
   - Fixed the dependency on Win32::OLE - the module now handles other
     environments gracefully
   - Added some tests for the module fallbacks (these tests need Test::Without::Module)
   - moved handling over to cvs
 
-0.04 20030301
+0.04 2003-03-01
   - reupload as the 0.02 and 0.03 upload was broken
 
-0.02 20030228
+0.02 2003-02-28
   - Made the shell much more robust against wrong parameters and
     internal failures.
   - Open /foo/ now goes into the Perl code as "follow(/foo/)",
     as it should be
 
-0.01  Thu Nov  7 23:04:20 2002
+0.01 2002-11-07
   - original version; created by h2xs 1.21 with options
     -X WWW::Mechanize::Shell
