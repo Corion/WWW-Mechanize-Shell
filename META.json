@@ -37,6 +37,7 @@
             "HTTP::Cookies" : "0",
             "Hook::LexWrap" : "0.2",
             "LWP" : "5.69",
+            "LWP::UserAgent" : "0",
             "Term::Shell" : "0.02",
             "Test::Harness" : "2.3",
             "URI::URL" : "0",
@@ -51,9 +52,9 @@
          "requires" : {
             "CGI" : "0",
             "File::Temp" : "0",
-            "HTTP::Daemon" : "0",
             "Test::HTTP::LocalServer" : "0.67",
             "Test::More" : "0",
+            "Test::Without::Module" : "0",
             "URI" : "0"
          }
       }

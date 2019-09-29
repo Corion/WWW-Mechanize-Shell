@@ -52,6 +52,7 @@ my %module = (
         'URI::URL' => 0.00,
         'Test::Harness' => 2.30,
         'LWP' => 5.69,
+        'LWP::UserAgent' => 0,
         'WWW::Mechanize' => 1.20,
         'WWW::Mechanize::Link' => 1.20,
         'WWW::Mechanize::FormFiller' => 0.05,
@@ -66,7 +67,7 @@ my %module = (
         'File::Temp'              => 0,
         'Test::HTTP::LocalServer' => '0.67', # earlier has some bugs in request handling
         'URI'                     => 0,
-        'HTTP::Daemon'            => 0,
+        'Test::Without::Module'   => 0, # we lazy-load some optional modules
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
