@@ -6,7 +6,7 @@ build_requires:
   CGI: '0'
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
-  Test::HTTP::LocalServer: '0.67'
+  Test::HTTP::LocalServer: '0.68'
   Test::More: '0'
   Test::Without::Module: '0'
   URI: '0'

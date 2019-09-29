@@ -65,7 +65,7 @@ my %module = (
         'Test::More'              => 0,
         'CGI'                     => 0,
         'File::Temp'              => 0,
-        'Test::HTTP::LocalServer' => '0.67', # earlier has some bugs in request handling
+        'Test::HTTP::LocalServer' => '0.68', # we need basic auth handling
         'URI'                     => 0,
         'Test::Without::Module'   => 0, # we lazy-load some optional modules
     },
