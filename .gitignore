@@ -7,8 +7,10 @@ pm_to_blib
 blib/
 WWW-Mechanize-Shell-*
 WWW-Mechanize-Shell-*/
+.lwpcookies
 .releaserc
 MYMETA.*
 *.pl
 .prove
 .patch
+CVS/
