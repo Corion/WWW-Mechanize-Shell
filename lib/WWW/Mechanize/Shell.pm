@@ -15,7 +15,7 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 use B::Deparse;
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 our @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -1834,7 +1834,7 @@ sub shell {
   use WWW::Mechanize::FormFiller;
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
-  our $VERSION = '0.57';
+  our $VERSION = '0.58';
 
   sub new {
     my ($class,$name,$shell) = @_;

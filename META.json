@@ -70,7 +70,7 @@
          "web" : "https://github.com/Corion/WWW-Mechanize-Shell"
       }
    },
-   "version" : "0.57",
+   "version" : "0.58",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }
