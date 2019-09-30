@@ -16,6 +16,7 @@ Todo:
 0.58 2019-09-30
     * Made the tests pass on IPv6 enabled systems
       Uncovered by making Test::HTTP::LocalServer work on IPv6 enabled systems.
+    * Test-only improvements, no need to upgrade
 
 0.57 2018-06-04
     * Add "images" command to list all images
