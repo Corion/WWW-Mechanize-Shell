@@ -1017,14 +1017,14 @@ sub tick_all {
   my ($self,$tick,$name) = @_;
   eval {
     local $^W;
-    my $index = 0;
+    my $index = 1;
     while(my $input = $self->agent->current_form->find_input($name,'checkbox',$index)) {
       my $value = (grep { defined $_ } ($input->possible_values()))[0];
       $self->agent->$tick($name,$value);
       $index++;
     };
     $self->add_history( sprintf q{
-    { local $^W; my $index = 0;
+    { local $^W; my $index = 1;
       while(my $input = $agent->current_form->find_input('%s','checkbox',$index)) {
         my $value = (grep { defined $_ } ($input->possible_values()))[0];
         $agent->%s('%s',$value);
