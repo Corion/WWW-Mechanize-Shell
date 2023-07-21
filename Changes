@@ -13,6 +13,10 @@ Todo:
     * Add set-cookie and delete-cookie commands
     * Add (optional) HTTP::Cookies::Find support
 
+0.61 2023-07-21
+    * Various test suite updates, no code updates, no need to upgrade
+    * Test suite now runs in parallel
+
 0.60 2021-12-06
     * Delete proxy-related environment variables when testing
       Upstreamed from Debian by gregor hermann, thanks!
