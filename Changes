@@ -13,6 +13,9 @@ Todo:
     * Add set-cookie and delete-cookie commands
     * Add (optional) HTTP::Cookies::Find support
 
+0.62 2023-07-21
+    * Test stability fix
+
 0.61 2023-07-21
     * Various test suite updates, no code updates, no need to upgrade
     * Test suite now runs in parallel

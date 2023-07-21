@@ -41,6 +41,6 @@ requires:
 resources:
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/WWW-Mechanize-Shell.git
-version: '0.61'
+version: '0.62'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1
